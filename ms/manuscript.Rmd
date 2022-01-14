@@ -1,0 +1,105 @@
+---
+title: "An open and continuously updated fern tree of life (FTOL)"
+output: 
+  bookdown::word_document2:
+    pandoc_args: [ "--csl", "frontiers.csl"]
+    toc: no
+    number_sections: no
+    reference_docx: Frontiers_Template.docx
+---
+
+---
+bibliography: 
+  - `r here::here("ms/references.yaml")`
+  - `r here::here("ms/references_other.yaml")`
+  - `r here::here("ms/references_other.bib")`
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<!-- Set left justification -->
+\raggedright
+
+<!-- Don't indent -->
+\setlength{\parindent}{0ex}
+
+**Joel H. Nitta^1^, Eric Schuettpelz^2^, and Wataru Iwasaki^3^**
+
+^1^Department of Biological Sciences, Graduate School of Science, The University of Tokyo, Tokyo, Japan
+
+^2^Department of Botany, National Museum of Natural History, Smithsonian Institution, Washington, D.C., USA
+
+^3^Department of Integrated Biosciences, Graduate School of Frontier Sciences, The University of Tokyo, Chiba, Japan
+
+**\*Correspondence:**    
+Joel H. Nitta  
+joelnitta@gmail.com
+
+Keywords: Fern~1~, Phylogeney~2~, Plastome~3~, PPGI~4~, Pteridophyte~5~, *rbcL*~6~.
+
+# Abstract
+
+Ferns (ca. 12,000 spp.) are the second most diverse clade of vascular plants after seed plants and have received relatively intense focus from molecular systematists, resulting in the publication of molecular trees for nearly all major clades and DNA sequences for ca. 1/3 of all fern species deposited in GenBank.
+Global trees including all ferns have been published periodically, but as molecular systematics research continues at a rapid pace, such trees quickly become outdated.
+While some large projects exist to generate trees for all plants or all life, such "one-size-fits-all" approaches are not expected to generate optimal results for specific groups because they must work across a very wide range of taxa.
+Here, we develop a mostly automated, reproducible, open pipeline to generate a continuously updated fern tree of life (FTOL) from sequence data on GenBank.
+Our tailored sampling strategy combines whole plastomes (few taxa, many genes) with Sanger-sequenced genes (many taxa, few genes) to obtain a global fern phylogeny with high resolution along the backbone and maximum sampling across the tips.
+We provide multiple versions of the phylogeny including a time-calibrated tree and a synthetic tree with species lacking molecular data added by taxonomy.
+We use an expert-curated reference taxonomy to resolve synonyms in compliance with Pteridophyte Phylogeny Group I (PPGI), the community-driven taxonomic system widely accepted by many pteridologists.
+The current FTOL (v0.0.1) includes 4,492 species, an increase of ca. 20% relative to the most recent global fern phylogeny while accounting for synonyms.
+FTOL will be updated on a semi-annual basis and will be available via a web portal and R package, enabling researchers to have easy access to the most recent, comprehensively sampled fern phylogeny.
+FTOL will be useful for anybody studying this important group of plants at scales from smaller (e.g., genus or lower) clades to the entire tree; we anticipate FTOL will be particularly relevant for macroecological studies at the regional to global scale.
+Finally, we envision FTOL will be integrated into the next PPG, PPGII, to produce a "living" taxonomic system with direct linkage between a community-driven fern taxonomy and the most recent hypothesis of phylogeny.
+
+# Introduction
+
+# Materials and Methods
+
+## Locus sampling
+
+The plastid genome has been the most widely sequenced genomic compartment in ferns by far, so we used plastid loci to build our tree.
+Our sampling includes two major categories of sequence data: seven loci (*atpA*, *atpB*, *matK*, *rbcL*, *rps4*, *trnL*--*trnF*, and *rps4*--*trnS*) that have been frequently used for molecular systematics studies in ferns and are typically obtained by PCR and Sanger sequencing ("Sanger loci") and a much larger set of single-copy, coding genes typically obtained from next-generation sequencing of the plastome ("plastome genes").
+*trnL*--*trnF* includes the *trnL* intron, the 3' *trnL* exon, and the spacer between *trnL* and *trnF*.
+*rps4*--*trnS* includes the spacer between *rps4* and *trnS*.
+The set of plastome genes is based on the list of 83 protein-coding genes of @Wei2017a, which was filtered to only genes that show no evidence of duplication.
+
+## Sequence extraction
+
+All sequences were downloaded from GenBank.
+GenBank queries were formatted including terms "Polypodiopsida[ORGN]" to target ferns and "[PDAT]" to specify sequence date range (e.g., 1980/01/01[PDAT]:2021/12/12[PDAT]) so that a given query always results in the same set of sequences regardless of when the query is made.
+There is no formal definition of genomic vs. Sanger sequences in GenBank, so we used an empirical sequence length cutoff to distinguish between Sanger (=< 7000 bp) or plastome sequences (> 7000 bp) with the "[SLEN]" term.
+Furthermore, there is a lack of consensus on sequence annotation in GenBank; the same locus may be annotated using different names, or not annotated at all.
+
+To avoid missing sequences due to differences in annotation format, we used the "Reference_Blast_Extract.py" script of  superCRUNCH [@Portik2020] to extract target loci from GenBank FASTA files.
+Briefly, this involves querying candidate FASTA files downloaded from GenBank with BLAST [@Altschul1997] against a reference database of known sequences [i.e., a "baited search"; @Smith2009b; @Smith2019]
+Those portions of the query that have a significant match in the reference are extracted and written to a new filtered FASTA file.
+We constructed the superCRUNCH reference databases by first downloading fern sequences from GenBank, then extracting target gene sequences with a custom R script that parses the GenBank flatfile; this only works for properly annotated accessions.
+We then filtered the reference sequences to a single representative longest sequence per genus (Sanger loci only).
+Next, we aligned the sequences with MAFFT [@Katoh2002] and removed poorly aligned regions with trimAl [@Capella-Gutierrez2009].
+To maximize the size of the reference database for Sanger loci, we then ran "Reference_Blast_Extract.py" on the sequences downloaded from GenBank, followed by filtering to the longest sequence per genus and alignment and cleaning as before; this retrieved additional sequences to use as references that lacked annotations in the first round.
+The cleaned alignments were then used as references for superCRUNCH to obtain a maximally sampled set of fern sequences.
+
+## Taxonomic name resolution
+
+One goal of this project is generate a phylogeny that is consistent with the community-driven Pteridophyte Phylogeny Group I taxonomic system [@PteridophytePhylogenyGroupI2016; hereafter "PPGI"].
+Species names in GenBank do not necessarily conform to PPGI.
+Therefore, we standardized all species names in the GenBank sequences against a reference taxonomy.
+We designed the reference taxonomy for this project based on the World Ferns database [@Hassler2022], which conforms to PPGI and is available in Darwin Core format [@DarwinCore2009] via the Catalog of Life [@COL2366].
+We used the taxastand R package [@Nitta2021] to resolve species names, which can account for differences in formatting of taxonomic authors (e.g., parenthetical basionym author present or absent) as well as perform fuzzy matching, which is needed to account for spelling errors or variations in author names.
+We manually inspected any fuzzily matched or non-matching names.
+This revealed some species names in GenBank that were completely lacking in the World Ferns database, spelling errors, as well as some names in the database that needed to be treated differently (e.g., changes in synonymy).
+Therefore, we updated and edited the World Ferns database using the dwctaxon R package, which is designed to work with taxonomic data in the Darwin Core format.
+We refer to the resulting taxonomic database as "pteridocat", and have made it freely available online (https://github.com/joelnitta/pteridocat) so that other researchers may standardize taxonomic names in their data to match those of FTOL.
+
+## Automated removal of contaminations
+
+Another potential issue with GenBank sequences is the presence of misidentified sequences and contaminations (hereafter "contaminations").
+We removed putative contaminations from Sanger sequences as follows.
+First, we constructed a BLAST library including all extracted Sanger sequences.
+Next, we conducted one BLAST search for each Sanger sequence against the library (all-by-all BLAST).
+We compared the families (following PPGI) of the matching sequences to each query; in the case the top three best matches belonged to a different family than the query, that query was considered a contamination and excluded from further analysis.
+For Cyatheales and Saccolomatineae, which include several closely related small families, we used the order and sub-order level, respectively, instead of family.
+While this method cannot account for contaminations at finer taxonomic levels, it is an efficient method to remove clearly incorrect sequences.
+
