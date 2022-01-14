@@ -1,0 +1,232 @@
+references:
+- id: Altschul1997
+  author:
+  - family: Altschul
+    given: Stephen F.
+  - family: Madden
+    given: Thomas L.
+  - family: Schäffer
+    given: Alejandro A.
+  - family: Zhang
+    given: Jinghui
+  - family: Zhang
+    given: Zheng
+  - family: Miller
+    given: Webb
+  - family: Lipman
+    given: David J.
+  citation-key: Altschul1997
+  container-title: Nucleic Acids Research
+  DOI: 10.1093/nar/25.17.3389
+  issued:
+  - year: 1997
+  page: 3389-3402
+  title: 'Gapped BLAST and PSI-BLAST: A new generation of protein database search
+    programs'
+  type: article-journal
+  URL: papers://ebd7d3df-d8f1-4be8-bcf7-4fb07ababf30/Paper/p449
+  volume: '25'
+- id: Capella-Gutierrez2009
+  author:
+  - family: Capella-Gutiérrez
+    given: Salvador
+  - family: Silla-Martínez
+    given: José M.
+  - family: Gabaldón
+    given: Toni
+  citation-key: Capella-Gutierrez2009
+  container-title: Bioinformatics
+  DOI: 10.1093/bioinformatics/btp348
+  ISSN: '13674803'
+  issue: '15'
+  issued:
+  - year: 2009
+  page: 1972-1973
+  PMID: '19505945'
+  title: 'trimAl: A tool for automated alignment trimming in large-scale phylogenetic
+    analyses'
+  type: article-journal
+  volume: '25'
+- id: Katoh2002
+  author:
+  - family: Katoh
+    given: Kazutaka
+  - family: Misawa
+    given: Kazuharu
+  - family: Kuma
+    given: Keiichi
+  - family: Miyata
+    given: Takashi
+  citation-key: Katoh2002
+  container-title: Nucleic Acids Research
+  DOI: 10.1093/nar/gkf436
+  ISSN: 1362-4962
+  issue: '14'
+  issued:
+  - year: 2002
+  page: 3059-3066
+  PMID: '12136088'
+  title: 'MAFFT: A novel method for rapid multiple sequence alignment based on fast
+    Fourier transform'
+  type: article-journal
+  volume: '30'
+- id: Nitta2021
+  accessed:
+  - year: 2021
+    month: 8
+    day: 3
+  author:
+  - family: Nitta
+    given: Joel H.
+  - family: Watkins
+    given: James E.
+  - family: Holbrook
+    given: N. Michele
+  - family: Wang
+    given: Tristan W.
+  - family: Davis
+    given: Charles C.
+  citation-key: Nitta2021
+  container-title: Journal of Plant Research
+  container-title-short: J Plant Res
+  DOI: 10.1007/s10265-021-01318-z
+  ISSN: 0918-9440, 1618-0860
+  issued:
+  - year: 2021
+    month: 6
+    day: 12
+  language: en
+  page: 971–988
+  source: DOI.org (Crossref)
+  title: <span class="nocase">Ecophysiological differentiation between life stages
+    in filmy ferns (Hymenophyllaceae)</span>
+  type: article-journal
+  URL: https://link.springer.com/10.1007/s10265-021-01318-z
+  volume: '134'
+- id: Portik2020
+  accessed:
+  - year: 2021
+    month: 10
+    day: 18
+  author:
+  - family: Portik
+    given: Daniel M.
+  - family: Wiens
+    given: John J.
+  citation-key: Portik2020
+  container-title: Methods in Ecology and Evolution
+  container-title-short: Methods Ecol Evol
+  DOI: 10/ggx588
+  editor:
+  - family: Orme
+    given: David
+  ISSN: 2041-210X, 2041-210X
+  issue: '6'
+  issued:
+  - year: 2020
+    month: 6
+  language: en
+  page: 763-772
+  source: DOI.org (Crossref)
+  title: 'SuperCRUNCH: A bioinformatics toolkit for creating and manipulating supermatrices
+    and other large phylogenetic datasets'
+  title-short: SuperCRUNCH
+  type: article-journal
+  URL: https://onlinelibrary.wiley.com/doi/10.1111/2041-210X.13392
+  volume: '11'
+- id: PteridophytePhylogenyGroupI2016
+  author:
+  - literal: Pteridophyte Phylogeny Group I
+  citation-key: PteridophytePhylogenyGroupI2016
+  container-title: Journal of Systematics and Evolution
+  DOI: 10.1111/jse.12229
+  issue: '6'
+  issued:
+  - year: 2016
+  page: 563-603
+  title: A community-derived classification for extant lycophytes and ferns
+  type: article-journal
+  volume: '54'
+- id: Smith2009b
+  author:
+  - family: Smith
+    given: Stephen A
+  - family: Beaulieu
+    given: Jeremy M
+  - family: Donoghue
+    given: Michael J
+  citation-key: Smith2009b
+  container-title: BMC Evolutionary Biology
+  DOI: 10.1186/1471-2148-9-37
+  ISSN: 1471-2148
+  issue: '37'
+  issued:
+  - year: 2009
+    month: 1
+  PMID: '19210768'
+  title: 'Mega-phylogeny approach for comparative biology: an alternative to supertree
+    and supermatrix approaches.'
+  type: article-journal
+  URL: http://www.pubmedcentral.nih.gov/articlerender.fcgi?artid=2645364&tool=pmcentrez&rendertype=abstract
+  volume: '9'
+- id: Smith2019
+  accessed:
+  - year: 2022
+    month: 1
+    day: 14
+  author:
+  - family: Smith
+    given: Stephen A.
+  - family: Walker
+    given: Joseph F.
+  citation-key: Smith2019
+  container-title: Methods in Ecology and Evolution
+  container-title-short: Methods Ecol Evol
+  DOI: 10/gfkngz
+  editor:
+  - family: Cooper
+    given: Natalie
+  ISSN: 2041-210X, 2041-210X
+  issue: '1'
+  issued:
+  - year: 2019
+    month: 1
+  language: en
+  page: 104-108
+  source: DOI.org (Crossref)
+  title: 'Py <span style="font-variant:small-caps;" smallcaps="smallcaps">PHLAWD</span>
+    : A python tool for phylogenetic dataset construction'
+  title-short: 'Py '
+  type: article-journal
+  URL: https://onlinelibrary.wiley.com/doi/10.1111/2041-210X.13096
+  volume: '10'
+- id: Wei2017a
+  author:
+  - family: Wei
+    given: Ran
+  - family: Yan
+    given: Yue-Hong
+  - family: Harris
+    given: AJ
+  - family: Kang
+    given: Jong-Soo
+  - family: Shen
+    given: Hui
+  - family: Xiang
+    given: Qiao-Ping
+  - family: Zhang
+    given: Xian-Chun
+  citation-key: Wei2017a
+  container-title: Genome Biology and Evolution
+  DOI: 10.1093/gbe/evx107
+  ISSN: 1759-6653
+  issue: '6'
+  issued:
+  - year: 2017
+  page: 1646-1657
+  PMID: '28854625'
+  title: Plastid phylogenomics resolve deep relationships among Eupolypod II ferns
+    with rapid radiation and rate heterogeneity
+  type: article-journal
+  URL: https://academic.oup.com/gbe/article-lookup/doi/10.1093/gbe/evx107
+  volume: '9'
