@@ -6,18 +6,58 @@ output:
     toc: no
     number_sections: no
     reference_docx: Frontiers_Template.docx
+editor_options: 
+  chunk_output_type: console
 ---
 
 ---
 bibliography: 
-  - `r here::here("ms/references.yaml")`
-  - `r here::here("ms/references_other.yaml")`
-  - `r here::here("ms/references_other.bib")`
+- `r here::here("ms/references.yaml")`
+- `r here::here("ms/references_other.yaml")`
+- `r here::here("ms/references_other.bib")`
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
+library(targets)
+library(assertr)
+library(ape)
+library(scales)
+library(tidyverse)
 ```
+
+```{r load-targets}
+tar_load(
+	c(
+		sanger_alignment,
+		plastome_alignment,
+		plastome_tree,
+		plastome_outgroups,
+		ppgi_taxonomy),
+	store = here::here("ftol_cache")
+)
+```
+
+```{r abstract-stats}
+# Make tibble with one row per species in Sanger sampling
+sanger_sampling <- tibble(
+	species = rownames(sanger_alignment)
+) %>%
+	# Add higher-level taxonomy
+	mutate(genus = str_split(species, "_") %>% map_chr(1)) %>%
+	left_join(
+		select(ppgi_taxonomy, genus, family, order), by = "genus"
+	)
+
+# Count number of fern species in Sanger data
+n_sanger_ferns <-
+	sanger_sampling %>% 
+	# outgroup taxa have no family data
+	filter(!is.na(family)) %>%
+	pull(species) %>%
+	n_distinct()
+```
+
 
 <!-- Set left justification -->
 \raggedright
@@ -48,7 +88,7 @@ Here, we develop a mostly automated, reproducible, open pipeline to generate a c
 Our tailored sampling strategy combines whole plastomes (few taxa, many genes) with Sanger-sequenced genes (many taxa, few genes) to obtain a global fern phylogeny with high resolution along the backbone and maximum sampling across the tips.
 We provide multiple versions of the phylogeny including a time-calibrated tree and a synthetic tree with species lacking molecular data added by taxonomy.
 We use an expert-curated reference taxonomy to resolve synonyms in compliance with Pteridophyte Phylogeny Group I (PPGI), the community-driven taxonomic system widely accepted by many pteridologists.
-The current FTOL (v0.0.1) includes 4,492 species, an increase of ca. 20% relative to the most recent global fern phylogeny while accounting for synonyms.
+The current FTOL (v0.0.1) includes `r comma(n_sanger_ferns)` species, an increase of ca. 20% relative to the most recent global fern phylogeny while accounting for synonyms.
 FTOL will be updated on a semi-annual basis and will be available via a web portal and R package, enabling researchers to have easy access to the most recent, comprehensively sampled fern phylogeny.
 FTOL will be useful for anybody studying this important group of plants at scales from smaller (e.g., genus or lower) clades to the entire tree; we anticipate FTOL will be particularly relevant for macroecological studies at the regional to global scale.
 Finally, we envision FTOL will be integrated into the next PPG, PPGII, to produce a "living" taxonomic system with direct linkage between a community-driven fern taxonomy and the most recent hypothesis of phylogeny.
@@ -73,7 +113,7 @@ There is no formal definition of genomic vs. Sanger sequences in GenBank, so we 
 Furthermore, there is a lack of consensus on sequence annotation in GenBank; the same locus may be annotated using different names, or not annotated at all.
 
 To avoid missing sequences due to differences in annotation format, we used the "Reference_Blast_Extract.py" script of  superCRUNCH [@Portik2020] to extract target loci from GenBank FASTA files.
-Briefly, this involves querying candidate FASTA files downloaded from GenBank with BLAST [@Altschul1997] against a reference database of known sequences [i.e., a "baited search"; @Smith2009b; @Smith2019]
+Briefly, this involves querying candidate FASTA files downloaded from GenBank with BLAST [@Altschul1997] against a reference database of known sequences [i.e., a "baited search"\; @Smith2009b; @Smith2019]
 Those portions of the query that have a significant match in the reference are extracted and written to a new filtered FASTA file.
 We constructed the superCRUNCH reference databases by first downloading fern sequences from GenBank, then extracting target gene sequences with a custom R script that parses the GenBank flatfile; this only works for properly annotated accessions.
 We then filtered the reference sequences to a single representative longest sequence per genus (Sanger loci only).
@@ -83,7 +123,7 @@ The cleaned alignments were then used as references for superCRUNCH to obtain a 
 
 ## Taxonomic name resolution
 
-One goal of this project is generate a phylogeny that is consistent with the community-driven Pteridophyte Phylogeny Group I taxonomic system [@PteridophytePhylogenyGroupI2016; hereafter "PPGI"].
+One goal of this project is generate a phylogeny that is consistent with the community-driven Pteridophyte Phylogeny Group I taxonomic system [@PteridophytePhylogenyGroupI2016\; hereafter "PPGI"].
 Species names in GenBank do not necessarily conform to PPGI.
 Therefore, we standardized all species names in the GenBank sequences against a reference taxonomy.
 We designed the reference taxonomy for this project based on the World Ferns database [@Hassler2022], which conforms to PPGI and is available in Darwin Core format [@DarwinCore2009] via the Catalog of Life [@COL2366].
