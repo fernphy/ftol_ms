@@ -32,13 +32,19 @@ tar_load(
 		sanger_alignment,
 		plastome_alignment,
 		plastome_tree,
-		plastome_outgroups,
+		plastome_metadata_renamed,
 		ppgi_taxonomy),
 	store = here::here("ftol_cache")
 )
 ```
 
 ```{r abstract-stats}
+# Make tibble of outgroup species
+og_species <- 
+	plastome_metadata_renamed %>%
+	select(species, outgroup) %>%
+	filter(outgroup == TRUE)
+
 # Make tibble with one row per species in Sanger sampling
 sanger_sampling <- tibble(
 	species = rownames(sanger_alignment)
@@ -47,15 +53,18 @@ sanger_sampling <- tibble(
 	mutate(genus = str_split(species, "_") %>% map_chr(1)) %>%
 	left_join(
 		select(ppgi_taxonomy, genus, family, order), by = "genus"
-	)
+	) %>% 
+	# Add outgroup status
+	left_join(og_species, by = "species") %>%
+	mutate(outgroup = replace_na(outgroup, FALSE)) %>%
+	verify(nrow(.) == nrow(sanger_alignment)) %>%
+	verify(sum(outgroup) == nrow(og_species))
 
 # Count number of fern species in Sanger data
 n_sanger_ferns <-
 	sanger_sampling %>% 
-	# outgroup taxa have no family data
-	filter(!is.na(family)) %>%
-	pull(species) %>%
-	n_distinct()
+	filter(outgroup == FALSE) %>%
+	n_distinct(.$species)
 ```
 
 
@@ -103,7 +112,7 @@ The plastid genome has been the most widely sequenced genomic compartment in fer
 Our sampling includes two major categories of sequence data: seven loci (*atpA*, *atpB*, *matK*, *rbcL*, *rps4*, *trnL*--*trnF*, and *rps4*--*trnS*) that have been frequently used for molecular systematics studies in ferns and are typically obtained by PCR and Sanger sequencing ("Sanger loci") and a much larger set of single-copy, coding genes typically obtained from next-generation sequencing of the plastome ("plastome genes").
 *trnL*--*trnF* includes the *trnL* intron, the 3' *trnL* exon, and the spacer between *trnL* and *trnF*.
 *rps4*--*trnS* includes the spacer between *rps4* and *trnS*.
-The set of plastome genes is based on the list of 83 protein-coding genes of @Wei2017a, which was filtered to only genes that show no evidence of duplication.
+The set of plastome genes is based on the list of 83 protein-coding genes of @Wei2017a, which was filtered to only genes that show no evidence of duplication (77 genes).
 
 ## Sequence extraction
 
@@ -113,13 +122,14 @@ There is no formal definition of genomic vs. Sanger sequences in GenBank, so we 
 Furthermore, there is a lack of consensus on sequence annotation in GenBank; the same locus may be annotated using different names, or not annotated at all.
 
 To avoid missing sequences due to differences in annotation format, we used the "Reference_Blast_Extract.py" script of  superCRUNCH [@Portik2020] to extract target loci from GenBank FASTA files.
-Briefly, this involves querying candidate FASTA files downloaded from GenBank with BLAST [@Altschul1997] against a reference database of known sequences [i.e., a "baited search"\; @Smith2009b; @Smith2019]
+Briefly, this involves querying candidate FASTA files downloaded from GenBank with BLAST [@Altschul1997] against a reference database of full length, representative sequences [i.e., a "baited search"\; @Smith2009b; @Smith2019].
 Those portions of the query that have a significant match in the reference are extracted and written to a new filtered FASTA file.
+
 We constructed the superCRUNCH reference databases by first downloading fern sequences from GenBank, then extracting target gene sequences with a custom R script that parses the GenBank flatfile; this only works for properly annotated accessions.
-We then filtered the reference sequences to a single representative longest sequence per genus (Sanger loci only).
-Next, we aligned the sequences with MAFFT [@Katoh2002] and removed poorly aligned regions with trimAl [@Capella-Gutierrez2009].
-To maximize the size of the reference database for Sanger loci, we then ran "Reference_Blast_Extract.py" on the sequences downloaded from GenBank, followed by filtering to the longest sequence per genus and alignment and cleaning as before; this retrieved additional sequences to use as references that lacked annotations in the first round.
-The cleaned alignments were then used as references for superCRUNCH to obtain a maximally sampled set of fern sequences.
+We then filtered the sequences to a single representative longest sequence per genus.
+Next, we aligned the filtered sequences with MAFFT [@Katoh2002] and removed poorly aligned regions with trimAl [@Capella-Gutierrez2009].
+To maximize the size of the reference database for Sanger loci, we then ran "Reference_Blast_Extract.py" using these sequences as references, followed by filtering to the longest sequence per genus and alignment and cleaning as before; this retrieved additional sequences that lacked annotations in the first round.
+The cleaned alignments were then used as references for superCRUNCH to obtain a maximally sampled set of fern sequences from sequences downloaded from GenBank.
 
 ## Taxonomic name resolution
 
@@ -143,3 +153,39 @@ We compared the families (following PPGI) of the matching sequences to each quer
 For Cyatheales and Saccolomatineae, which include several closely related small families, we used the order and sub-order level, respectively, instead of family.
 While this method cannot account for contaminations at finer taxonomic levels, it is an efficient method to remove clearly incorrect sequences.
 
+## Sequence selection and concatenation
+
+A typical step in multilocus workflows is to concatenate loci across samples.
+For phylogenetic studies aiming to produce one tip per species, this is often done by concatenating the longest sequence per locus within each species.
+This is potentially problematic because accessions on GenBank may be misidentified and/or species may not be monophyletic.
+Therefore, we concatenated accessions and selected one final set of concatenated loci per species as follows (here, we refer to "accession" to mean a single locus within a GenBank accession; GenBank accessions sometimes have multiple loci per accession, but we already split those out using superCRUNCH as described previously).
+First, we constructed gene trees with FastTree [@Price2009; @Price2010] on default settings, and classified species as monophyletic if they were monophyletic in all gene trees including multiple accessions of that species.
+We then concatenated loci for monophyletic species by selecting the longest accession per locus within each species.
+Next, for the remaining species, we concatenated loci across accessions if all accessions originated from the same voucher specimen; this could not be done in all cases as voucher information is not always annotated on GenBank.
+Next, for the remaining species, we concatenated loci across accessions if all accessions for a given species originated from only one publication, on the assumption that the authors of the study intended to do so.
+For the remaining species that could not be concatenated using any of the above methods, we selected one longest accession per locus and discarded the others.
+
+We then selected the final set of concatenated loci for each species. 
+We sought to maximize representation of *rbcL* as this is historically the most sequenced locus for ferns, and we expect that maximal sampling of one locus should improve phylogenetic analysis.
+Our selection is based on the following criteria, in order of priority:
+
+1. The sample (set of accessions joined by the methods described above) with the longest concatenated sequence length; sample includes *rbcL* and additional loci.
+2. The sample with the longest *rbcL* sequence; sample includes only *rbcL* and no additional loci.
+3. The sample with the longest concatenated sequence length; sample does not include *rbcL*.
+
+The above steps were not needed for plastome data, as each plastome sequence on GenBank originates from a single voucher specimen.
+For these, we selected one specimen per species with the longest combined sequence length across all plastome genes.
+
+## Sequence alignment
+
+For non-spacer regions, we aligned each locus separately with MAFFT.
+
+Spacer regions are difficult to align across higher taxonomic levels within ferns (e.g., family or higher) as they include frequent indels; however, spacer regions are very useful for phylogenetic analysis at finer levels (e.g., within genera) where slower-evolving genes like *rbcL* may not provide enough resolution.
+Therefore, we first aligned spacer regions for each family with MAFFT, then merged the subalignments using the MAFFT "--merge" option.
+This retains the indels within each subalignment while aligning across subalignments.
+For some small families with fewer than three species each that could be used for subalignments, these were added as "singletons" during the MAFFT "--merge".
+
+Next, we removed poorly aligned regions from the alignments using trimAl.
+We removed regions with >1% or >5% of sequences having gaps from coding regions or spacers, respectively.
+
+## Phylogenetic analysis

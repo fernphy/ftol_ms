@@ -134,6 +134,46 @@ references:
   type: article-journal
   URL: https://onlinelibrary.wiley.com/doi/10.1111/2041-210X.13392
   volume: '11'
+- id: Price2009
+  author:
+  - family: Price
+    given: Morgan N.
+  - family: Dehal
+    given: Paramvir S.
+  - family: Arkin
+    given: Adam P.
+  citation-key: Price2009
+  container-title: Molecular Biology and Evolution
+  DOI: 10.1093/molbev/msp077
+  ISSN: 07374038
+  issue: '7'
+  issued:
+  - year: 2009
+  page: 1641-1650
+  PMID: '19377059'
+  title: 'FastTree: Computing large minimum evolution trees with profiles instead
+    of a distance matrix'
+  type: article-journal
+  volume: '26'
+- id: Price2010
+  author:
+  - family: Price
+    given: Morgan N.
+  - family: Dehal
+    given: Paramvir S.
+  - family: Arkin
+    given: Adam P.
+  citation-key: Price2010
+  container-title: PLoS ONE
+  DOI: 10.1371/journal.pone.0009490
+  ISSN: '19326203'
+  issue: '3'
+  issued:
+  - year: 2010
+  page: e9490
+  title: FastTree 2 - Approximately maximum-likelihood trees for large alignments
+  type: article-journal
+  volume: '5'
 - id: PteridophytePhylogenyGroupI2016
   author:
   - literal: Pteridophyte Phylogeny Group I
