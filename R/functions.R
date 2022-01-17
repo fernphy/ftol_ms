@@ -9,7 +9,7 @@ extract_citations <- function(rmd_file) {
 		stringr::str_split(" |;") %>% 
 		unlist %>% 
 		magrittr::extract(., stringr::str_detect(., "@")) %>% 
-		stringr::str_remove_all("\\[|\\]|\\)|\\(|\\.$|,|\\{|\\}") %>% 
+		stringr::str_remove_all("\\[|\\]|\\)|\\(|\\.$|,|\\{|\\}|\\\\") %>% 
 		magrittr::extract(., stringr::str_detect(., "^@|^-@")) %>% 
 		stringr::str_remove_all("^@|^-@") %>% 
 		unique %>% 
