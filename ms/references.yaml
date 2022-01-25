@@ -1,4 +1,24 @@
 references:
+- id: Almeida2017
+  author:
+  - family: Almeida
+    given: Thaís Elias
+  - family: Salino
+    given: Alexandre
+  - family: Dubuisson
+    given: Jean-Yves
+  - family: Hennerquin
+    given: Sabine
+  citation-key: Almeida2017
+  container-title: PhytoKeys
+  DOI: 10.3897/phytokeys.78.12189
+  ISSN: 1314-2003
+  issued:
+  - year: 2017
+  page: 109-131
+  title: Adetogramma (Polypodiaceae), a new monotypic fern genus segregated from Polypodium
+  type: article-journal
+  volume: '78'
 - id: Altschul1997
   author:
   - family: Altschul
@@ -26,6 +46,54 @@ references:
   type: article-journal
   URL: papers://ebd7d3df-d8f1-4be8-bcf7-4fb07ababf30/Paper/p449
   volume: '25'
+- id: Antonelli2016
+  accessed:
+  - year: 2020
+    month: 6
+    day: 19
+  author:
+  - family: Antonelli
+    given: Alexandre
+  - family: Hettling
+    given: Hannes
+  - family: Condamine
+    given: Fabien L.
+  - family: Vos
+    given: Karin
+  - family: Nilsson
+    given: R. Henrik
+  - family: Sanderson
+    given: Michael J.
+  - family: Sauquet
+    given: Hervé
+  - family: Scharn
+    given: Ruud
+  - family: Silvestro
+    given: Daniele
+  - family: Töpel
+    given: Mats
+  - family: Bacon
+    given: Christine D.
+  - family: Oxelman
+    given: Bengt
+  - family: Vos
+    given: Rutger A.
+  citation-key: Antonelli2016
+  container-title: Systematic Biology
+  container-title-short: Syst Biol
+  DOI: 10/f3t3b8
+  ISSN: 1063-5157, 1076-836X
+  issued:
+  - year: 2016
+    month: 9
+    day: 10
+  language: en
+  page: syw066
+  source: DOI.org (Crossref)
+  title: Toward a Self-Updating Platform for Estimating Rates of Speciation and Migration,
+    Ages, and Relationships of Taxa
+  type: article-journal
+  URL: https://academic.oup.com/sysbio/article-lookup/doi/10.1093/sysbio/syw066
 - id: Capella-Gutierrez2009
   author:
   - family: Capella-Gutiérrez
@@ -47,6 +115,190 @@ references:
     analyses'
   type: article-journal
   volume: '25'
+- id: Eiserhardt2018
+  author:
+  - family: Eiserhardt
+    given: Wolf L.
+  - family: Antonelli
+    given: Alexandre
+  - family: Bennett
+    given: Dominic J.
+  - family: Botigué
+    given: Laura R.
+  - family: Burleigh
+    given: J. Gordon
+  - family: Dodsworth
+    given: Steven
+  - family: Enquist
+    given: Brian J.
+  - family: Forest
+    given: Félix
+  - family: Kim
+    given: Jan T.
+  - family: Kozlov
+    given: Alexey M.
+  - family: Leitch
+    given: Ilia J.
+  - family: Maitner
+    given: Brian S.
+  - family: Mirarab
+    given: Siavash
+  - family: Piel
+    given: William H.
+  - family: Pérez-Escobar
+    given: Oscar A.
+  - family: Pokorny
+    given: Lisa
+  - family: Rahbek
+    given: Carsten
+  - family: Sandel
+    given: Brody
+  - family: Smith
+    given: Stephen A.
+  - family: Stamatakis
+    given: Alexandros
+  - family: Vos
+    given: Rutger A.
+  - family: Warnow
+    given: Tandy
+  - family: Baker
+    given: William J.
+  citation-key: Eiserhardt2018
+  container-title: American Journal of Botany
+  DOI: 10.1002/ajb2.1041
+  ISSN: 00029122
+  issue: '3'
+  issued:
+  - year: 2018
+  page: 614-622
+  PMID: '29603138'
+  title: A roadmap for global synthesis of the plant tree of life
+  type: article-journal
+  volume: '105'
+- id: Hennequin2014
+  author:
+  - family: Hennequin
+    given: Sabine
+  - family: Kessler
+    given: Michael
+  - family: Lindsay
+    given: Stuart
+  - family: Schneider
+    given: Harald
+  citation-key: Hennequin2014
+  container-title: Journal of Biogeography
+  DOI: 10.1111/jbi.12339
+  editor:
+  - family: Fernández-Palacios
+    given: José María
+  ISSN: '03050270'
+  issued:
+  - year: 2014
+    month: 5
+  page: 1651-1663
+  title: Evolutionary patterns in the assembly of fern diversity on the oceanic Mascarene
+    Islands
+  type: article-journal
+  URL: http://doi.wiley.com/10.1111/jbi.12339
+  volume: '41'
+- id: Hinchliff2015
+  author:
+  - family: Hinchliff
+    given: Cody E.
+  - family: Smith
+    given: Stephen A
+  - family: Allman
+    given: James F.
+  - family: Burleigh
+    given: J. Gordon
+  - family: Chaudhary
+    given: Ruchi
+  - family: Coghill
+    given: Lyndon M.
+  - family: Crandall
+    given: Keith
+    dropping-particle: a.
+  - family: Deng
+    given: Jiabin
+  - family: Drew
+    given: Bryan T.
+  - family: Gazis
+    given: Romina
+  - family: Gude
+    given: Karl
+  - family: Hibbett
+    given: David S.
+  - family: Katz
+    given: Laura
+    dropping-particle: a.
+  - family: Laughinghouse
+    given: H. Dail
+  - family: McTavish
+    given: Emily Jane
+  - family: Midford
+    given: Peter E.
+  - family: Owen
+    given: Christopher L.
+  - family: Ree
+    given: Richard H.
+  - family: Rees
+    given: Jonathan
+    dropping-particle: a.
+  - family: Soltis
+    given: Douglas E.
+  - family: Williams
+    given: Tiffani
+  - family: Cranston
+    given: Karen
+    dropping-particle: a.
+  citation-key: Hinchliff2015
+  container-title: Proceedings of the National Academy of Sciences
+  DOI: 10.1073/pnas.1423041112
+  ISSN: 0027-8424
+  issued:
+  - year: 2015
+  page: '201423041'
+  title: Synthesis of phylogeny and taxonomy into a comprehensive tree of life
+  type: article-journal
+  URL: http://www.pnas.org/lookup/doi/10.1073/pnas.1423041112
+- id: Kao2020
+  author:
+  - family: Kao
+    given: Tzu-Tong
+  - family: Rothfels
+    given: Carl J.
+  - family: Melgoza-Castillo
+    given: Alicia
+  - family: Pryer
+    given: Kathleen M.
+  - family: Windham
+    given: Michael D.
+  citation-key: Kao2020
+  container-title: in Review
+  DOI: 10.1002/ajb2.1461
+  issue: '4'
+  issued:
+  - year: 2020
+  page: 1-18
+  title: Infraspecific diversification of the star cloak fern (Notholaena standleyi)
+    in the deserts of the United States and Mexico
+  type: article-journal
+  volume: '107'
+- id: Kato1993
+  author:
+  - family: Kato
+    given: M
+  citation-key: Kato1993
+  container-title: Journal of Biogeography
+  DOI: Doi 10.2307/2845634
+  issue: '3'
+  issued:
+  - year: 1993
+  page: 265-274
+  title: 'Biogeography of ferns: Dispersal and vicariance'
+  type: article-journal
+  URL: papers://ebd7d3df-d8f1-4be8-bcf7-4fb07ababf30/Paper/p420
+  volume: '20'
 - id: Katoh2002
   author:
   - family: Katoh
@@ -70,6 +322,47 @@ references:
     Fourier transform'
   type: article-journal
   volume: '30'
+- id: Lehtonen2011
+  author:
+  - family: Lehtonen
+    given: Samuli
+  citation-key: Lehtonen2011
+  container-title: PLoS ONE
+  DOI: 10.1371/journal.pone.0024851
+  ISSN: 1932-6203
+  issue: '10'
+  issued:
+  - year: 2011
+    month: 10
+  page: e24851
+  title: Towards resolving the complete fern tree of life
+  type: article-journal
+  URL: papers://ebd7d3df-d8f1-4be8-bcf7-4fb07ababf30/Paper/p1987
+  volume: '6'
+- id: Lehtonen2015
+  author:
+  - family: Lehtonen
+    given: Samuli
+  - family: Jones
+    given: Mirkka M.
+  - family: Zuquim
+    given: Gabriela
+  - family: Prado
+    given: Jefferson
+  - family: Tuomisto
+    given: Hanna
+  citation-key: Lehtonen2015
+  container-title: Global Ecology and Biogeography
+  DOI: 10.1111/geb.12294
+  ISSN: 1466822X
+  issued:
+  - year: 2015
+  page: 695-705
+  title: Phylogenetic relatedness within Neotropical fern communities increases with
+    soil fertility
+  type: article-journal
+  URL: http://doi.wiley.com/10.1111/geb.12294
+  volume: '24'
 - id: Nitta2021
   accessed:
   - year: 2021
@@ -174,6 +467,33 @@ references:
   title: FastTree 2 - Approximately maximum-likelihood trees for large alignments
   type: article-journal
   volume: '5'
+- id: Pryer2004a
+  author:
+  - family: Pryer
+    given: Kathleen M
+  - family: Schuettpelz
+    given: Eric
+  - family: Wolf
+    given: Paul G.
+  - family: Schneider
+    given: Harald
+  - family: Smith
+    given: Alan R.
+  - family: Cranfill
+    given: Raymond B
+  citation-key: Pryer2004a
+  container-title: American Journal of Botany
+  DOI: 10.3732/ajb.91.10.1582
+  ISSN: 1537-2197
+  issue: '10'
+  issued:
+  - year: 2004
+  page: 1582-1598
+  title: Phylogeny and evolution of ferns (monilophytes) with a focus on the early
+    leptosporangiate divergences
+  type: article-journal
+  URL: papers://ebd7d3df-d8f1-4be8-bcf7-4fb07ababf30/Paper/p402
+  volume: '91'
 - id: PteridophytePhylogenyGroupI2016
   author:
   - literal: Pteridophyte Phylogeny Group I
@@ -187,6 +507,55 @@ references:
   title: A community-derived classification for extant lycophytes and ferns
   type: article-journal
   volume: '54'
+- id: Schuettpelz2007
+  author:
+  - family: Schuettpelz
+    given: Eric
+  - family: Pryer
+    given: Kathleen M
+  citation-key: Schuettpelz2007
+  container-title: Taxon
+  DOI: 10.2307/25065903
+  issue: '4'
+  issued:
+  - year: 2007
+    month: 12
+  page: 1037-1050
+  title: Fern phylogeny inferred from 400 leptosporangiate species and three plastid
+    genes
+  type: article-journal
+  URL: http://www.ingentaconnect.com/content/iapt/tax/2007/00000056/00000004/art00007
+    papers://ebd7d3df-d8f1-4be8-bcf7-4fb07ababf30/Paper/p620
+  volume: '56'
+- id: Shang2018
+  author:
+  - family: Shang
+    given: Hui
+  - family: Sundue
+    given: Michael A
+  - family: Wei
+    given: Ran
+  - family: Wei
+    given: Xue Ping
+  - family: Luo
+    given: Jun Jie
+  - family: Liu
+    given: Li
+  - family: Schwartsburd
+    given: Pedro B.
+  - family: Yan
+    given: Yue Hong
+  - family: Zhang
+    given: Xian Chun
+  citation-key: Shang2018
+  container-title: Molecular Phylogenetics and Evolution
+  DOI: 10.1016/j.ympev.2018.04.038
+  ISSN: '10959513'
+  issued:
+  - year: 2018
+  title: 'Hiya: A new genus segregated from Hypolepis in the fern family Dennstaedtiaceae,
+    based on phylogenetic evidence and character evolution'
+  type: article-journal
 - id: Smith2009b
   author:
   - family: Smith
@@ -240,6 +609,39 @@ references:
   type: article-journal
   URL: https://onlinelibrary.wiley.com/doi/10.1111/2041-210X.13096
   volume: '10'
+- id: Testo2016a
+  author:
+  - family: Testo
+    given: Weston L.
+  - family: Sundue
+    given: Michael A
+  citation-key: Testo2016a
+  container-title: Molecular Phylogenetics and Evolution
+  DOI: 10.1016/j.ympev.2016.09.003
+  ISSN: '10959513'
+  issued:
+  - year: 2016
+  page: 200-211
+  PMID: '27621129'
+  title: A 4000-species dataset provides new insight into the evolution of ferns
+  type: article-journal
+  URL: http://dx.doi.org/10.1016/j.ympev.2016.09.003
+  volume: '105'
+- id: Tryon1986
+  author:
+  - family: Tryon
+    given: R
+  citation-key: Tryon1986
+  container-title: The Botanical Review
+  ISSN: 1874-9372
+  issue: '2'
+  issued:
+  - year: 1986
+  page: 117-156
+  title: The biogeography of species, with special reference to ferns
+  type: article-journal
+  URL: papers://ebd7d3df-d8f1-4be8-bcf7-4fb07ababf30/Paper/p1319
+  volume: '52'
 - id: Wei2017a
   author:
   - family: Wei
@@ -270,3 +672,36 @@ references:
   type: article-journal
   URL: https://academic.oup.com/gbe/article-lookup/doi/10.1093/gbe/evx107
   volume: '9'
+- id: Zhang2020
+  author:
+  - family: Zhang
+    given: Liang
+  - family: Zhou
+    given: Xin-Mao
+  - family: Liang
+    given: Zhen-Long
+  - family: Fan
+    given: Xue-Ping
+  - family: Thi Lu
+    given: Ngan
+  - family: Song
+    given: Min-Shu
+  - family: Knapp
+    given: Ralf
+  - family: Gao
+    given: Xin-Fen
+  - family: Sun
+    given: Hang
+  - family: Zhang
+    given: Li-Bing
+  citation-key: Zhang2020
+  container-title: Molecular Phylogenetics and Evolution
+  DOI: 10.1016/j.ympev.2020.106803
+  ISSN: '10557903'
+  issued:
+  - year: 2020
+  page: '106803'
+  title: Phylogeny and classification of the tribe Lepisoreae (Polypodiaceae; pteridophyta)
+    with the description of a new genus, Ellipinema gen. nov., segregated from Lepisorus
+  type: article-journal
+  URL: https://doi.org/10.1016/j.ympev.2020.106803
