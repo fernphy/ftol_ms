@@ -322,6 +322,32 @@ references:
     Fourier transform'
   type: article-journal
   volume: '30'
+- id: Landau2021
+  accessed:
+  - year: 2021
+    month: 2
+    day: 1
+  author:
+  - family: Landau
+    given: William Michael
+  citation-key: Landau2021
+  container-title: Journal of Open Source Software
+  DOI: 10.21105/joss.02959
+  ISSN: 2475-9066
+  issue: '57'
+  issued:
+  - year: 2021
+    month: 1
+    day: 15
+  language: en
+  page: '2959'
+  source: joss.theoj.org
+  title: 'The targets R package: A dynamic Make-like function-oriented pipeline toolkit
+    for reproducibility and high-performance computing'
+  title-short: The targets R package
+  type: article-journal
+  URL: https://joss.theoj.org/papers/10.21105/joss.02959
+  volume: '6'
 - id: Lehtonen2011
   author:
   - family: Lehtonen
@@ -363,6 +389,50 @@ references:
   type: article-journal
   URL: http://doi.wiley.com/10.1111/geb.12294
   volume: '24'
+- id: Minh2013
+  author:
+  - family: Minh
+    given: Bui Quang
+  - family: Nguyen
+    given: Minh Anh Thi
+  - family: Haeseler
+    given: Arndt
+    non-dropping-particle: von
+  citation-key: Minh2013
+  container-title: Molecular Biology and Evolution
+  DOI: 10.1093/molbev/mst024
+  ISSN: 07374038
+  issue: '5'
+  issued:
+  - year: 2013
+  page: 1188-1195
+  title: Ultrafast approximation for phylogenetic bootstrap
+  type: article-journal
+  volume: '30'
+- id: Nguyen2015
+  author:
+  - family: Nguyen
+    given: Lam-Tung
+  - family: Schmidt
+    given: Heiko A.
+  - family: Haeseler
+    given: Arndt
+    non-dropping-particle: von
+  - family: Minh
+    given: Bui Quang
+  citation-key: Nguyen2015
+  container-title: Molecular Biology and Evolution
+  container-title-short: Mol. Biol. Evol.
+  DOI: 10.1093/molbev/msu300
+  ISSN: '15371719'
+  issue: '1'
+  issued:
+  - year: 2015
+  page: 268-274
+  title: 'IQ-TREE: A fast and effective stochastic algorithm for estimating maximum-likelihood
+    phylogenies'
+  type: article-journal
+  volume: '32'
 - id: Nitta2021
   accessed:
   - year: 2021
@@ -507,6 +577,14 @@ references:
   title: A community-derived classification for extant lycophytes and ferns
   type: article-journal
   volume: '54'
+- id: RCoreTeam2020a
+  author:
+  - literal: R Core Team
+  citation-key: RCoreTeam2020a
+  issued:
+  - year: 2020
+  title: 'R: A language and environment for statistical computing. 4.0.2'
+  type: article-journal
 - id: Schuettpelz2007
   author:
   - family: Schuettpelz

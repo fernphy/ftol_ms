@@ -80,7 +80,7 @@ n_sanger_ferns <-
 
 ^2^Department of Botany, National Museum of Natural History, Smithsonian Institution, Washington, D.C., USA
 
-^3^ Departamento de Botánica, Instituto de Biología, Universidad Nacional Autónoma de México, Mexico City, Mexico
+^3^Departamento de Botánica, Instituto de Biología, Universidad Nacional Autónoma de México, Mexico City, Mexico
 
 ^4^Department of Integrated Biosciences, Graduate School of Frontier Sciences, The University of Tokyo, Chiba, Japan
 
@@ -96,10 +96,10 @@ Ferns (ca. 12,000 spp.) are the second most diverse clade of vascular plants aft
 Global trees including all ferns have been published periodically, but as molecular systematics research continues at a rapid pace, such trees quickly become outdated.
 While some large projects exist to generate trees for all plants or all life, such "one-size-fits-all" approaches are not expected to generate optimal results for specific groups because they must work across a very wide range of taxa.
 Here, we develop a mostly automated, reproducible, open pipeline to generate a continuously updated fern tree of life (FTOL) from sequence data on GenBank.
-Our tailored sampling strategy combines whole plastomes (few taxa, many genes) with Sanger-sequenced genes (many taxa, few genes) to obtain a global fern phylogeny with high resolution along the backbone and maximum sampling across the tips.
+Our tailored sampling strategy combines whole plastomes (few taxa, many loci) with Sanger-sequenced loci (many taxa, few loci) to obtain a global fern phylogeny with high resolution along the backbone and maximum sampling across the tips.
 We provide multiple versions of the phylogeny including a time-calibrated tree and a synthetic tree with species lacking molecular data added by taxonomy.
 We use an expert-curated reference taxonomy to resolve synonyms in compliance with Pteridophyte Phylogeny Group I (PPGI), the community-driven taxonomic system widely accepted by many pteridologists.
-The current FTOL (v0.0.1) includes `r comma(n_sanger_ferns)` species, an increase of ca. 20% relative to the most recent global fern phylogeny while accounting for synonyms.
+The current FTOL (v0.0.1) includes `r comma(n_sanger_ferns)` species, an increase of > 20% relative to the most recent global fern phylogeny.
 FTOL will be updated on a semi-annual basis and will be available via a web portal and R package, enabling researchers to have easy access to the most recent, comprehensively sampled fern phylogeny.
 FTOL will be useful for anybody studying this important group of plants at scales from smaller (e.g., genus or lower) clades to the entire tree; we anticipate FTOL will be particularly relevant for macroecological studies at the regional to global scale.
 Finally, we envision FTOL will be integrated into the next PPG, PPGII, to produce a "living" taxonomic system with direct linkage between a community-driven fern taxonomy and the most recent hypothesis of phylogeny.
@@ -137,10 +137,11 @@ We anticipate FTOL will have several impacts for the field of fern systematics a
 ## Locus sampling
 
 The plastid genome has been the most widely sequenced genomic compartment in ferns by far, so we used plastid loci to build our tree.
-Our sampling includes two major categories of sequence data: seven loci (*atpA*, *atpB*, *matK*, *rbcL*, *rps4*, *trnL*--*trnF*, and *rps4*--*trnS*) that have been frequently used for molecular systematics studies in ferns and are typically obtained by PCR and Sanger sequencing ("Sanger loci") and a much larger set of single-copy, coding genes typically obtained from next-generation sequencing of the plastome ("plastome genes").
+Our sampling includes two major categories of sequence data: seven loci (*atpA*, *atpB*, *matK*, *rbcL*, *rps4*, *trnL*--*trnF*, and *rps4*--*trnS*) that have been frequently used for molecular systematics studies in ferns and are typically obtained by PCR and Sanger sequencing ("Sanger loci") and a much larger set of single-copy, coding genes typically obtained from next-generation sequencing of the plastome ("plastome loci").
 *trnL*--*trnF* includes the *trnL* intron, the 3' *trnL* exon, and the spacer between *trnL* and *trnF*.
 *rps4*--*trnS* includes the spacer between *rps4* and *trnS*.
-The set of plastome genes is based on the list of 83 protein-coding genes of @Wei2017a, which was filtered to only genes that show no evidence of duplication (77 genes).
+The set of plastome loci is based on the list of 83 protein-coding genes of @Wei2017a, which was filtered to only genes that show no evidence of duplication (77 genes), then combined with the two spacers (79 loci total).
+The plastome loci include all seven Sanger loci.
 
 ## Sequence extraction
 
@@ -202,7 +203,7 @@ Our selection is based on the following criteria, in order of priority:
 3. The sample with the longest concatenated sequence length; sample does not include *rbcL*.
 
 The above steps were not needed for plastome data, as each plastome sequence on GenBank originates from a single voucher specimen.
-For these, we selected one specimen per species with the longest combined sequence length across all plastome genes.
+For these, we selected one specimen per species with the longest combined sequence length across all plastome loci.
 
 ## Sequence alignment
 
@@ -219,3 +220,20 @@ Next, we removed poorly aligned regions from the alignments using trimAl.
 We removed regions with >1% or >5% of sequences having gaps from coding regions or spacers, respectively.
 
 ## Phylogenetic analysis
+
+Phylogenetic analysis was conducted in two steps.
+First, we generated a backbone phylogeny using maximum likelihood (ML) analysis of the plastome loci in IQ TREE [@Nguyen2015] with 1000 ultrafast rapid bootstrap replicates [@Minh2013].
+We applied the 'GTR+I+G' to a concatenated dataset with no partitioning.
+
+Next, we used the backbone phylogeny as a constraint tree to conduct phylogenetic analysis of the Sanger loci in IQ TREE.
+Settings for the ML analysis of the Sanger loci were otherwise identical to the backbone phylogenetic analysis.
+
+## Reproducibility
+
+The workflow is managed in R [@RCoreTeam2020a] with the targets package [@Landau2021].
+Code used to generate FTOL is available at https://github.com/joelnitta/ftol.
+A docker image to run the code is available at https://hub.docker.com/r/joelnitta/ftol.
+
+# References
+<!-- Insert <div id="refs"></div> to place the refs here instead of at the end -->
+<div id="refs"></div>
