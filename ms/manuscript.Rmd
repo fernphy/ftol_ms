@@ -19,6 +19,8 @@ bibliography:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
+library(rmarkdown)
+library(bookdown)
 library(targets)
 library(assertr)
 library(ape)
@@ -26,7 +28,6 @@ library(scales)
 library(tidyverse)
 library(rgnparser)
 library(glue)
-library(phytools)
 
 # Specify percentage format
 percent <- function(...) {scales::percent(...)}
@@ -348,45 +349,32 @@ og_taxa <-
 	filter(outgroup == TRUE) %>%
 	pull(species)
 
-backbone_tree_full <- 
-	plastome_tree %>%
-	ape::root.phylo("Anthoceros_angustus") %>%
-	ape::ladderize() %>%
-	ape::drop.tip(og_taxa)
-
 family_exemp <-
-tibble(
-	species = backbone_tree_full$tip.label
-) %>%
-	mutate(genus = str_split(species, "_") %>% map_chr(1)) %>%
+tibble(species = plastome_tree$tip.label) %>%
+	mutate(
+		genus = str_split(species, "_") %>% map_chr(1),
+		phy_order = seq_len(nrow(.))) %>%
 	left_join(select(ppgi_taxonomy, family, genus), by = "genus") %>%
+	mutate(family = replace_na(family, "og")) %>%
 	group_by(family) %>%
 	slice(1) %>%
 	ungroup() %>%
-	pull(species)
+	arrange(phy_order)
+	
+backbone_tree <- ape::keep.tip(plastome_tree, family_exemp$species)
+backbone_tree$tip.label <- family_exemp$family
 
-backbone_tree_exemp <- ape::keep.tip(backbone_tree_full, family_exemp)
+backbone_tree$node.label <- str_replace(backbone_tree$node.label, "100", "")
 
-bb_trans_table <-
-	tibble(species = backbone_tree_exemp$tip.label) %>%
-	mutate(genus = str_split(species, "_") %>% map_chr(1)) %>%
-	left_join(select(ppgi_taxonomy, family, genus), by = "genus") %>%
-	left_join(accepted_sampling_by_rank, by = c(family = "name")) %>%
-	assert(not_na, species, family, n) %>%
-	select(tip.label = species, clade.label = family, N = n) %>%
-	## set crown node depth to 1/2 the maximum depth
-	mutate(
-		depth = sapply(backbone_tree_exemp$tip.label, function(x,y) 
-	0.5*y$edge.length[which(backbone_tree_exemp$edge[,2] ==
-	which(y$tip.label == x))], y = backbone_tree_exemp)
-	)
+backbone_tree <-
+	backbone_tree %>%
+	root.phylo("og") %>%
+	ladderize() %>%
+	drop.tip("og")
 
-## convert
-tt <- phylo.toBackbone(backbone_tree_exemp, bb_trans_table)
-## plot
-plot(tt)
+plot(backbone_tree, font = 1)
+nodelabels(backbone_tree$node.label, frame = "none", col = "grey", cex = 0.8)
 ```
-
 
 # References
 <!-- Insert <div id="refs"></div> to place the refs here instead of at the end -->
