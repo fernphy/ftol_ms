@@ -24,6 +24,16 @@ library(assertr)
 library(ape)
 library(scales)
 library(tidyverse)
+library(rgnparser)
+library(glue)
+library(phytools)
+
+# Specify percentage format
+percent <- function(...) {scales::percent(...)}
+number <- function(...) {scales::number(big.mark = ",", ...)}
+
+# Specify FTOL version
+ftol_ver <- "v0.0.2"
 ```
 
 ```{r load-targets}
@@ -33,7 +43,9 @@ tar_load(
 		plastome_alignment,
 		plastome_tree,
 		plastome_metadata_renamed,
-		ppgi_taxonomy),
+		ppgi_taxonomy,
+		plastid_calibration_dates,
+		pteridocat),
 	store = here::here("ftol_cache")
 )
 ```
@@ -66,7 +78,6 @@ n_sanger_ferns <-
 	filter(outgroup == FALSE) %>%
 	n_distinct(.$species)
 ```
-
 
 <!-- Set left justification -->
 \raggedright
@@ -147,6 +158,7 @@ The plastome loci include all seven Sanger loci.
 
 All sequences were downloaded from GenBank.
 GenBank queries were formatted including terms "Polypodiopsida[ORGN]" to target ferns and "[PDAT]" to specify sequence date range (e.g., 1980/01/01[PDAT]:2021/12/12[PDAT]) so that a given query always results in the same set of sequences regardless of when the query is made.
+Names including the terms "aff." or "cf.", hybrid formulas, and environmental DNA samples were excluded.
 There is no formal definition of genomic vs. Sanger sequences in GenBank, so we used an empirical sequence length cutoff to distinguish between Sanger (=< 7000 bp) or plastome sequences (> 7000 bp) with the "[SLEN]" term.
 Furthermore, there is a lack of consensus on sequence annotation in GenBank; the same locus may be annotated using different names, or not annotated at all.
 
@@ -228,11 +240,153 @@ We applied the 'GTR+I+G' to a concatenated dataset with no partitioning.
 Next, we used the backbone phylogeny as a constraint tree to conduct phylogenetic analysis of the Sanger loci in IQ TREE.
 Settings for the ML analysis of the Sanger loci were otherwise identical to the backbone phylogenetic analysis.
 
+## Molecular dating
+
+We dated the tree using treePL [@Smith2012], which is one of the only programs capable of dating very large alignments.
+We applied a set of `r nrow (plastid_calibration_dates)` calibration points, mostly based on @Testo2016a and references within.
+
 ## Reproducibility
 
 The workflow is managed in R [@RCoreTeam2020a] with the targets package [@Landau2021].
 Code used to generate FTOL is available at https://github.com/joelnitta/ftol.
 A docker image to run the code is available at https://hub.docker.com/r/joelnitta/ftol.
+
+# Results
+
+## Sampling
+
+```{r sampling-stats, message=FALSE}
+# Make list of FTOL sampling
+ftol_sampling_by_rank <-
+	sanger_sampling %>%
+	filter(outgroup == FALSE) %>%
+	select(-outgroup) %>%
+	pivot_longer(names_to = "rank", values_to = "name", -species) %>%
+	group_by(rank) %>%
+	count(name) %>%
+	ungroup
+
+# Make list of all accepted species
+accepted_species <-
+	pteridocat %>% 
+	# Only keep accepted names
+	filter(str_detect(taxonomicStatus, "accepted")) %>%
+	# Only keep species
+	# FIXME: need to add rank for newly added names in pteridocat_maker
+	# then don't need is.na()
+	filter(taxonRank == "species" | is.na(taxonRank)) %>%
+	select(scientificName) %>%
+	mutate(
+		rgnparser::gn_parse_tidy(scientificName) %>% select(species = canonicalsimple),
+		species = str_replace_all(species, " ", "_")
+	) %>%
+	# Map on higher level taxonomy
+	mutate(genus = str_split(scientificName, " ") %>% map_chr(1)) %>%
+	left_join(select(ppgi_taxonomy, genus, family, order, class), by = "genus") %>%
+	# FIXME: update class for nothogenera in PPG
+	mutate(class = case_when(
+		str_detect(scientificName, "Schizoloma|Phlebosia|Cystocarpium") ~ "Polypodiopsida",
+		TRUE ~ class
+	)) %>%
+	# Drop lycophytes
+	assert(not_na, class) %>%
+	filter(class == "Polypodiopsida") %>%
+	select(-class)
+
+accepted_sampling_by_rank <-
+	accepted_species %>%
+	select(-scientificName) %>%
+	pivot_longer(names_to = "rank", values_to = "name", -species) %>%
+	group_by(rank) %>%
+	count(name) %>%
+	ungroup %>%
+	# Note that nothogenera have no family or order
+	filter(!is.na(name))
+
+coverage <- left_join(
+	ftol_sampling_by_rank,
+	rename(accepted_sampling_by_rank, n_accepted = n),
+	by = c("rank", "name")
+) %>%
+	mutate(coverage = n/n_accepted)
+
+# Format overall sampling for printing in MS
+total_sampling <-
+	# Start with FTOL sampling by genus, family, order
+	ftol_sampling_by_rank %>% 
+	count(rank) %>%
+	# Add n species
+	bind_rows(
+		sanger_sampling %>%
+			filter(outgroup == FALSE) %>%
+			select(-outgroup) %>%
+			summarize(n = n(), rank = "species")
+	) %>%
+	# Join to accepted number of species, genus, family, order
+	left_join(
+		count(accepted_sampling_by_rank, rank, name = "n_accepted") %>%
+			bind_rows(
+				summarize(accepted_species, n_accepted = n(), rank = "species")
+			),
+		by = "rank"
+	) %>%
+	# Calculate coverage
+	mutate(
+		coverage_p = percent(n / n_accepted),
+		coverage = glue("{number(n)}/{number(n_accepted)}")) %>%
+	# Split for printing
+	split(.$rank)
+```
+
+Taxon sampling for the current version of FTOL (`r ftol_ver`) includes `r total_sampling$species$coverage` species (`r total_sampling$species$coverage_p`), `r total_sampling$genus$coverage` genera (`r total_sampling$genus$coverage_p`), `r total_sampling$family$coverage` families, and `r total_sampling$order$coverage` orders of ferns (all coverage values are relative to the number of accepted species in Pteridocat).
+
+# Figures
+
+```{r backbone-tree}
+og_taxa <-
+	sanger_sampling %>%
+	filter(outgroup == TRUE) %>%
+	pull(species)
+
+backbone_tree_full <- 
+	plastome_tree %>%
+	ape::root.phylo("Anthoceros_angustus") %>%
+	ape::ladderize() %>%
+	ape::drop.tip(og_taxa)
+
+family_exemp <-
+tibble(
+	species = backbone_tree_full$tip.label
+) %>%
+	mutate(genus = str_split(species, "_") %>% map_chr(1)) %>%
+	left_join(select(ppgi_taxonomy, family, genus), by = "genus") %>%
+	group_by(family) %>%
+	slice(1) %>%
+	ungroup() %>%
+	pull(species)
+
+backbone_tree_exemp <- ape::keep.tip(backbone_tree_full, family_exemp)
+
+bb_trans_table <-
+	tibble(species = backbone_tree_exemp$tip.label) %>%
+	mutate(genus = str_split(species, "_") %>% map_chr(1)) %>%
+	left_join(select(ppgi_taxonomy, family, genus), by = "genus") %>%
+	left_join(accepted_sampling_by_rank, by = c(family = "name")) %>%
+	assert(not_na, species, family, n) %>%
+	select(tip.label = species, clade.label = family, N = n) %>%
+	## set crown node depth to 1/2 the maximum depth
+	mutate(
+		depth = sapply(backbone_tree_exemp$tip.label, function(x,y) 
+	0.5*y$edge.length[which(backbone_tree_exemp$edge[,2] ==
+	which(y$tip.label == x))], y = backbone_tree_exemp)
+	)
+
+## convert
+tt <- phylo.toBackbone(backbone_tree_exemp, bb_trans_table)
+## plot
+plot(tt)
+```
+
 
 # References
 <!-- Insert <div id="refs"></div> to place the refs here instead of at the end -->
