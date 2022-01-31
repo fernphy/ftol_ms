@@ -175,6 +175,51 @@ references:
   title: A roadmap for global synthesis of the plant tree of life
   type: article-journal
   volume: '105'
+- id: Fawcett2021a
+  accessed:
+  - year: 2022
+    month: 1
+    day: 31
+  author:
+  - family: Fawcett
+    given: Susan
+  - family: Smith
+    given: Alan R.
+  - family: Sundue
+    given: Michael
+  - family: Burleigh
+    given: J. Gordon
+  - family: Sessa
+    given: Emily B.
+  - family: Kuo
+    given: Li-Yaung
+  - family: Chen
+    given: Cheng-Wei
+  - family: Testo
+    given: Weston L.
+  - family: Kessler
+    given: Michael
+  - family: Consortium
+    given: GoFlag
+  - family: Barrington
+    given: David S.
+  citation-key: Fawcett2021a
+  container-title: Systematic Botany
+  container-title-short: Systematic Botany
+  DOI: 10/gpbfv2
+  ISSN: 0363-6445
+  issue: '4'
+  issued:
+  - year: 2021
+    month: 12
+    day: 21
+  language: en
+  page: 891-915
+  source: DOI.org (Crossref)
+  title: A Global Phylogenomic Study of the Thelypteridaceae
+  type: article-journal
+  URL: https://www.ingentaconnect.com/content/10.1600/036364421X16370109698650
+  volume: '46'
 - id: Hennequin2014
   author:
   - family: Hennequin
@@ -389,6 +434,23 @@ references:
   type: article-journal
   URL: http://doi.wiley.com/10.1111/geb.12294
   volume: '24'
+- id: Lehtonen2019
+  author:
+  - family: Lehtonen
+    given: Samuli
+  - family: Cárdenas
+    given: Glenda G
+  citation-key: Lehtonen2019
+  container-title: Botanical Journal of the Linnean Society
+  DOI: 10.1093/botlinnean/boz020
+  ISSN: 0024-4074
+  issue: '3'
+  issued:
+  - year: 2019
+  page: 229-241
+  title: Dynamism in plastome structure observed across the phylogenetic tree of ferns
+  type: article-journal
+  volume: '190'
 - id: Minh2013
   author:
   - family: Minh
@@ -577,6 +639,46 @@ references:
   title: A community-derived classification for extant lycophytes and ferns
   type: article-journal
   volume: '54'
+- id: Qi2018
+  author:
+  - family: Qi
+    given: Xinping
+  - family: Kuo
+    given: Li-Yaung
+  - family: Guo
+    given: Chunce
+  - family: Li
+    given: Hao
+  - family: Li
+    given: Zhongyang
+  - family: Qi
+    given: Ji
+  - family: Wang
+    given: Linbo
+  - family: Hu
+    given: Yi
+  - family: Xiang
+    given: Jianying
+  - family: Zhang
+    given: Caifei
+  - family: Guo
+    given: Jing
+  - family: Huang
+    given: Chien Hsun
+  - family: Ma
+    given: Hong
+  citation-key: Qi2018
+  container-title: Molecular Phylogenetics and Evolution
+  DOI: 10.1016/j.ympev.2018.06.043
+  ISSN: '10959513'
+  issued:
+  - year: 2018
+  page: 961-977
+  title: A well-resolved fern nuclear phylogeny reveals the evolution history of numerous
+    transcription factor families
+  type: article-journal
+  URL: https://www.sciencedirect.com/science/article/pii/S1055790318301854?_rdoc=1&_fmt=high&_origin=gateway&_docanchor=&md5=b8429449ccfc9c30159a5f9aeaa92ffb
+  volume: '127'
 - id: RCoreTeam2020a
   author:
   - literal: R Core Team
@@ -585,6 +687,66 @@ references:
   - year: 2020
   title: 'R: A language and environment for statistical computing. 4.0.2'
   type: article-journal
+- id: Rothfels2015a
+  author:
+  - family: Rothfels
+    given: Carl J.
+  - family: Li
+    given: Fay-Wei
+  - family: Sigel
+    given: Erin M
+  - family: Huiet
+    given: Layne
+  - family: Larsson
+    given: Anders
+  - family: Burge
+    given: Dylan O.
+  - family: Ruhsam
+    given: Markus
+  - family: Deyholos
+    given: Michael
+  - family: Soltis
+    given: Douglas E.
+  - family: Stewart
+    given: C. N.
+  - family: Shaw
+    given: Shane W.
+  - family: Pokorny
+    given: Lisa
+  - family: Chen
+    given: Tao
+  - family: DePamphilis
+    given: Claude
+  - family: DeGironimo
+    given: Lisa
+  - family: Chen
+    given: Li
+  - family: Wei
+    given: Xiaofeng
+  - family: Sun
+    given: Xiao
+  - family: Korall
+    given: Petra
+  - family: Stevenson
+    given: Dennis W.
+  - family: Graham
+    given: Sean W.
+  - family: Wong
+    given: G. K.-S.
+  - family: Pryer
+    given: Kathleen M
+  citation-key: Rothfels2015a
+  container-title: American Journal of Botany
+  DOI: 10.3732/ajb.1500089
+  ISSN: 0002-9122
+  issue: '7'
+  issued:
+  - year: 2015
+  page: 1-19
+  title: The evolutionary history of ferns inferred from 25 low-copy nuclear genes
+  type: article-journal
+  URL: http://www.amjbot.org/content/early/2015/07/15/ajb.1500089
+  volume: '102'
 - id: Schuettpelz2007
   author:
   - family: Schuettpelz
@@ -634,6 +796,43 @@ references:
   title: 'Hiya: A new genus segregated from Hypolepis in the fern family Dennstaedtiaceae,
     based on phylogenetic evidence and character evolution'
   type: article-journal
+- id: Shen2018
+  author:
+  - family: Shen
+    given: Hui
+  - family: Jin
+    given: Dongmei
+  - family: Shu
+    given: Jiang-Ping
+  - family: Zhou
+    given: Xi-Le
+  - family: Lei
+    given: Ming
+  - family: Wei
+    given: Ran
+  - family: Shang
+    given: Hui
+  - family: Wei
+    given: Hong-jin
+  - family: Zhang
+    given: Rui
+  - family: Liu
+    given: Li
+  - family: Gu
+    given: Yu-Feng
+  - family: Zhang
+    given: Xian-Chun
+  - family: Yan
+    given: Yue-Hong
+  citation-key: Shen2018
+  container-title: GigaScience
+  DOI: 10.1093/gigascience/gix116/
+  issued:
+  - year: 2018
+  page: 1-11
+  title: Large scale phylogenomic analysis resolves a backbone phylogeny in ferns
+  type: article-journal
+  volume: '7'
 - id: Smith2009b
   author:
   - family: Smith
@@ -656,6 +855,25 @@ references:
   type: article-journal
   URL: http://www.pubmedcentral.nih.gov/articlerender.fcgi?artid=2645364&tool=pmcentrez&rendertype=abstract
   volume: '9'
+- id: Smith2012
+  author:
+  - family: Smith
+    given: Stephen A
+  - family: O'Meara
+    given: Brian C.
+  citation-key: Smith2012
+  container-title: Bioinformatics
+  DOI: 10.1093/bioinformatics/bts492
+  ISSN: '13674803'
+  issue: '20'
+  issued:
+  - year: 2012
+  page: 2689-2690
+  PMID: '22908216'
+  title: 'treePL: divergence time estimation using penalized likelihood for large
+    phylogenies'
+  type: article-journal
+  volume: '28'
 - id: Smith2019
   accessed:
   - year: 2022
@@ -687,6 +905,38 @@ references:
   type: article-journal
   URL: https://onlinelibrary.wiley.com/doi/10.1111/2041-210X.13096
   volume: '10'
+- id: Talavera2021
+  accessed:
+  - year: 2021
+    month: 8
+    day: 30
+  author:
+  - family: Talavera
+    given: Gerard
+  - family: Lukhtanov
+    given: Vladimir
+  - family: Pierce
+    given: Naomi E
+  - family: Vila
+    given: Roger
+  citation-key: Talavera2021
+  container-title: Systematic Biology
+  DOI: 10/gmmt6s
+  editor:
+  - family: Bond
+    given: Jason
+  ISSN: 1063-5157, 1076-836X
+  issued:
+  - year: 2021
+    month: 7
+    day: 19
+  language: en
+  page: syab038
+  source: DOI.org (Crossref)
+  title: DNA Barcodes Combined with Multilocus Data of Representative Taxa Can Generate
+    Reliable Higher-Level Phylogenies
+  type: article-journal
+  URL: https://academic.oup.com/sysbio/advance-article/doi/10.1093/sysbio/syab038/6281234
 - id: Testo2016a
   author:
   - family: Testo
@@ -750,6 +1000,32 @@ references:
   type: article-journal
   URL: https://academic.oup.com/gbe/article-lookup/doi/10.1093/gbe/evx107
   volume: '9'
+- id: Wei2022
+  accessed:
+  - year: 2022
+    month: 1
+    day: 26
+  author:
+  - family: Wei
+    given: Ran
+  - family: Zhang
+    given: Xian‐Chun
+  citation-key: Wei2022
+  container-title: TAXON
+  container-title-short: TAXON
+  DOI: 10/gn9jpt
+  ISSN: 0040-0262, 1996-8175
+  issued:
+  - year: 2022
+    month: 1
+    day: 19
+  language: en
+  page: tax.12658
+  source: DOI.org (Crossref)
+  title: A revised subfamilial classification of Polypodiaceae based on plastome,
+    nuclear ribosomal, and morphological evidence
+  type: article-journal
+  URL: https://onlinelibrary.wiley.com/doi/10.1002/tax.12658
 - id: Zhang2020
   author:
   - family: Zhang
