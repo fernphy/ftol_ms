@@ -8,6 +8,8 @@ output:
     reference_docx: Frontiers_Template.docx
 editor_options: 
   chunk_output_type: console
+params:
+  doc_type: doc
 ---
 
 ---
@@ -17,8 +19,11 @@ bibliography:
 - `r here::here("ms/references_other.bib")`
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+
+# Load packages
+library(conflicted)
 library(rmarkdown)
 library(bookdown)
 library(targets)
@@ -27,7 +32,18 @@ library(ape)
 library(scales)
 library(tidyverse)
 library(rgnparser)
+library(ggtree)
 library(glue)
+library(Polychrome)
+library(patchwork)
+library(magrittr)
+
+# Resolve conflicts
+conflict_prefer("filter", "dplyr")
+conflict_prefer("extract", "magrittr")
+
+# Load functions
+source(here::here("R/functions.R"))
 
 # Specify percentage format
 percent <- function(...) {scales::percent(...)}
@@ -45,13 +61,31 @@ tar_load(
 		plastome_tree,
 		plastome_metadata_renamed,
 		ppgi_taxonomy,
+		plastome_alignment,
 		plastid_calibration_dates,
-		pteridocat),
+		pteridocat,
+		sanger_alignment_tbl),
 	store = here::here("ftol_cache")
 )
+
+# FIXME: read in real ultrametric tree when ready
+sanger_tree <- ape::read.tree(here::here("working/sanger_alignment.phy.contree.tre"))
 ```
 
 ```{r abstract-stats}
+# Helper function to add plot_group:
+# a "rank" that may be at order or suborder level for plotting
+add_plot_group <- function(data) {
+	data %>%
+		mutate(
+			plot_group = coalesce(suborder, order),
+			plot_group = case_when(
+				plot_group %in% c("Ophioglossales", "Psilotales") ~ "Ophioglossales + Psilotales",
+				TRUE ~ plot_group
+			)
+		)
+}
+
 # Make tibble of outgroup species
 og_species <- 
 	plastome_metadata_renamed %>%
@@ -65,8 +99,10 @@ sanger_sampling <- tibble(
 	# Add higher-level taxonomy
 	mutate(genus = str_split(species, "_") %>% map_chr(1)) %>%
 	left_join(
-		select(ppgi_taxonomy, genus, family, order), by = "genus"
+		select(ppgi_taxonomy, genus, family, suborder, order), by = "genus"
 	) %>% 
+	# Add plot_group
+	add_plot_group() %>%
 	# Add outgroup status
 	left_join(og_species, by = "species") %>%
 	mutate(outgroup = replace_na(outgroup, FALSE)) %>%
@@ -161,8 +197,8 @@ All sequences were downloaded from GenBank.
 GenBank queries were formatted including terms "Polypodiopsida[ORGN]" to target ferns and "[PDAT]" to specify sequence date range (e.g., 1980/01/01[PDAT]:2021/12/12[PDAT]) so that a given query always results in the same set of sequences regardless of when the query is made.
 Names including the terms "aff." or "cf.", hybrid formulas, and environmental DNA samples were excluded.
 There is no formal definition of genomic vs. Sanger sequences in GenBank, so we used an empirical sequence length cutoff to distinguish between Sanger (=< 7000 bp) or plastome sequences (> 7000 bp) with the "[SLEN]" term.
-Furthermore, there is a lack of consensus on sequence annotation in GenBank; the same locus may be annotated using different names, or not annotated at all.
 
+There is a lack of consensus on sequence annotation in GenBank; the same locus may be annotated using different names, or not annotated at all.
 To avoid missing sequences due to differences in annotation format, we used the "Reference_Blast_Extract.py" script of  superCRUNCH [@Portik2020] to extract target loci from GenBank FASTA files.
 Briefly, this involves querying candidate FASTA files downloaded from GenBank with BLAST [@Altschul1997] against a reference database of full length, representative sequences [i.e., a "baited search"\; @Smith2009b; @Smith2019].
 Those portions of the query that have a significant match in the reference are extracted and written to a new filtered FASTA file.
@@ -181,7 +217,7 @@ Therefore, we standardized all species names in the GenBank sequences against a 
 We designed the reference taxonomy for this project based on the World Ferns database [@Hassler2022], which conforms to PPGI and is available in Darwin Core format [@DarwinCore2009] via the Catalog of Life [@COL2366].
 We used the taxastand R package [@Nitta2021] to resolve species names, which can account for differences in formatting of taxonomic authors (e.g., parenthetical basionym author present or absent) as well as perform fuzzy matching, which is needed to account for spelling errors or variations in author names.
 We manually inspected any fuzzily matched or non-matching names.
-This revealed some species names in GenBank that were completely lacking in the World Ferns database, spelling errors, as well as some names in the database that needed to be treated differently (e.g., changes in synonymy).
+This revealed some species names in GenBank that were lacking in the World Ferns database, spelling errors, as well as some names in the database that needed to be treated differently (e.g., changes in synonymy).
 Therefore, we updated and edited the World Ferns database using the dwctaxon R package, which is designed to work with taxonomic data in the Darwin Core format.
 We refer to the resulting taxonomic database as "pteridocat", and have made it freely available online (https://github.com/joelnitta/pteridocat) so that other researchers may standardize taxonomic names in their data to match those of FTOL.
 
@@ -193,14 +229,15 @@ First, we constructed a BLAST library including all extracted Sanger sequences.
 Next, we conducted one BLAST search for each Sanger sequence against the library (all-by-all BLAST).
 We compared the families (following PPGI) of the matching sequences to each query; in the case the top three best matches belonged to a different family than the query, that query was considered a contamination and excluded from further analysis.
 For Cyatheales and Saccolomatineae, which include several closely related small families, we used the order and sub-order level, respectively, instead of family.
-While this method cannot account for contaminations at finer taxonomic levels, it is an efficient method to remove clearly incorrect sequences.
+Species belonging to monotypic families were not considered for this filtering.
+While this method cannot account for contaminations at finer taxonomic levels, it is an efficient method to remove obviously incorrect sequences.
 
 ## Sequence selection and concatenation
 
 A typical step in multilocus workflows is to concatenate loci across samples.
 For phylogenetic studies aiming to produce one tip per species, this is often done by concatenating the longest sequence per locus within each species.
-This is potentially problematic because accessions on GenBank may be misidentified and/or species may not be monophyletic.
-Therefore, we concatenated accessions and selected one final set of concatenated loci per species as follows (here, we refer to "accession" to mean a single locus within a GenBank accession; GenBank accessions sometimes have multiple loci per accession, but we already split those out using superCRUNCH as described previously).
+However, such an approach is potentially problematic because accessions on GenBank may be misidentified and/or species may not be monophyletic.
+Therefore, we concatenated accessions and selected one final set of concatenated loci per species as follows (here, we refer to "accession" to mean a single locus within a GenBank accession; GenBank accessions may have multiple loci per accession, but we already split those out using superCRUNCH as described previously).
 First, we constructed gene trees with FastTree [@Price2009; @Price2010] on default settings, and classified species as monophyletic if they were monophyletic in all gene trees including multiple accessions of that species.
 We then concatenated loci for monophyletic species by selecting the longest accession per locus within each species.
 Next, for the remaining species, we concatenated loci across accessions if all accessions originated from the same voucher specimen; this could not be done in all cases as voucher information is not always annotated on GenBank.
@@ -208,7 +245,7 @@ Next, for the remaining species, we concatenated loci across accessions if all a
 For the remaining species that could not be concatenated using any of the above methods, we selected one longest accession per locus and discarded the others.
 
 We then selected the final set of concatenated loci for each species. 
-We sought to maximize representation of *rbcL* as this is historically the most sequenced locus for ferns, and we expect that maximal sampling of one locus should improve phylogenetic analysis.
+We sought to maximize representation of *rbcL* as this is historically the most sequenced locus for ferns, and maximal sampling of one locus should improve phylogenetic analysis [@Talavera2021].
 Our selection is based on the following criteria, in order of priority:
 
 1. The sample (set of accessions joined by the methods described above) with the longest concatenated sequence length; sample includes *rbcL* and additional loci.
@@ -235,8 +272,8 @@ We removed regions with >1% or >5% of sequences having gaps from coding regions 
 ## Phylogenetic analysis
 
 Phylogenetic analysis was conducted in two steps.
-First, we generated a backbone phylogeny using maximum likelihood (ML) analysis of the plastome loci in IQ TREE [@Nguyen2015] with 1000 ultrafast rapid bootstrap replicates [@Minh2013].
-We applied the 'GTR+I+G' to a concatenated dataset with no partitioning.
+First, we generated a backbone phylogeny using maximum likelihood (ML) analysis of the plastome loci in IQ TREE [@Nguyen2015] with `r number(1000)` ultrafast rapid bootstrap replicates [@Minh2013].
+We applied the 'GTR+I+G' model to a concatenated dataset with no partitioning.
 
 Next, we used the backbone phylogeny as a constraint tree to conduct phylogenetic analysis of the Sanger loci in IQ TREE.
 Settings for the ML analysis of the Sanger loci were otherwise identical to the backbone phylogenetic analysis.
@@ -254,14 +291,33 @@ A docker image to run the code is available at https://hub.docker.com/r/joelnitt
 
 # Results
 
-## Sampling
+## Taxon sampling
 
 ```{r sampling-stats, message=FALSE}
-# Make list of FTOL sampling
+# FTOL sampling ----
+
+# Helper function to add plot_group:
+# a "rank" that may be at order or suborder level for plotting
+add_plot_group <- function(data) {
+	data %>%
+		mutate(
+			plot_group = coalesce(suborder, order),
+			plot_group = case_when(
+				plot_group %in% c("Ophioglossales", "Psilotales") ~ "Ophioglossales + Psilotales",
+				TRUE ~ plot_group
+			)
+		)
+}
+
+# Tally FTOL sampling by rank
 ftol_sampling_by_rank <-
 	sanger_sampling %>%
 	filter(outgroup == FALSE) %>%
 	select(-outgroup) %>%
+	# add plot_group
+	add_plot_group() %>%
+	# drop suborder
+	select(-suborder) %>%
 	pivot_longer(names_to = "rank", values_to = "name", -species) %>%
 	group_by(rank) %>%
 	count(name) %>%
@@ -283,7 +339,7 @@ accepted_species <-
 	) %>%
 	# Map on higher level taxonomy
 	mutate(genus = str_split(scientificName, " ") %>% map_chr(1)) %>%
-	left_join(select(ppgi_taxonomy, genus, family, order, class), by = "genus") %>%
+	left_join(select(ppgi_taxonomy, genus, family, suborder, order, class), by = "genus") %>%
 	# FIXME: update class for nothogenera in PPG
 	mutate(class = case_when(
 		str_detect(scientificName, "Schizoloma|Phlebosia|Cystocarpium") ~ "Polypodiopsida",
@@ -292,8 +348,13 @@ accepted_species <-
 	# Drop lycophytes
 	assert(not_na, class) %>%
 	filter(class == "Polypodiopsida") %>%
-	select(-class)
+	select(-class) %>%
+	# Add plot_group
+	add_plot_group() %>%
+	# drop suborder
+	select(-suborder) 
 
+# Tally accepted sampling by rank
 accepted_sampling_by_rank <-
 	accepted_species %>%
 	select(-scientificName) %>%
@@ -304,12 +365,21 @@ accepted_sampling_by_rank <-
 	# Note that nothogenera have no family or order
 	filter(!is.na(name))
 
-coverage <- left_join(
+# Format coverage at order-ish level for plotting
+coverage_data <- left_join(
 	ftol_sampling_by_rank,
 	rename(accepted_sampling_by_rank, n_accepted = n),
 	by = c("rank", "name")
 ) %>%
 	mutate(coverage = n/n_accepted)
+
+# Format for text in MS
+tax_coverage <-
+coverage_data %>%
+	filter(rank == "plot_group") %>%
+	arrange(coverage) %>%
+	transmute(clade = name, coverage = percent(coverage)) %>%
+	split(.$clade)
 
 # Format overall sampling for printing in MS
 total_sampling <-
@@ -337,45 +407,398 @@ total_sampling <-
 		coverage = glue("{number(n)}/{number(n_accepted)}")) %>%
 	# Split for printing
 	split(.$rank)
+
+# Plastome (backbone) sampling ----
+bb_sampling <-
+	tibble(species = plastome_tree$tip.label) %>%
+	# Add higher taxonomy
+	left_join(sanger_sampling, by = "species")
+
+bb_sampling_by_rank <-
+	bb_sampling %>%
+	# Drop OG
+	filter(outgroup == FALSE) %>%
+	select(-outgroup) %>%
+	pivot_longer(names_to = "rank", values_to = "name", -species) %>%
+	group_by(rank) %>%
+	count(name) %>%
+	ungroup
+
+# Format sampling for printing in MS
+bb_total_sampling <-
+	# Start with backbone sampling by genus, family, order
+	bb_sampling_by_rank %>% 
+	count(rank) %>%
+	# Add n species
+	bind_rows(
+		bb_sampling %>%
+			filter(outgroup == FALSE) %>%
+			select(-outgroup) %>%
+			summarize(n = n(), rank = "species")
+	) %>%
+	# Join to accepted number of species, genus, family, order
+	left_join(
+		count(accepted_sampling_by_rank, rank, name = "n_accepted") %>%
+			bind_rows(
+				summarize(accepted_species, n_accepted = n(), rank = "species")
+			),
+		by = "rank"
+	) %>%
+	# Calculate coverage
+	mutate(
+		coverage_p = percent(n / n_accepted),
+		coverage = glue("{number(n)}/{number(n_accepted)}")) %>%
+	# Split for printing
+	split(.$rank)
 ```
 
 Taxon sampling for the current version of FTOL (`r ftol_ver`) includes `r total_sampling$species$coverage` species (`r total_sampling$species$coverage_p`), `r total_sampling$genus$coverage` genera (`r total_sampling$genus$coverage_p`), `r total_sampling$family$coverage` families, and `r total_sampling$order$coverage` orders of ferns (all coverage values are relative to the number of accepted species in Pteridocat).
+Coverage varied by major clade from `r tax_coverage %>% first %>% extract2("coverage")` (`r tax_coverage %>% first %>% extract2("clade")`) to `r tax_coverage %>% last %>% extract2("coverage")` (`r tax_coverage %>% last %>% extract2("clade")`) (`r figure("ftol")`).
+
+Taxon sampling for the backbone phylogeny (plastome genes) includes `r bb_total_sampling$species$n` species (`r bb_total_sampling$species$coverage_p`), `r bb_total_sampling$genus$coverage` genera (`r bb_total_sampling$genus$coverage_p`), `r bb_total_sampling$family$coverage` families (`r bb_total_sampling$family$coverage_p`), and `r bb_total_sampling$order$coverage` orders of ferns.
+
+## DNA alignments
+
+```{r dna-stats}
+# Define missing base codes in ape::base.freq
+missing_base_codes <- c("n", "-", "?")
+
+# Calculate frequence of missing bases in each dataset
+plastome_base_freq <- base.freq(plastome_alignment, all = TRUE)
+plastome_missing_freq <- sum(plastome_base_freq[missing_base_codes])
+sanger_base_freq <- base.freq(sanger_alignment, all = TRUE)
+sanger_missing_freq <- sum(sanger_base_freq[missing_base_codes])
+
+sanger_missing_by_gene <-
+	sanger_alignment_tbl %>%
+	rename(gene = target) %>%
+	mutate(
+		# Format gene names for printing
+		gene = str_replace_all(gene, "-", "--"),
+		gene = str_replace_all(gene, "([^-]+)", "*\\1*"),
+		# Calculate percent missing data per gene
+		missing = map_dbl(align_trimmed, ~sum(base.freq(., all = TRUE)[missing_base_codes])),
+		missing = percent(missing)) %>%
+	select(-align_trimmed) %>%
+	arrange(missing) %>%
+	split(.$gene)
+```
+
+The Sanger DNA alignment was `r number(ncol(sanger_alignment))` bp with `r percent(sanger_missing_freq, accuracy = 0.1)` missing data (missing bases or gaps) overall; rates of missing data by locus ranged from `r sanger_missing_by_gene %>% first() %>% extract2("missing")` (`r sanger_missing_by_gene %>% first() %>% extract2("gene")`) to `r sanger_missing_by_gene %>% last() %>% extract2("missing")` (`r sanger_missing_by_gene %>% last() %>% extract2("gene")`).
+The plastome DNA alignment was `r number(ncol(plastome_alignment))` bp with `r percent(plastome_missing_freq, accuracy = 0.1)` missing data. 
+
+## Topology
+
+Ferns are strongly supported as monophyletic ("strongly supported" indicates BS 100% unless otherwise mentioned; `r figure("backbone")`).
+The first split within ferns separates a clade including Equisetales and Ophioglossales from all other species.
+The next split separates Marattiales from leptosporangiates (Polypodiidae).
+
+Within leptosporangiate ferns, Osmundales is sister to all other species.
+The next lineage to diverge is a clade including Hymenophyllales and Gleicheniales, followed by Schizaeales.
+The backbone phylogeny recovered Salviniales as sister to Cyatheales but without strong support (), which are in turn sister to Polypodiales. 
+
+The first split within Polypodiales separates a clade including Saccolomatineae and Lindsaeineae from the remainder of species, followed by the subsequent divergences of Pteridineae, then Dennstaedtiineae, which is sister to the eupolypods.
+There are two major clades within eupolypods, eupolypods I and II.
+
+Within eupolypods I, Hypodematiaceae is sister to all remaining species, which diverge successfully in the order Didymochlaenaceae, Dryopteridaceae, Lomariopsidaceae, Nephrolepidaceae, Tectariaceae, Oleandraceae, then Polypodiaceae sister to Davalliaceae.
+
+Within eupolypods II, we recover two large clades.
+One clade consists of Cyctopteridaceae, Rhacidosoraceae, Diplaziopsidaceae, and a clade comprised of Aspleniaceae and Hemidictyaceae.
+The other clade includes Thelypteridaceae, Woodsiaceae, a clade comprised of Onocleaceae and Blechnaceae, and a clade comprised of Athyriaceae and Desmophlebiaceae.
+
+## Divergence times
+
+# Discussion
+
+## FTOL phylogeny
+
+The position of Equisetales as sister to Ophioglossales agrees with some plastome studies [ML analysis of @Lehtonen2019] and many plastid studies including fewer genes, but contradicts nuclear studies, which have recovered Equisetales as sister to all other ferns [@Rothfels2015a; @Qi2018; @Shen2018].
+@Rothfels2015a argued that resolution of Equisetales sister to Ophioglossales may have been due to insufficient sampling of plastid genes available at that time, but this is not supported by our study or other recent plastid phylogenomic analyses [@Lehtonen2019].
+
+## Accesibility and usage of FTOL
+
+We have sought to make FTOL easily available to support research on the evolution and ecology of ferns.
+
+## Future directions
+
+Currently, the vast majority of publicly available DNA sequence data for ferns is Sanger-sequenced plastid gene regions.
+Plastid sequences are convenient for phylogenetic analysis because they are essentially a single, uniparentally inherited linkage group, thus free from recombination.
+However, the plastid tree does not necessarily agree with trees inferred from other data sources.
+Conflict between plastid and nuclear phylogenies has been frequently observed in narrowly focused (`r eg`, genus level) studies using traditional Sanger sequencing, and has recently been demonstrated at deeper levels within Polypodiaceae using phylogenomic approaches [@Wei2022].
+Such conflict does not necessarily reflect insufficient methodology or sampling, but rather may be due processes including (but not limited to) introgression, lineage sorting, and hybridization at deep phylogenetic levels.
+Therefore, we have no expectation that there is a single fern tree of life; rather, multiple trees exist that each capture an element of biological reality, and FTOL is merely one such possible tree.
+
+Recent studies using transcriptomics are clarifying the backbone of the fern phylogeny using many (25--2400) nuclear genes from representative species spanning the tree [@Rothfels2015a; @Qi2018; @Shen2018].
+The most comprehensively sampled phylogenomic study targeting ferns is the on-going Genealogy of Flagellate Plants (GoFLAG) project, which seeks to generate genomic data (ca. 300 single-to-low copy nuclear gene regions) for all flagellate plants (bryophytes, lycophytes, ferns, and gymnosperms) [@Breinholt2021].
+GoFLAG data have recently been used in a phylogenomic analysis and taxonomic revision of Thelypteridaceae resulting in multiple new genera [@Fawcett2021; @Fawcett2021a], and additional phylogenomic analyses of other fern groups using GoFLAG markers are to be expected in the near future.
+The rapid growth of genomic data notwithstanding, species level sampling of such nuclear phylogenomic datasets still is far less that available for plastid data.
+Furthermore, many subclades of ferns are under active investigation using plastid markers using both Sanger and next-gen sequencing, and plastid data for previously unsampled species will likely continue to grow at a rapid pace.
+We therefore expect that the methodology outlined here will continue to be useful to generate a maximally sampled plastid fern tree of life for several more years.
+Future efforts should focus on integrating across plastid and nuclear DNA sequences to gain better insight into the complex evolutionary history of ferns.
+
+# References
+<!-- Insert <div id="refs"></div> to place the refs here instead of at the end -->
+<div id="refs"></div>
 
 # Figures
 
-```{r backbone-tree}
+```{r plot-prep}
+# Make vector of outgroup taxa
 og_taxa <-
 	sanger_sampling %>%
 	filter(outgroup == TRUE) %>%
 	pull(species)
 
-family_exemp <-
-tibble(species = plastome_tree$tip.label) %>%
+# Make tibble of backbone tips with higher-level taxonomy
+backbone_taxonomy <-
+	tibble(species = plastome_tree$tip.label) %>%
+	# Add higher taxonomy
+	left_join(sanger_sampling, by = "species") %>%
+	# Add column for phylogenetic order
+	mutate(phy_order = seq_len(nrow(.))) %>%
+	# Outgroup lacks family data, so call "og"
 	mutate(
-		genus = str_split(species, "_") %>% map_chr(1),
-		phy_order = seq_len(nrow(.))) %>%
-	left_join(select(ppgi_taxonomy, family, genus), by = "genus") %>%
-	mutate(family = replace_na(family, "og")) %>%
+		family = case_when(
+			outgroup == TRUE ~ "og",
+			TRUE ~ family),
+		plot_group = case_when(
+			outgroup == TRUE ~ "og",
+			TRUE ~ plot_group)
+	)
+```
+
+```{r ftol-make}
+# Coverage bar plot ----
+
+# Make exemplar set of species in backbone representing plot groups
+plot_group_exemp_taxa <-
+	backbone_taxonomy %>%
+	# Slice to one exemplar species per family
+	group_by(plot_group) %>%
+	slice(1) %>%
+	ungroup() %>%
+	# Slicing arranges alphabetically, so put back in (unladderized) phylo order
+	arrange(phy_order)
+
+# Get names of exemplar tips in ladderized phylo order
+# Trim tree to exemplar species, rename by family
+phy <- ape::keep.tip(plastome_tree, plot_group_exemp_taxa$species)
+phy$tip.label <- plot_group_exemp_taxa$plot_group
+
+# Make tibble of plot groups in phylogenetic order
+plot_group_phy_order <-
+	phy %>%
+	# Reroot, ladderize, drop outgroup
+	root.phylo("og") %>%
+	ladderize() %>%
+	drop.tip("og") %>%
+	jntools::get_tips_in_ape_plot_order() %>%
+	tibble(
+		name = .,
+		phy_order = seq_along(.)
+	)
+
+rm(phy)
+
+# Make a color palette for major clades
+# Start with list of green.armytage.colors names,
+# exclude those that are too close or stand out too much
+# https://www.jstatsoft.org/article/view/v090c01
+green_army_use_cols <-
+c(
+	"amethyst",
+	"blue",
+	"caramel",
+	"damson",
+	# "ebony",
+	# "forest",
+	"green",
+	"honeydew",
+	# "iron",
+	# "jade",
+	# "khaki",
+	# "lime",
+	"mallow",
+	"navy",
+	# "orpiment",
+	"pink",
+	# "quagmire",
+	"red",
+	"sky",
+	"turquoise",
+	"uranium",
+	"violet",
+	"wine",
+	# "xanthin",
+	# "yellow",
+	"zinnia"
+)
+
+clade_cols <-
+Polychrome::green.armytage.colors() %>%
+  extract(green_army_use_cols) %>%
+	extract(seq_len(nrow(plot_group_phy_order))) %>%
+	set_names(plot_group_phy_order$name)
+
+# Format coverage at order-ish level for plotting
+b <-
+	coverage_data %>%
+	filter(rank == "plot_group") %>%
+	left_join(plot_group_phy_order, by = "name") %>%
+	arrange(phy_order) %>%
+	rename(clade = name) %>%
+	mutate(
+		clade = fct_reorder(clade, phy_order) %>%
+			fct_rev(),
+		coverage_text = glue("{number(n, accuracy = 1)}/{number(n_accepted, accuracy = 1)}")
+	) %>%
+	ggplot(aes(x = coverage, y = clade, fill = clade)) +
+	geom_col(color = "grey10", size = 0.2) +
+	geom_text(
+		aes(label = coverage_text),
+		hjust = 0,
+		nudge_x = 0.01,
+		size = 6*.36 # 6 pt font
+	) +
+	scale_x_continuous(
+		labels = percent,
+		limits = c(0,1),
+		expand = expansion(mult = c(0, 0))
+		) +
+	scale_fill_manual(values = clade_cols) +
+	labs(x = "Coverage") +
+	theme_bw() +
+	theme(
+		axis.text.y = element_text(size = 6),
+		axis.title.y = element_blank(),
+		legend.position = "none",
+		plot.background = element_rect(fill = "transparent", colour = NA),
+		panel.grid.major.y = element_blank(),
+		panel.grid.minor.x = element_blank()
+		)
+
+# Tree plot ----
+
+phy <- sanger_tree %>%
+	root("Anthoceros_angustus") %>%
+	ladderize()
+
+# Make tibble for annotating major clades
+# FIXME: need to do this better when full tree is available
+clade_tibble <-
+sanger_sampling %>%
+	inner_join(
+		tibble(species = phy$tip.label),
+		by = "species"
+	) %>%
+	filter(outgroup == FALSE) %>%
+	select(species, genus, plot_group) %>%
+	group_by(genus, plot_group) %>%
+	slice(1) %>%
+	ungroup() %>%
+	select(-genus) %>%
+	group_by(plot_group) %>%
+	slice(1:2) %>%
+	add_count() %>%
+	filter(n > 1) %>%
+	select(-n) %>%
+	nest() %>%
+	ungroup() %>%
+	mutate(mrca = map_dbl(data, ~getMRCA(phy, .$species))) %>%
+	select(-data) %>%
+	mutate(dummy = "")
+
+a <- ggtree(
+	phy, 
+	layout = "circular", right = FALSE, size = 0.2,
+	# FIXME: change to phylogram when ultrametric tree is done
+	branch.length = "none"
+	) +
+	geom_cladelab(
+		data = clade_tibble,
+		mapping = aes(
+			node = mrca,
+			color = plot_group,
+			label = dummy
+		),
+	offset = 0.1,
+	barsize = 2) +
+	scale_color_manual(values = clade_cols) +
+	theme(legend.position = "none")
+
+ftol_plot <-
+a + inset_element(b, left = 0.85, bottom = 0.14, right = 1.3, top = .8) +
+	plot_annotation(
+		theme = theme(
+			plot.margin = unit(c(-2,5,-2,-1.6), "cm"))
+		)
+```
+
+```{r ftol-save, eval = params$doc_type == "doc"}
+# Save plot if rendering to doc
+ggsave(
+	result_file(figure("ftol"), "pdf"),
+	ftol_plot, width = 7, height = 7, units = "in")
+```
+
+```{r ftol-print, fig.width = 5, fig.height = 5, eval = params$doc_type == "pdf"}
+# Print plot if rendering to PDF
+ftol_plot
+```
+
+**`r figure("ftol")`**. Fern Tree of Life (FTOL) `r ftol_ver`. Inset plot shows coverage by major clade. Numbers next to each bar show sampled species out of total number of species.
+
+```{r backbone-make}
+# Make exemplar set of species in backbone representing families
+family_exemp <-
+	backbone_taxonomy %>%
+	# Slice to one exemplar species per family
 	group_by(family) %>%
 	slice(1) %>%
 	ungroup() %>%
+	# Slicing arranges alphabetically, so put back in (unladderized) phylo order
 	arrange(phy_order)
-	
-backbone_tree <- ape::keep.tip(plastome_tree, family_exemp$species)
-backbone_tree$tip.label <- family_exemp$family
 
-backbone_tree$node.label <- str_replace(backbone_tree$node.label, "100", "")
-
-backbone_tree <-
-	backbone_tree %>%
+# Trim tree to exemplar species, rename by family
+phy <- keep.tip(plastome_tree, family_exemp$species)
+phy$tip.label <- family_exemp$family
+# Convert BS support values to numeric
+phy$node.label <- parse_number(phy$node.label)
+# Reroot, ladderize, drop outgroup
+phy <-
+	phy %>%
 	root.phylo("og") %>%
 	ladderize() %>%
 	drop.tip("og")
 
-plot(backbone_tree, font = 1)
-nodelabels(backbone_tree$node.label, frame = "none", col = "grey", cex = 0.8)
+# Make tibble for printing BS values
+bs_tibble <- tibble(
+	# hard-code node ID: internal nodes start after tip nodes,
+	# and phy$node.label is in the same order as internal nodes
+	node = 1:Nnode(phy) + Ntip(phy), 
+	# Don't print BS = 100%
+	bootstrap = ifelse(phy$node.label == 100, "", phy$node.label))
+
+# Use the ggtree::`%<+%` operator to map the 
+# bootstrap values onto the ggtree object
+backbone_plot <- ggtree(phy) %<+% bs_tibble +
+	# now we can show BS values using geom_text()
+	geom_text(aes(label = bootstrap), hjust = -.25, size = 2.5) +
+	# add tip labels
+	geom_tiplab(aes(label = label)) +
+	xlim(0,1.1)
 ```
 
-# References
-<!-- Insert <div id="refs"></div> to place the refs here instead of at the end -->
-<div id="refs"></div>
+```{r backbone-tree-save, eval = params$doc_type == "doc"}
+# Save plot if rendering to doc
+ggsave(
+	result_file(figure("backbone"), "pdf"),
+	backbone_plot, width = 7, height = 9, units = "in")
+```
+
+```{r backbone-tree-print, fig.width = 5, fig.height = 5, eval = params$doc_type == "pdf"}
+# Print plot if rendering to PDF
+backbone_plot
+```
+
+**`r figure("backbone")`**. Backbone phylogeny. One exemplar tip is shown per family. Unlabeled bootstrap support values are all 100%. Outgroup (seed plants, lycophytes, and bryophytes) not shown.
