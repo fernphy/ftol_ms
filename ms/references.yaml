@@ -94,6 +94,78 @@ references:
     Ages, and Relationships of Taxa
   type: article-journal
   URL: https://academic.oup.com/sysbio/article-lookup/doi/10.1093/sysbio/syw066
+- id: Breinholt2021
+  accessed:
+  - year: 2021
+    month: 4
+    day: 5
+  author:
+  - family: Breinholt
+    given: Jesse W.
+  - family: Carey
+    given: Sarah B.
+  - family: Tiley
+    given: George P.
+  - family: Davis
+    given: E. Christine
+  - family: Endara
+    given: Lorena
+  - family: McDaniel
+    given: Stuart F.
+  - family: Neves
+    given: Leandro G.
+  - family: Sessa
+    given: Emily B.
+  - family: Konrat
+    given: Matt
+    dropping-particle: von
+  - family: Chantanaorrapint
+    given: Sahut
+  - family: Fawcett
+    given: Susan
+  - family: Ickert‐Bond
+    given: Stefanie M.
+  - family: Labiak
+    given: Paulo H.
+  - family: Larraín
+    given: Juan
+  - family: Lehnert
+    given: Marcus
+  - family: Lewis
+    given: Lily R.
+  - family: Nagalingum
+    given: Nathalie S.
+  - family: Patel
+    given: Nikisha
+  - family: Rensing
+    given: Stefan A.
+  - family: Testo
+    given: Weston
+  - family: Vasco
+    given: Alejandra
+  - family: Villarreal
+    given: Juan Carlos
+  - family: Williams
+    given: Evelyn Webb
+  - family: Burleigh
+    given: J. Gordon
+  citation-key: Breinholt2021
+  container-title: Applications in Plant Sciences
+  container-title-short: Appl. Plant Sci.
+  DOI: 10/gjm9j6
+  ISSN: 2168-0450
+  issue: '1'
+  issued:
+  - year: 2021
+  language: en
+  note: '_eprint: https://bsapubs.onlinelibrary.wiley.com/doi/pdf/10.1002/aps3.11406'
+  page: e11406
+  source: Wiley Online Library
+  title: A target enrichment probe set for resolving the flagellate land plant tree
+    of life
+  type: article-journal
+  URL: https://bsapubs.onlinelibrary.wiley.com/doi/abs/10.1002/aps3.11406
+  volume: '9'
 - id: Capella-Gutierrez2009
   author:
   - family: Capella-Gutiérrez
@@ -175,11 +247,23 @@ references:
   title: A roadmap for global synthesis of the plant tree of life
   type: article-journal
   volume: '105'
+- id: Fawcett2021
+  author:
+  - family: Fawcett
+    given: Susan
+  - family: Smith
+    given: Alan
+  citation-key: Fawcett2021
+  issued:
+  - year: 2021
+  publisher: Botanical Research Institute of Texas Press
+  title: A Generic Classification of the Thelypteridaceae
+  type: book
 - id: Fawcett2021a
   accessed:
   - year: 2022
-    month: 1
-    day: 31
+    month: 2
+    day: 1
   author:
   - family: Fawcett
     given: Susan
@@ -220,6 +304,66 @@ references:
   type: article-journal
   URL: https://www.ingentaconnect.com/content/10.1600/036364421X16370109698650
   volume: '46'
+- id: Gitzendanner2018b
+  accessed:
+  - year: 2022
+    month: 2
+    day: 1
+  author:
+  - family: Gitzendanner
+    given: Matthew A.
+  - family: Soltis
+    given: Pamela S.
+  - family: Wong
+    given: Gane K.-S.
+  - family: Ruhfel
+    given: Brad R.
+  - family: Soltis
+    given: Douglas E.
+  citation-key: Gitzendanner2018b
+  container-title: American Journal of Botany
+  container-title-short: Am J Bot
+  DOI: 10/gc894d
+  ISSN: 00029122
+  issue: '3'
+  issued:
+  - year: 2018
+    month: 3
+  language: en
+  page: 291-301
+  source: DOI.org (Crossref)
+  title: 'Plastid phylogenomic analysis of green plants: A billion years of evolutionary
+    history'
+  title-short: Plastid phylogenomic analysis of green plants
+  type: article-journal
+  URL: https://onlinelibrary.wiley.com/doi/10.1002/ajb2.1048
+  volume: '105'
+- id: Grewe2013
+  author:
+  - family: Grewe
+    given: F
+  - family: Guo
+    given: W
+  - family: Gubbels
+    given: E A
+  - family: Hansen
+    given: A K
+  - family: Mower
+    given: J P
+  citation-key: Grewe2013
+  container-title: BMC evolutionary biology
+  ISSN: 1471-2148
+  issue: '1'
+  issued:
+  - year: 2013
+    month: 1
+  page: '1'
+  title: Complete plastid genomes from Ophioglossum californicum, Psilotum nudum,
+    and Equisetum hyemale reveal an ancestral land plant genome structure and resolve
+    the position of Equisetales among monilophytes
+  type: article-journal
+  URL: BMC Evolutionary Biology papers://ebd7d3df-d8f1-4be8-bcf7-4fb07ababf30/Paper/p2243
+  volume: '13'
 - id: Hennequin2014
   author:
   - family: Hennequin
@@ -367,6 +511,74 @@ references:
     Fourier transform'
   type: article-journal
   volume: '30'
+- id: Knie2015
+  author:
+  - family: Knie
+    given: Nils
+  - family: Fischer
+    given: Simon
+  - family: Grewe
+    given: Felix
+  - family: Polsakiewicz
+    given: Monika
+  - family: Knoop
+    given: Volker
+  citation-key: Knie2015
+  container-title: Molecular phylogenetics and evolution
+  DOI: 10.1016/j.ympev.2015.05.008
+  ISSN: 1095-9513
+  issued:
+  - year: 2015
+  page: 140-149
+  PMID: '25999055'
+  title: Horsetails are the sister group to all other monilophytes and Marattiales
+    are sister to leptosporangiate ferns.
+  type: article-journal
+  URL: http://www.sciencedirect.com/science/article/pii/S1055790315001451
+  volume: '90'
+- id: Kuo2011
+  author:
+  - family: Kuo
+    given: Li-Yaung
+  - family: Li
+    given: Fay-Wei
+  - family: Chiou
+    given: Wen-Liang
+  - family: Wang
+    given: Chun-Neng
+  citation-key: Kuo2011
+  container-title: Molecular Phylogenetics and Evolution
+  ISSN: '10557903'
+  issue: '3'
+  issued:
+  - year: 2011
+    month: 6
+  page: 556-566
+  title: First insights into fern *matK* phylogeny
+  type: article-journal
+  URL: http://dx.doi.org/10.1016/j.ympev.2011.03.010 papers://ebd7d3df-d8f1-4be8-bcf7-4fb07ababf30/Paper/p1708
+  volume: '59'
+- id: Kuo2018
+  author:
+  - family: Kuo
+    given: Li-Yaung
+  - family: Qi
+    given: Xinping
+  - family: Ma
+    given: Hong
+  - family: Li
+    given: Fay-Wei
+  citation-key: Kuo2018
+  container-title: American Journal of Botany
+  DOI: 10.1002/ajb2.1152
+  ISSN: 00029122
+  issue: '9'
+  issued:
+  - year: 2018
+  page: 1545-1555
+  title: 'Order-level fern plastome phylogenomics: new insights from Hymenophyllales'
+  type: article-journal
+  volume: '105'
 - id: Landau2021
   accessed:
   - year: 2021
@@ -434,6 +646,38 @@ references:
   type: article-journal
   URL: http://doi.wiley.com/10.1111/geb.12294
   volume: '24'
+- id: Lehtonen2017
+  author:
+  - family: Lehtonen
+    given: Samuli
+  - family: Silvestro
+    given: Daniele
+  - family: Karger
+    given: Dirk Nikolaus
+  - family: Scotese
+    given: Christopher
+  - family: Tuomisto
+    given: Hanna
+  - family: Kessler
+    given: Michael
+  - family: Peña
+    given: Carlos
+  - family: Wahlberg
+    given: Niklas
+  - family: Antonelli
+    given: Alexandre
+  citation-key: Lehtonen2017
+  container-title: Scientific Reports
+  DOI: 10.1038/s41598-017-05263-7
+  ISSN: '20452322'
+  issue: '1'
+  issued:
+  - year: 2017
+  page: '4831'
+  title: Environmentally driven extinction and opportunistic origination explain fern
+    diversification patterns
+  type: article-journal
+  volume: '7'
 - id: Lehtonen2019
   author:
   - family: Lehtonen
@@ -528,6 +772,33 @@ references:
   type: article-journal
   URL: https://link.springer.com/10.1007/s10265-021-01318-z
   volume: '134'
+- id: Page2008
+  accessed:
+  - year: 2022
+    month: 2
+    day: 2
+  author:
+  - family: Page
+    given: R. D. M.
+  citation-key: Page2008
+  container-title: Briefings in Bioinformatics
+  container-title-short: Briefings in Bioinformatics
+  DOI: 10/dz9
+  ISSN: 1467-5463, 1477-4054
+  issue: '5'
+  issued:
+  - year: 2008
+    month: 4
+    day: 24
+  language: en
+  page: 345-354
+  source: DOI.org (Crossref)
+  title: 'Biodiversity informatics: the challenge of linking data and the role of
+    shared identifiers'
+  title-short: Biodiversity informatics
+  type: article-journal
+  URL: https://academic.oup.com/bib/article-lookup/doi/10.1093/bib/bbn022
+  volume: '9'
 - id: Portik2020
   accessed:
   - year: 2021
@@ -599,6 +870,34 @@ references:
   title: FastTree 2 - Approximately maximum-likelihood trees for large alignments
   type: article-journal
   volume: '5'
+- id: Pryer2001
+  author:
+  - family: Pryer
+    given: Kathleen M
+  - family: Schneider
+    given: Harald
+  - family: Smith
+    given: Alan R.
+  - family: Cranfill
+    given: Raymond B
+  - family: Wolf
+    given: Paul G.
+  - family: Hunt
+    given: Jeffrey S
+  - family: Sipes
+    given: Sedonia D
+  citation-key: Pryer2001
+  container-title: Nature
+  ISSN: 00280836
+  issue: '6820'
+  issued:
+  - year: 2001
+  page: 618-622
+  title: Horsetails and ferns are a monophyletic group and the closest living relatives
+    to seed plants
+  type: article-journal
+  URL: papers://ebd7d3df-d8f1-4be8-bcf7-4fb07ababf30/Paper/p1752
+  volume: '409'
 - id: Pryer2004a
   author:
   - family: Pryer
@@ -679,6 +978,107 @@ references:
   type: article-journal
   URL: https://www.sciencedirect.com/science/article/pii/S1055790318301854?_rdoc=1&_fmt=high&_origin=gateway&_docanchor=&md5=b8429449ccfc9c30159a5f9aeaa92ffb
   volume: '127'
+- id: Qiu2006
+  author:
+  - family: Qiu
+    given: 'Y'
+  - family: Li
+    given: L
+  - family: Wang
+    given: B
+  - family: Chen
+    given: Z D
+  - family: Knoop
+    given: V
+  - family: Groth-Malonek
+    given: M
+  - family: Dombrovska
+    given: O
+  - family: Lee
+    given: J
+  - family: Kent
+    given: L
+  - family: Rest
+    given: J
+  citation-key: Qiu2006
+  container-title: Proceedings of the National Academy of Sciences
+  DOI: 10.1073/pnas.0603335103
+  ISSN: 1091-6490
+  issue: '42'
+  issued:
+  - year: 2006
+  page: '15511'
+  title: The deepest divergences in land plants inferred from phylogenomic evidence
+  type: article-journal
+  URL: papers://ebd7d3df-d8f1-4be8-bcf7-4fb07ababf30/Paper/p1622
+  volume: '103'
+- id: Qiu2007
+  accessed:
+  - year: 2022
+    month: 2
+    day: 1
+  author:
+  - family: Qiu
+    given: Yin‐Long
+  - family: Li
+    given: Libo
+  - family: Wang
+    given: Bin
+  - family: Chen
+    given: Zhiduan
+  - family: Dombrovska
+    given: Olena
+  - family: Lee
+    given: Jungho
+  - family: Kent
+    given: Livija
+  - family: Li
+    given: Ruiqi
+  - family: Jobson
+    given: Richard W.
+  - family: Hendry
+    given: Tory A.
+  - family: Taylor
+    given: David W.
+  - family: Testa
+    given: Christopher M.
+  - family: Ambros
+    given: Mathew
+  citation-key: Qiu2007
+  container-title: International Journal of Plant Sciences
+  container-title-short: International Journal of Plant Sciences
+  DOI: 10/cfzs3k
+  ISSN: 1058-5893, 1537-5315
+  issue: '5'
+  issued:
+  - year: 2007
+    month: 6
+  language: en
+  page: 691-708
+  source: DOI.org (Crossref)
+  title: A Nonflowering Land Plant Phylogeny Inferred from Nucleotide Sequences of
+    Seven Chloroplast, Mitochondrial, and Nuclear Genes
+  type: article-journal
+  URL: http://www.journals.uchicago.edu/doi/10.1086/513474
+  volume: '168'
+- id: Rai2010
+  author:
+  - family: Rai
+    given: H
+  - family: Graham
+    given: S
+  citation-key: Rai2010
+  container-title: American Journal of Botany
+  ISSN: 1537-2197
+  issue: '9'
+  issued:
+  - year: 2010
+  page: '1444'
+  title: Utility of a large, multigene plastid data set in inferring higher-order
+    relationships in ferns and relatives (monilophytes)
+  type: article-journal
+  URL: papers://ebd7d3df-d8f1-4be8-bcf7-4fb07ababf30/Paper/p1580
+  volume: '97'
 - id: RCoreTeam2020a
   author:
   - literal: R Core Team
@@ -747,6 +1147,58 @@ references:
   type: article-journal
   URL: http://www.amjbot.org/content/early/2015/07/15/ajb.1500089
   volume: '102'
+- id: Ruhfel2014
+  author:
+  - family: Ruhfel
+    given: Brad R
+  - family: Gitzendanner
+    given: Matthew
+    dropping-particle: a
+  - family: Soltis
+    given: Pamela S
+  - family: Soltis
+    given: Douglas E
+  - family: Burleigh
+    given: J Gordon
+  citation-key: Ruhfel2014
+  container-title: BMC evolutionary biology
+  DOI: 10.1186/1471-2148-14-23
+  ISSN: 1471-2148
+  issued:
+  - year: 2014
+    month: 1
+  page: '23'
+  PMID: '24533922'
+  title: From algae to angiosperms-inferring the phylogeny of green plants (Viridiplantae)
+    from 360 plastid genomes.
+  type: article-journal
+  URL: http://www.pubmedcentral.nih.gov/articlerender.fcgi?artid=3933183&tool=pmcentrez&rendertype=abstract
+  volume: '14'
+- id: Schneider2004d
+  author:
+  - family: Schneider
+    given: Harald
+  - family: Schuettpelz
+    given: Eric
+  - family: Pryer
+    given: Kathleen M
+  - family: Cranfill
+    given: Raymond B
+  - family: Magallón
+    given: Susana
+  - family: Lupia
+    given: Richard
+  citation-key: Schneider2004d
+  container-title: Nature
+  ISSN: 00280836
+  issue: '6982'
+  issued:
+  - year: 2004
+  page: 553-557
+  title: Ferns diversified in the shadow of angiosperms
+  type: article-journal
+  URL: papers://ebd7d3df-d8f1-4be8-bcf7-4fb07ababf30/Paper/p1859
+  volume: '428'
 - id: Schuettpelz2007
   author:
   - family: Schuettpelz
@@ -1026,6 +1478,106 @@ references:
     nuclear ribosomal, and morphological evidence
   type: article-journal
   URL: https://onlinelibrary.wiley.com/doi/10.1002/tax.12658
+- id: Wickett2014
+  author:
+  - family: Wickett
+    given: N J
+  - family: Mirarab
+    given: S.
+  - family: Nguyen
+    given: N.
+  - family: Warnow
+    given: T.
+  - family: Carpenter
+    given: E.
+  - family: Matasci
+    given: N.
+  - family: Ayyampalayam
+    given: S.
+  - family: Barker
+    given: Michael S
+  - family: Burleigh
+    given: J. G.
+  - family: Gitzendanner
+    given: M. A.
+  - family: Ruhfel
+    given: Brad R
+  - family: Wafula
+    given: E.
+  - family: Der
+    given: Joshua P
+  - family: Graham
+    given: S. W.
+  - family: Mathews
+    given: S.
+  - family: Melkonian
+    given: M.
+  - family: Soltis
+    given: D. E.
+  - family: Soltis
+    given: P. S.
+  - family: Miles
+    given: N. W.
+  - family: Rothfels
+    given: Carl J.
+  - family: Pokorny
+    given: L.
+  - family: Shaw
+    given: A. J.
+  - family: DeGironimo
+    given: L.
+  - family: Stevenson
+    given: D. W.
+  - family: Surek
+    given: B.
+  - family: Villarreal
+    given: J. C.
+  - family: Roure
+    given: B.
+  - family: Philippe
+    given: H.
+  - family: DePamphilis
+    given: C. W.
+  - family: Chen
+    given: T.
+  - family: Deyholos
+    given: M. K.
+  - family: Baucom
+    given: R. S.
+  - family: Kutchan
+    given: T. M.
+  - family: Augustin
+    given: M. M.
+  - family: Wang
+    given: J.
+  - family: Zhang
+    given: Y.
+  - family: Tian
+    given: Z.
+  - family: Yan
+    given: Z.
+  - family: Wu
+    given: X.
+  - family: Sun
+    given: X.
+  - family: Wong
+    given: G. K.-S.
+  - family: Leebens-Mack
+    given: J.
+  citation-key: Wickett2014
+  container-title: Proceedings of the National Academy of Sciences
+  DOI: 10.1073/pnas.1323926111
+  ISSN: 0027-8424
+  issue: '45'
+  issued:
+  - year: 2014
+    month: 10
+  page: E4859-E4868
+  title: Phylotranscriptomic analysis of the origin and early diversification of land
+    plants
+  type: article-journal
+  URL: http://www.pnas.org/cgi/doi/10.1073/pnas.1323926111
+  volume: '111'
 - id: Zhang2020
   author:
   - family: Zhang

@@ -20,7 +20,8 @@ bibliography:
 ---
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+knitr::opts_chunk$set(
+	echo = FALSE, warning = FALSE, message = FALSE, results = 'hide')
 
 # Load packages
 library(conflicted)
@@ -303,7 +304,8 @@ add_plot_group <- function(data) {
 		mutate(
 			plot_group = coalesce(suborder, order),
 			plot_group = case_when(
-				plot_group %in% c("Ophioglossales", "Psilotales") ~ "Ophioglossales + Psilotales",
+				plot_group %in% c("Ophioglossales", "Psilotales") ~ 
+					"Ophioglossales + Psilotales",
 				TRUE ~ plot_group
 			)
 		)
@@ -334,15 +336,20 @@ accepted_species <-
 	filter(taxonRank == "species" | is.na(taxonRank)) %>%
 	select(scientificName) %>%
 	mutate(
-		rgnparser::gn_parse_tidy(scientificName) %>% select(species = canonicalsimple),
+		rgnparser::gn_parse_tidy(scientificName) %>% 
+			select(species = canonicalsimple),
 		species = str_replace_all(species, " ", "_")
 	) %>%
 	# Map on higher level taxonomy
 	mutate(genus = str_split(scientificName, " ") %>% map_chr(1)) %>%
-	left_join(select(ppgi_taxonomy, genus, family, suborder, order, class), by = "genus") %>%
+	left_join(
+		select(ppgi_taxonomy, genus, family, 
+					 suborder, order, class), by = "genus"
+		) %>%
 	# FIXME: update class for nothogenera in PPG
 	mutate(class = case_when(
-		str_detect(scientificName, "Schizoloma|Phlebosia|Cystocarpium") ~ "Polypodiopsida",
+		str_detect(
+			scientificName, "Schizoloma|Phlebosia|Cystocarpium") ~ "Polypodiopsida",
 		TRUE ~ class
 	)) %>%
 	# Drop lycophytes
@@ -404,7 +411,7 @@ total_sampling <-
 	# Calculate coverage
 	mutate(
 		coverage_p = percent(n / n_accepted),
-		coverage = glue("{number(n)}/{number(n_accepted)}")) %>%
+		coverage = glue("{number(n, accuracy = 1)}/{number(n_accepted, accuracy = 1)}")) %>% #nolint
 	# Split for printing
 	split(.$rank)
 
@@ -447,7 +454,7 @@ bb_total_sampling <-
 	# Calculate coverage
 	mutate(
 		coverage_p = percent(n / n_accepted),
-		coverage = glue("{number(n)}/{number(n_accepted)}")) %>%
+		coverage = glue("{number(n, accuracy = 1)}/{number(n_accepted, accuracy = 1)}")) %>% #nolint
 	# Split for printing
 	split(.$rank)
 ```
@@ -489,20 +496,43 @@ The plastome DNA alignment was `r number(ncol(plastome_alignment))` bp with `r p
 
 ## Topology
 
-Ferns are strongly supported as monophyletic ("strongly supported" indicates BS 100% unless otherwise mentioned; `r figure("backbone")`).
-The first split within ferns separates a clade including Equisetales and Ophioglossales from all other species.
-The next split separates Marattiales from leptosporangiates (Polypodiidae).
+```{r topology-stats}
+#' Function to get support value in BS%
+#'
+#' @param phy an object of class "phylo".
+#' @param tips a vector of mode numeric or character specifying the tips
+#'
+#' @return Bootstrap support as % of that node
+get_bs <- function(phy, tips) {
+	node_select <- ape::getMRCA(phy, tips)
+	as_tibble(phy) %>%
+	filter(node == node_select) %>%
+		pull(label) %>%
+		parse_number() %>%
+		magrittr::multiply_by(0.01) %>%
+		percent()
+}
+
+ferns_bs <- get_bs(plastome_tree, c("Equisetum_arvense", "Danaea_nodosa"))
+hym_gle_bs <- get_bs(plastome_tree, c("Dipteris_conjugata", "Hymenophyllum_polyanthos"))
+cyath_salv_bs <- get_bs(plastome_tree, c("Plagiogyria_adnata", "Azolla_filiculoides"))
+denn_poly_bs <- get_bs(plastome_tree, c("Dennstaedtia_hirsuta", "Pseudophegopteris_aurita"))
+```
+
+Ferns are strongly supported as monophyletic (BS `r ferns_bs`; all subsequent relationships mentioned received BS >=`r percent(.98)` in the backbone phylogeny unless otherwise indicated).
+The first split within ferns separates a clade including Equisetidae and Ophioglossidae from all other species (`r figure("backbone")`).
+The next split separates Marattiales from the remaining ferns, the leptosporangiates (Polypodiidae).
 
 Within leptosporangiate ferns, Osmundales is sister to all other species.
-The next lineage to diverge is a clade including Hymenophyllales and Gleicheniales, followed by Schizaeales.
-The backbone phylogeny recovered Salviniales as sister to Cyatheales but without strong support (), which are in turn sister to Polypodiales. 
+The next lineage to diverge is a clade including Hymenophyllales and Gleicheniales (BS `r hym_gle_bs`), followed by Schizaeales.
+Salviniales was recovered as sister to Cyatheales but without strong support (BS `r cyath_salv_bs`), which are in turn sister to Polypodiales. 
 
-The first split within Polypodiales separates a clade including Saccolomatineae and Lindsaeineae from the remainder of species, followed by the subsequent divergences of Pteridineae, then Dennstaedtiineae, which is sister to the eupolypods.
-There are two major clades within eupolypods, eupolypods I and II.
+The first split within Polypodiales separates a clade including Saccolomatineae and Lindsaeineae from the remainder of species, followed by the subsequent divergences of Pteridineae, then Dennstaedtiineae, which is sister to the eupolypods with moderate support (BS `r denn_poly_bs`).
+There are two major clades within eupolypods, Polypodiineae (eupolypods I) and Aspleniineae (eupolypods II).
 
-Within eupolypods I, Hypodematiaceae is sister to all remaining species, which diverge successfully in the order Didymochlaenaceae, Dryopteridaceae, Lomariopsidaceae, Nephrolepidaceae, Tectariaceae, Oleandraceae, then Polypodiaceae sister to Davalliaceae.
+Within Polypodiineae, Hypodematiaceae is sister to all remaining species, which diverge successfully in the order Didymochlaenaceae, Dryopteridaceae, Lomariopsidaceae, Nephrolepidaceae, Tectariaceae, Oleandraceae, then finally Polypodiaceae sister to Davalliaceae.
 
-Within eupolypods II, we recover two large clades.
+Within Aspleniineae, we recover two large clades.
 One clade consists of Cyctopteridaceae, Rhacidosoraceae, Diplaziopsidaceae, and a clade comprised of Aspleniaceae and Hemidictyaceae.
 The other clade includes Thelypteridaceae, Woodsiaceae, a clade comprised of Onocleaceae and Blechnaceae, and a clade comprised of Athyriaceae and Desmophlebiaceae.
 
@@ -512,12 +542,29 @@ The other clade includes Thelypteridaceae, Woodsiaceae, a clade comprised of Ono
 
 ## FTOL phylogeny
 
-The position of Equisetales as sister to Ophioglossales agrees with some plastome studies [ML analysis of @Lehtonen2019] and many plastid studies including fewer genes, but contradicts nuclear studies, which have recovered Equisetales as sister to all other ferns [@Rothfels2015a; @Qi2018; @Shen2018].
-@Rothfels2015a argued that resolution of Equisetales sister to Ophioglossales may have been due to insufficient sampling of plastid genes available at that time, but this is not supported by our study or other recent plastid phylogenomic analyses [@Lehtonen2019].
+The phylogenetic position of Equisetidae relative to other ferns has long been a point of contention in molecular systematics of ferns.
+We recovered Equisetidae as sister to Ophioglossidae (Psilotales + Ophioglossales), in agreement with other plastid phylogenomic analyses [@Grewe2013; @Ruhfel2014; @Gitzendanner2018b; @Lehtonen2019; @Kuo2018].
+This contradicts nuclear phylogenomic analyses [@Rothfels2015a; @Qi2018; @Shen2018], most plastid analyses with smaller numbers (`r ca` 3--17) of genes [@Schneider2004d; @Rai2010; @Kuo2011; @Testo2016a] and an analysis including mitochondrial data [@Knie2015], which have recovered Equisetidae as sister to all other ferns; some earlier plastid analyses based on Sanger data also recovered Equisetidae sister to Marattidae with low support [@Pryer2001; @Qiu2006; @Qiu2007].
+Aside from alternative resolutions of Equisetidae dependent on nuclear envelope or model parameters [@Wickett2014; @Kuo2018], structural support exists for both Equisetidae as sister to Ophioglossidae [`r ca` 550 bp intron in plastid *rps12i346*\; @Grewe2013] and Equisetidae as sister to all other ferns [`r ca` 70 bp intron in mitochondrial *rpl2*\; @Knie2015].
+The clear contradiction between plastid and nuclear phylogenomic data may indicate ancient hybridization or introgression, but robust support for any particular scenario is lacking.
+
+Another enigmatic relationship in ferns is the placement of Hymenophyllales.
+The monophyly of Polypodiidae (leptosporangiate ferns) is well supported across many studies and not in doubt, as is the status of Osmundales as the first lineage to diverge from the remainder of leptosporangiates.
+However, the subsequent placement of Hymenophyllales differs across studies: some recover Hymenophyllales as the next diverging lineage after Osmundales [@Pryer2001; @Testo2016a; @Schneider2004d; @Schuettpelz2007], while others recover a clade comprising Hymenophyllales sister to Gleicheniales, which then together are sister to the remaining non-Osmundales leptosporangiates [@Pryer2004a; @Lehtonen2017].
+Another possibility supported by recent transcriptomic studies is Hymenophyllaceae sister to Gleicheniaceae, which are in turn sister to Dipteridaceae, resulting in a non-monophyletic Gleicheniales [@Qi2018; @Shen2018].
+We recovered a monophyletic Gleicheniales sister to Hymenophyllales with moderate support, a relationship that was also observed in some, but not all, analyses of plastome data by @Lehtonen2019 and @Kuo2018.
+However, current plastome sampling does not include all genera of Gleicheniales; additional taxon sampling may help to resolve this relationship.
 
 ## Accesibility and usage of FTOL
 
 We have sought to make FTOL easily available to support research on the evolution and ecology of ferns.
+FTOL is available via the "ftol" R package, as well as a web portal (FIXME: add URL when ready).
+
+A typical step in any analysis that joins data across multiple sources (`r eg`, trait data and a phylogeny) is to resolve taxonomic names so that the usage of synonyms does not prevent data from joining [@Page2008].
+During the preparation of FTOL, we developed two additional R packages that enable taxonomic name resolution to join data with FTOL: the "pteridocat" package (https://github.com/joelnitta/pteridocat) and the "taxastand" package (https://github.com/joelnitta/taxastand) .
+The "pteridocat" package includes the pteridcat taxonomic database as a data frame (tibble) in Darwin Core format.
+The "taxastand" package includes functions to resolve taxonomic names while taking account variation in taxonomic author format and orthographic variation.
+By using these two packages in combination, it should be straightforward for other researchers to map their own data onto FTOL, thus greatly enabling and enhancing studies including, but not limited to, comparative phylogenetics, biogeography, and community ecology in ferns.
 
 ## Future directions
 
@@ -678,39 +725,46 @@ b <-
 		)
 
 # Tree plot ----
-
 phy <- sanger_tree %>%
 	root("Anthoceros_angustus") %>%
 	ladderize()
 
 # Make tibble for annotating major clades
-# FIXME: need to do this better when full tree is available
 clade_tibble <-
-sanger_sampling %>%
-	inner_join(
-		tibble(species = phy$tip.label),
-		by = "species"
-	) %>%
-	filter(outgroup == FALSE) %>%
-	select(species, genus, plot_group) %>%
-	group_by(genus, plot_group) %>%
-	slice(1) %>%
-	ungroup() %>%
-	select(-genus) %>%
+tibble(
+	Polypodiineae = c("Leucostegia_truncata", "Didymochlaena_fijiensis"),
+	Aspleniineae = c("Acystopteris_taiwaniana", "Rhachidosorus_pulcher"),
+	Dennstaedtiineae = c("Monachosorum_flagellare", "Dennstaedtia_auriculata"),
+	Pteridineae = c("Coniogramme_affinis", "Pteris_dispar"),
+	Lindsaeineae = c("Cystodium_sorbifolium", "Odontosoria_retusa"),
+	Saccolomatineae = c("Saccoloma_inaequale", "Orthiopteris_campylura"),
+	Cyatheales = c("Cyathea_bipinnatifida", "Culcita_macrocarpa"),
+	Salviniales = c("Marsilea_nashii", "Salvinia_oblongifolia"),
+	Schizaeales = c("Schizaea_elegans", "Lygodium_palmatum"),
+	Gleicheniales = c("Matonia_foxworthyi", "Sticherus_bifidus"),
+	Hymenophyllales = c("Cephalomanes_javanicum", "Hymenophyllum_tortuosum"),
+	Marattiales = c("Angiopteris_evecta", "Danaea_erecta"),
+	`Ophioglossales + Psilotales` = c("Psilotum_nudum", "Sceptridium_nipponicum"),
+	Osmundales = c("Osmundastrum_cinnamomeum", "Todea_barbara"),
+	Equisetales = c("Equisetum_bogotense", "Equisetum_hyemale")
+) %>%
+	pivot_longer(names_to = "plot_group", values_to = "taxa", cols = everything()) %>%
+	arrange(plot_group) %>%
 	group_by(plot_group) %>%
-	slice(1:2) %>%
-	add_count() %>%
-	filter(n > 1) %>%
-	select(-n) %>%
-	nest() %>%
-	ungroup() %>%
-	mutate(mrca = map_dbl(data, ~getMRCA(phy, .$species))) %>%
-	select(-data) %>%
-	mutate(dummy = "")
+	summarize(taxa = list(taxa)) %>%
+	mutate(
+		mrca = map_chr(taxa, ~getMRCA(phy, .))
+	) %>%
+	transmute(
+		plot_group,
+		mrca,
+		dummy = ""
+	) %>%
+	mutate(mrca = parse_number(mrca))
 
 a <- ggtree(
 	phy, 
-	layout = "circular", right = FALSE, size = 0.2,
+	layout = "circular", right = FALSE, size = 0.1,
 	# FIXME: change to phylogram when ultrametric tree is done
 	branch.length = "none"
 	) +
@@ -779,14 +833,83 @@ bs_tibble <- tibble(
 	# Don't print BS = 100%
 	bootstrap = ifelse(phy$node.label == 100, "", phy$node.label))
 
+tibble(
+	Polypodiineae = c("Hypodematiaceae", "Davalliaceae"),
+	Aspleniineae = c("Cystopteridaceae", "Athyriaceae"),
+	Lindsaeineae = c("Lindsaeaceae", "Cystodiaceae"),
+	Cyatheales = c("Cyatheaceae", "Plagiogyriaceae"),
+	Salviniales = c("Marsileaceae", "Salviniaceae"),
+	Schizaeales = c("")
+) %>%
+	pivot_longer(names_to = "plot_group", values_to = "taxa", cols = everything()) %>%
+	arrange(plot_group) %>%
+	group_by(plot_group) 
+
+# Make tibble for labeling clades
+phy_tip <- as_tibble(phy)
+
+suborder_labels_singletons <-
+ family_exemp %>% 
+	filter(outgroup == FALSE) %>%
+	group_by(plot_group) %>%
+	select(plot_group, family) %>% 
+	filter(n_distinct(family) == 1) %>%
+ 	ungroup() %>%
+ 	left_join(phy_tip, by = c(family = "label")) %>%
+ 	select(plot_group, mrca = node)
+
+suborder_labels <-
+  family_exemp %>% 
+	filter(outgroup == FALSE) %>%
+	group_by(plot_group) %>%
+	select(plot_group, family) %>% 
+	filter(n_distinct(family) > 1) %>%
+	summarize(taxa = list(family)) %>%
+	mutate(
+		mrca = map_chr(taxa, ~getMRCA(phy, .))
+	) %>%
+	transmute(
+		plot_group,
+		mrca
+	) %>%
+	mutate(mrca = parse_number(mrca)) %>%
+	bind_rows(suborder_labels_singletons)
+
 # Use the ggtree::`%<+%` operator to map the 
 # bootstrap values onto the ggtree object
-backbone_plot <- ggtree(phy) %<+% bs_tibble +
+backbone_plot <- 
+	ggtree(phy) %<+% bs_tibble +
 	# now we can show BS values using geom_text()
 	geom_text(aes(label = bootstrap), hjust = -.25, size = 2.5) +
 	# add tip labels
 	geom_tiplab(aes(label = label)) +
-	xlim(0,1.1)
+	# label clades
+	geom_cladelab(
+		data = suborder_labels,
+		mapping = aes(
+			node = mrca,
+			label = plot_group
+		),
+		offset = 0.26,
+		align = TRUE,
+		extend = 0.3,
+		textcolour = "black",
+		barsize = 2) +
+	# highlight clades
+	geom_hilight(
+		data = suborder_labels,
+		mapping = aes(
+			node = mrca,
+			fill = plot_group
+		),
+		alpha = 0.2,
+		align = "right",
+		extend = 0.28,
+		gradient.direction = "rt",
+		gradient.length.out = 2) +
+	scale_fill_manual(values = clade_cols) +
+	xlim(0, 1.7) +
+	theme(legend.position = "none")
 ```
 
 ```{r backbone-tree-save, eval = params$doc_type == "doc"}

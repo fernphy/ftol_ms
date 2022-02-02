@@ -9,6 +9,7 @@ number <- function(...) {scales::number(big.mark = ",", ...)}
 # Abbreviations
 ie <- "*i.e.*"
 eg <- "*e.g.*"
+ca <- "*ca.*"
 
 # References ----
 
