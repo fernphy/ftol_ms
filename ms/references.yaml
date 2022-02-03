@@ -695,6 +695,36 @@ references:
   title: Dynamism in plastome structure observed across the phylogenetic tree of ferns
   type: article-journal
   volume: '190'
+- id: Loiseau2020
+  author:
+  - family: Loiseau
+    given: Oriane
+  - family: Weigand
+    given: Anna
+  - family: Noben
+    given: Sarah
+  - family: Rolland
+    given: Jonathan
+  - family: Silvestro
+    given: Daniele
+  - family: Kessler
+    given: Michael
+  - family: Lehnert
+    given: Marcus
+  - family: Salamin
+    given: Nicolas
+  citation-key: Loiseau2020
+  container-title: Annals of Botany
+  DOI: 10.1093/aob/mcz145
+  ISSN: '10958290'
+  issue: '1'
+  issued:
+  - year: 2020
+  page: 93-103
+  title: 'Slowly but surely: Gradual diversification and phenotypic evolution in the
+    hyperdiverse tree fern family Cyatheaceae'
+  type: article-journal
+  volume: '125'
 - id: Minh2013
   author:
   - family: Minh

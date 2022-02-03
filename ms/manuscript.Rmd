@@ -282,7 +282,7 @@ We compiled a list of putative rogue GenBank accessions, re-ran all analyses to 
 ## Molecular dating
 
 We dated the tree using treePL [@Smith2012].
-We applied a set of `r nrow (plastid_calibration_dates)` calibration points as minimum ages.
+We applied a set of FIXME calibration points as minimum ages.
 Our calibration points are all based on fossils (not secondary calibration points) following a careful literature review.
 We used the species identification of each fossil to assign lineage only after consulting the original publication; previous studies [`r eg`, @Testo2016a] have used genus to assign lineage, but this can be problematic as genus concepts may vary between the original publication and current taxonomy [`r eg`, *Kuylisporites*\; @Loiseau2020].
 
@@ -958,17 +958,17 @@ backbone_plot <-
 		barcolour = "grey20",
 		barsize = 2) +
 	# Label other groups
-	geom_label_repel(
+	geom_text_repel(
 		data = other_clade_labels %>%
 			filter(clade_label == "Polypodiidae\n(leptosporangiates)"),
 		aes(x = x, y = y, label = clade_label),
 		hjust = 0,
 		xlim = c(NA, 10),
-		ylim = c(13, NA),
+		ylim = c(15, NA),
 		color = "grey20",
 		segment.color = "grey20"
 	) +
-	geom_label_repel(
+	geom_text_repel(
 		data = other_clade_labels %>%
 			filter(clade_label == "eupolypods"),
 		aes(x = x, y = y, label = clade_label),
@@ -978,13 +978,13 @@ backbone_plot <-
 		color = "grey20",
 		segment.color = "grey20"
 	) +
-	geom_label_repel(
+	geom_text_repel(
 		data = other_clade_labels %>%
 			filter(clade_label == "Polypodiales"),
 		aes(x = x, y = y, label = clade_label),
 		hjust = 0,
-		nudge_x = -25,
-		nudge_y = 4,
+		xlim = c(NA, 48),
+		ylim = c(24, NA),
 		color = "grey20",
 		segment.color = "grey20"
 	) +
