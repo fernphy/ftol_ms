@@ -38,6 +38,7 @@ library(glue)
 library(Polychrome)
 library(patchwork)
 library(magrittr)
+library(ggrepel)
 
 # Resolve conflicts
 conflict_prefer("filter", "dplyr")
@@ -70,23 +71,10 @@ tar_load(
 )
 
 # FIXME: read in real ultrametric tree when ready
-sanger_tree <- ape::read.tree(here::here("working/sanger_alignment.phy.contree.tre"))
+sanger_tree <- ape::read.tree(here::here("working/sanger_alignment_2022-02-02.tre"))
 ```
 
 ```{r abstract-stats}
-# Helper function to add plot_group:
-# a "rank" that may be at order or suborder level for plotting
-add_plot_group <- function(data) {
-	data %>%
-		mutate(
-			plot_group = coalesce(suborder, order),
-			plot_group = case_when(
-				plot_group %in% c("Ophioglossales", "Psilotales") ~ "Ophioglossales + Psilotales",
-				TRUE ~ plot_group
-			)
-		)
-}
-
 # Make tibble of outgroup species
 og_species <- 
 	plastome_metadata_renamed %>%
@@ -222,16 +210,16 @@ This revealed some species names in GenBank that were lacking in the World Ferns
 Therefore, we updated and edited the World Ferns database using the dwctaxon R package, which is designed to work with taxonomic data in the Darwin Core format.
 We refer to the resulting taxonomic database as "pteridocat", and have made it freely available online (https://github.com/joelnitta/pteridocat) so that other researchers may standardize taxonomic names in their data to match those of FTOL.
 
-## Automated removal of contaminations
+## Automated removal of rogue sequences
 
-Another potential issue with GenBank sequences is the presence of misidentified sequences and contaminations (hereafter "contaminations").
-We removed putative contaminations from Sanger sequences as follows.
+Another potential issue with GenBank sequences is the presence of misidentified sequences and contaminations (hereafter "rogues").
+We removed putative rogues from Sanger sequences as follows.
 First, we constructed a BLAST library including all extracted Sanger sequences.
 Next, we conducted one BLAST search for each Sanger sequence against the library (all-by-all BLAST).
 We compared the families (following PPGI) of the matching sequences to each query; in the case the top three best matches belonged to a different family than the query, that query was considered a contamination and excluded from further analysis.
 For Cyatheales and Saccolomatineae, which include several closely related small families, we used the order and sub-order level, respectively, instead of family.
 Species belonging to monotypic families were not considered for this filtering.
-While this method cannot account for contaminations at finer taxonomic levels, it is an efficient method to remove obviously incorrect sequences.
+While this method cannot account for rogues at finer taxonomic levels, it is an efficient method to remove obviously incorrect sequences.
 
 ## Sequence selection and concatenation
 
@@ -279,10 +267,24 @@ We applied the 'GTR+I+G' model to a concatenated dataset with no partitioning.
 Next, we used the backbone phylogeny as a constraint tree to conduct phylogenetic analysis of the Sanger loci in IQ TREE.
 Settings for the ML analysis of the Sanger loci were otherwise identical to the backbone phylogenetic analysis.
 
+We did not conduct a more exhaustive analysis testing various partitions of the data or other phylogenetic methods as our goal is to produce a single species-level phylogeny that is a reasonable hypothesis of fern evolution, not to interrogate the outcomes of multiple, more or less equally applicable phylogenetic methods.
+
+## Manual inspection
+
+After generating the initial ML tree, we manually inspected it to identify any putative remaining rogues at finer levels that were missed by our automated detection at the family level.
+Where applicable, we updated our taxonomic database if the molecular data clearly indicated the current usage of a synonym was incorrect.
+However, this is not possible in all cases, particularly in groups that are in need of taxonomic revision (`r eg`, cheilanthoid ferns, grammitid ferns, microsoroid ferns).
+While we consider our phylogeny as an important guide for future taxonomic revisions, we did not make any taxonomic changes that would require valid publication according to the Code of Botanical Taxonomy.
+In a very small number of cases we assigned a different higher level taxonomy for recently described names if no existing combinations were available that were compatible with our taxonomic system.
+These are indicated in our supplemental data files as "comb. ined.".
+We compiled a list of putative rogue GenBank accessions, re-ran all analyses to this point after excluding rogues, then continued with the manually inspected phylogeny.
+
 ## Molecular dating
 
-We dated the tree using treePL [@Smith2012], which is one of the only programs capable of dating very large alignments.
-We applied a set of `r nrow (plastid_calibration_dates)` calibration points, mostly based on @Testo2016a and references within.
+We dated the tree using treePL [@Smith2012].
+We applied a set of `r nrow (plastid_calibration_dates)` calibration points as minimum ages.
+Our calibration points are all based on fossils (not secondary calibration points) following a careful literature review.
+We used the species identification of each fossil to assign lineage only after consulting the original publication; previous studies [`r eg`, @Testo2016a] have used genus to assign lineage, but this can be problematic as genus concepts may vary between the original publication and current taxonomy [`r eg`, *Kuylisporites*\; @Loiseau2020].
 
 ## Reproducibility
 
@@ -561,12 +563,31 @@ We have sought to make FTOL easily available to support research on the evolutio
 FTOL is available via the "ftol" R package, as well as a web portal (FIXME: add URL when ready).
 
 A typical step in any analysis that joins data across multiple sources (`r eg`, trait data and a phylogeny) is to resolve taxonomic names so that the usage of synonyms does not prevent data from joining [@Page2008].
-During the preparation of FTOL, we developed two additional R packages that enable taxonomic name resolution to join data with FTOL: the "pteridocat" package (https://github.com/joelnitta/pteridocat) and the "taxastand" package (https://github.com/joelnitta/taxastand) .
-The "pteridocat" package includes the pteridcat taxonomic database as a data frame (tibble) in Darwin Core format.
+During the preparation of FTOL, we developed two additional R packages that enable taxonomic name resolution to join data with FTOL: the "pteridocat" package (https://github.com/joelnitta/pteridocat) and the "taxastand" package (https://github.com/joelnitta/taxastand).
+We selected R because it is widely used by the ecological research community, well established, and freely available.
+The "pteridocat" package includes the pteridocat taxonomic database as a data frame (tibble) in Darwin Core format.
 The "taxastand" package includes functions to resolve taxonomic names while taking account variation in taxonomic author format and orthographic variation.
 By using these two packages in combination, it should be straightforward for other researchers to map their own data onto FTOL, thus greatly enabling and enhancing studies including, but not limited to, comparative phylogenetics, biogeography, and community ecology in ferns.
 
-## Future directions
+## FTOL as a living, community-driven resource
+
+One feature of FTOL that sets it apart from the vast majority of other fern phylogenetic studies is its iterative nature.
+Unlike most other published fern phylogenies, the current version of FTOL described in this manuscript (`r ftol_ver`) is not meant to be the last.
+Rather, we plan to re-run these analyses as additional data become available on GenBank, and release updated versions of the tree regularly (`ie`, semi-annually).
+
+Furthermore, FTOL will not only grow in size with time, but also become more refined.
+We are aware that our methodology cannot produce a "perfect" tree, nor is that our goal.
+Each round of analysis involves a step to manually inspect the tree and make taxonomic modifications (`ie`, change opinion regarding synonyms) and flag rogue accessions for exclusion.
+However, it is impossible to catch everything since it is possible the subsequent round of GenBank mining will recover additional rogues among the replacements for the excluded sequences.
+Indeed, we anticipate that there will almost always be tips in the tree that need correction, either because they get overlooked, or proper taxonomic treatment is not yet available (`r eg`, cheilanthoid ferns).
+That is why we have made our methodology (code), data, and software (R packages and docker image) completely open and available to the research community.
+It is our hope that other researchers using FTOL will contribute by making edits and suggestions, preferably through GitHub (https://github.com/joelnitta/ftol) or by contacting us by email.
+This way, FTOL will continually improve and keep pace with the currently available data and taxonomic hypotheses of ferns.
+
+We want to make it clear that FTOL is no way meant to be the "official" fern phylogeny; it is simply one reasonable hypothesis that has been designed to be maximally inclusive at the species level.
+FTOL cannot substitute for systematic careful studies at finer taxonomic scales that include sampling multiple individuals per species and/or other sources (`r eg`, morphologic, nuclear) of data, and such studies continue to be vital to our understanding of fern evolution.
+
+## Plastid vs. nuclear trees
 
 Currently, the vast majority of publicly available DNA sequence data for ferns is Sanger-sequenced plastid gene regions.
 Plastid sequences are convenient for phylogenetic analysis because they are essentially a single, uniparentally inherited linkage group, thus free from recombination.
@@ -823,7 +844,9 @@ phy <-
 	phy %>%
 	root.phylo("og") %>%
 	ladderize() %>%
-	drop.tip("og")
+	drop.tip("og") %>%
+	# Scale to total height of 100 for easy plotting
+	rescale_tree(100)
 
 # Make tibble for printing BS values
 bs_tibble <- tibble(
@@ -832,18 +855,6 @@ bs_tibble <- tibble(
 	node = 1:Nnode(phy) + Ntip(phy), 
 	# Don't print BS = 100%
 	bootstrap = ifelse(phy$node.label == 100, "", phy$node.label))
-
-tibble(
-	Polypodiineae = c("Hypodematiaceae", "Davalliaceae"),
-	Aspleniineae = c("Cystopteridaceae", "Athyriaceae"),
-	Lindsaeineae = c("Lindsaeaceae", "Cystodiaceae"),
-	Cyatheales = c("Cyatheaceae", "Plagiogyriaceae"),
-	Salviniales = c("Marsileaceae", "Salviniaceae"),
-	Schizaeales = c("")
-) %>%
-	pivot_longer(names_to = "plot_group", values_to = "taxa", cols = everything()) %>%
-	arrange(plot_group) %>%
-	group_by(plot_group) 
 
 # Make tibble for labeling clades
 phy_tip <- as_tibble(phy)
@@ -873,8 +884,44 @@ suborder_labels <-
 		mrca
 	) %>%
 	mutate(mrca = parse_number(mrca)) %>%
-	bind_rows(suborder_labels_singletons)
+	bind_rows(suborder_labels_singletons) %>%
+	mutate(
+		clade_label = case_when(
+			plot_group == "Aspleniineae" ~ "Aspleniineae\n(eupolypods II)",
+			plot_group == "Polypodiineae" ~ "Polypodiineae\n(eupolypods I)",
+			TRUE ~ plot_group
+		)
+	)
 
+# Get data of x and y co-ordinates for ggtree plot
+phy_plot_data <- ggplot_build(ggtree(phy)) %>%
+	magrittr::extract2("data") %>%
+	magrittr::extract2(1) %>%
+	as_tibble()
+	
+# Make a dataframe for plotting various clade labels
+other_clade_labels <-
+list(
+	"eupolypods" = c("Polypodiaceae", "Aspleniaceae"),
+	"Polypodiales" = c("Polypodiaceae", "Saccolomataceae"),
+	"Polypodiidae\n(leptosporangiates)" = c("Polypodiaceae", "Osmundaceae")
+) %>%
+	tibble(
+		clade_label = names(.),
+		x = map_dbl(., ~node_height_from_tips(phy, .)),
+		node = map_dbl(., ~ape::getMRCA(phy, .))
+	) %>%
+	left_join(
+		select(phy_plot_data, node, y), by = "node"
+	) %>%
+	select(-`.`, -node)
+
+segment_cols <-
+rep("grey20", length(other_clade_labels$clade_label)) %>%
+	set_names(other_clade_labels$clade_label)
+
+	
+set.seed(123)
 # Use the ggtree::`%<+%` operator to map the 
 # bootstrap values onto the ggtree object
 backbone_plot <- 
@@ -883,19 +930,7 @@ backbone_plot <-
 	geom_text(aes(label = bootstrap), hjust = -.25, size = 2.5) +
 	# add tip labels
 	geom_tiplab(aes(label = label)) +
-	# label clades
-	geom_cladelab(
-		data = suborder_labels,
-		mapping = aes(
-			node = mrca,
-			label = plot_group
-		),
-		offset = 0.26,
-		align = TRUE,
-		extend = 0.3,
-		textcolour = "black",
-		barsize = 2) +
-	# highlight clades
+	# highlight major clades
 	geom_hilight(
 		data = suborder_labels,
 		mapping = aes(
@@ -904,11 +939,57 @@ backbone_plot <-
 		),
 		alpha = 0.2,
 		align = "right",
-		extend = 0.28,
+		extend = 30,
 		gradient.direction = "rt",
+		roundrect = TRUE,
 		gradient.length.out = 2) +
 	scale_fill_manual(values = clade_cols) +
-	xlim(0, 1.7) +
+	# label major clades
+	geom_cladelab(
+		data = suborder_labels,
+		mapping = aes(
+			node = mrca,
+			label = clade_label
+		),
+		offset = 28,
+		align = TRUE,
+		extend = 0.3,
+		hjust = 0,
+		barcolour = "grey20",
+		barsize = 2) +
+	# Label other groups
+	geom_label_repel(
+		data = other_clade_labels %>%
+			filter(clade_label == "Polypodiidae\n(leptosporangiates)"),
+		aes(x = x, y = y, label = clade_label),
+		hjust = 0,
+		xlim = c(NA, 10),
+		ylim = c(13, NA),
+		color = "grey20",
+		segment.color = "grey20"
+	) +
+	geom_label_repel(
+		data = other_clade_labels %>%
+			filter(clade_label == "eupolypods"),
+		aes(x = x, y = y, label = clade_label),
+		hjust = 0,
+		xlim = c(NA, 64),
+		ylim = c(32, NA),
+		color = "grey20",
+		segment.color = "grey20"
+	) +
+	geom_label_repel(
+		data = other_clade_labels %>%
+			filter(clade_label == "Polypodiales"),
+		aes(x = x, y = y, label = clade_label),
+		hjust = 0,
+		nudge_x = -25,
+		nudge_y = 4,
+		color = "grey20",
+		segment.color = "grey20"
+	) +
+	xlim(0, 180) +
+	coord_cartesian(clip = "off") +
 	theme(legend.position = "none")
 ```
 
@@ -924,4 +1005,4 @@ ggsave(
 backbone_plot
 ```
 
-**`r figure("backbone")`**. Backbone phylogeny. One exemplar tip is shown per family. Unlabeled bootstrap support values are all 100%. Outgroup (seed plants, lycophytes, and bryophytes) not shown.
+**`r figure("backbone")`**. Fern tree of life (FTOL) backbone phylogeny. One exemplar tip is shown per family. Ultrafast bootstrap support values (%) shown at nodes; unlabeled nodes are 100%. Outgroup (seed plants, lycophytes, and bryophytes) not shown. Colors of major clades correspond to those used in `r figure("ftol")`. Taxonomy follows [@PteridophytePhylogenyGroupI2016]; informal clade names in lowercase.

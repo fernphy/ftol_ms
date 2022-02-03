@@ -136,3 +136,49 @@ s_table_num <- function(name) {s_table(name) %>% str_remove("Table S ")}
 #'
 #' Breaks a page depending if the output format is PDF
 pagebreak_pdf <- function(rmd_params = params) {ifelse(rmd_params$doc_type == "pdf", return("\\clearpage"), return(""))}
+
+# Phylogeny ----
+
+#' Rescale tree height
+#' 
+#' from:
+#' http://blog.phytools.org/2012/02/quicker-way-to-rescale-total-length-of.html
+#'
+#' @param tree Input phylogeny (list of class "phylo")
+#' @param scale Numeric: total height to scale to
+#'
+#' @return Phylogeny (list of class "phylo")
+#' 
+rescale_tree <- function(tree, scale){
+	tree$edge.length <-
+		tree$edge.length/max(phytools::nodeHeights(tree)[,2])*scale
+	return(tree)
+}
+
+#' Get node height corresponding to the most recent common
+#' ancestor of two or more taxa in a phylogeny
+#'
+#' @param phy List of class "phylo"
+#' @param tips Character vector; tips of the phylogeny
+#'
+#' @return Height of the MRCA node of the tips
+#' 
+node_height_from_tips <- function(phy, tips) {
+	ape::getMRCA(phy, tips) %>%
+		phytools::nodeheight(phy, .)
+}
+
+# Etc -----
+# Helper function to add plot_group:
+# a "rank" that may be at order or suborder level for plotting
+add_plot_group <- function(data) {
+	data %>%
+		mutate(
+			plot_group = coalesce(suborder, order),
+			plot_group = case_when(
+				plot_group %in% c("Ophioglossales", "Psilotales") ~ "Ophioglossales + Psilotales",
+				TRUE ~ plot_group
+			)
+		)
+}
+
