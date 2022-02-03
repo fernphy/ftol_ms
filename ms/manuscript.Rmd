@@ -45,7 +45,7 @@ conflict_prefer("filter", "dplyr")
 conflict_prefer("extract", "magrittr")
 
 # Load functions
-source(here::here("R/functions.R"))
+source(here::here("R/ms_functions.R"))
 
 # Specify percentage format
 percent <- function(...) {scales::percent(...)}
@@ -552,7 +552,7 @@ The clear contradiction between plastid and nuclear phylogenomic data may indica
 
 Another enigmatic relationship in ferns is the placement of Hymenophyllales.
 The monophyly of Polypodiidae (leptosporangiate ferns) is well supported across many studies and not in doubt, as is the status of Osmundales as the first lineage to diverge from the remainder of leptosporangiates.
-However, the subsequent placement of Hymenophyllales differs across studies: some recover Hymenophyllales as the next diverging lineage after Osmundales [@Pryer2001; @Testo2016a; @Schneider2004d; @Schuettpelz2007], while others recover a clade comprising Hymenophyllales sister to Gleicheniales, which then together are sister to the remaining non-Osmundales leptosporangiates [@Pryer2004a; @Lehtonen2017].
+However, the subsequent placement of Hymenophyllales differs across studies: some recover Hymenophyllales as the next diverging lineage after Osmundales [@Pryer2001; @Testo2016a; @Schneider2004d; @Schuettpelz2006; @Schuettpelz2007], while others recover a clade comprising Hymenophyllales sister to Gleicheniales, which then together are sister to the remaining non-Osmundales leptosporangiates [@Pryer2004a; @Lehtonen2017].
 Another possibility supported by recent transcriptomic studies is Hymenophyllaceae sister to Gleicheniaceae, which are in turn sister to Dipteridaceae, resulting in a non-monophyletic Gleicheniales [@Qi2018; @Shen2018].
 We recovered a monophyletic Gleicheniales sister to Hymenophyllales with moderate support, a relationship that was also observed in some, but not all, analyses of plastome data by @Lehtonen2019 and @Kuo2018.
 However, current plastome sampling does not include all genera of Gleicheniales; additional taxon sampling may help to resolve this relationship.
@@ -634,6 +634,18 @@ backbone_taxonomy <-
 			TRUE ~ plot_group)
 	)
 ```
+
+```{r gb-make}
+
+gb_acc_by_dna_type %>%
+	filter(year == 2020)
+
+ggplot(gb_acc_by_dna_type, aes(x = year, y = hits, color = type)) +
+	geom_line() +
+	geom_point()
+
+```
+
 
 ```{r ftol-make}
 # Coverage bar plot ----
