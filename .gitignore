@@ -6,3 +6,5 @@ data_raw
 working
 manuscript.docx
 results
+_targets
+~*.docx
