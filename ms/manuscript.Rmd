@@ -718,7 +718,7 @@ compartment_cols <- c(
 
 genbank_plot <-
 	ggplot(gb_species_by_year, aes(x = year, y = n_species)) +
-	geom_line(aes(color = type), size = .7) +
+	geom_line(aes(color = type)) +
 	scale_color_manual(values = compartment_cols, guide = "none") +
 	geom_label_repel(
 		data = compartment_labs %>% filter(type %in% c("nuclear", "mitochondrial")),
@@ -739,11 +739,11 @@ genbank_plot <-
 	) +
 	geom_point(
 		data = fern_tree_sampling,
-		aes(shape = source),
-		size = 2.5,
+		aes(shape = source)
 	) +
 	labs(shape = "Study", y = "No. species", x = "Year") +
-	theme(legend.position = "bottom") +
+	theme(legend.position = "bottom",
+				plot.margin = margin(r = 1, t = 0.5, unit = "in")) +
 	coord_cartesian(clip = "off")
 ```
 
@@ -754,7 +754,7 @@ ggsave(
 	genbank_plot, width = 7, height = 5, units = "in")
 ```
 
-```{r genbank-print, fig.width = 3.3, fig.height = 5, eval = params$doc_type == "pdf"}
+```{r genbank-print, fig.width = 7, fig.height = 5, eval = params$doc_type == "pdf"}
 # Print plot if rendering to PDF
 genbank_plot
 ```
