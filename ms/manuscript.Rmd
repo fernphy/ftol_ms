@@ -683,12 +683,12 @@ backbone_taxonomy <-
 ```{r genbank-make}
 fern_tree_sampling <-
 	tribble(
-		~source, ~year, ~n_species,
-		"Hasebe1995", 1995, 107,
-		"Schuettpelz2007", 2007, 400,
-		"Lehtonen2011", 2011, 2957,
-		"Testo2016a", 2016, 3973,
-		"this_study", 2021, n_sanger_ferns
+		~source, ~year, ~n_species, ~label,
+		"Hasebe1995", 1995, 107, "Hasebe et al. 1995",
+		"Schuettpelz2007", 2007, 400, "Schuettpelz et al. 2007",
+		"Lehtonen2011", 2011, 2957, "Lehtonen 2011",
+		"Testo2016a", 2016, 3973, "Testo and Sundue 2016",
+		"this_study", 2021, n_sanger_ferns, "This study",
 	) %>%
 	mutate(source = fct_reorder(source, year))
 
@@ -741,9 +741,14 @@ genbank_plot <-
 		data = fern_tree_sampling,
 		aes(shape = source)
 	) +
+	scale_shape(
+    limits = fern_tree_sampling$source, 
+    labels = fern_tree_sampling$label
+	) +
 	labs(shape = "Study", y = "No. species", x = "Year") +
 	theme(legend.position = "bottom",
-				plot.margin = margin(r = 1, t = 0.5, unit = "in")) +
+				plot.margin = margin(r = 1, t = 0.5, l = 0.5, unit = "in")) +
+	guides(shape = guide_legend(title.position = "top")) +
 	coord_cartesian(clip = "off")
 ```
 
