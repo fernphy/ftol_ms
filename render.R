@@ -1,1 +1,0 @@
-rmarkdown::render("ms/manuscript.Rmd", output_dir = "results")

@@ -56,6 +56,7 @@ ftol_ver <- "v0.0.2"
 ```
 
 ```{r load-targets}
+# Targets from FTOL workflow
 tar_load(
 	c(
 		sanger_alignment,
@@ -63,15 +64,23 @@ tar_load(
 		plastome_tree,
 		plastome_metadata_renamed,
 		ppgi_taxonomy,
-		plastome_alignment,
 		plastid_calibration_dates,
 		pteridocat,
 		sanger_alignment_tbl),
 	store = here::here("ftol_cache")
 )
 
+# Targets from MS workflow
+tar_load(
+	c(
+		gb_species_by_year,
+		ref_files
+	),
+	store = here::here("_targets")
+)
+
 # FIXME: read in real ultrametric tree when ready
-sanger_tree <- ape::read.tree(here::here("working/sanger_alignment_2022-02-02.tre"))
+sanger_tree <- ape::read.tree(here::here("working/sanger_alignment.phy.tre"))
 ```
 
 ```{r abstract-stats}
@@ -149,7 +158,7 @@ Fortunately, ferns have received relatively intense focus from molecular systema
 Thus, there is both sufficient sampling and a pressing need for a globally sampled fern phylogeny.
 
 Past efforts to construct such a global phylogeny have steadily increased in number of species as sequences in GenBank have accumulated [@Pryer2004a; @Lehtonen2011; @Schuettpelz2007; @Testo2016a].
-Indeed, accumulation of plastid fern accessions in GenBank show no sign of slowing since the most recent global phylogeny [@Testo2016a].
+Indeed, accumulation of plastid fern accessions in GenBank show no sign of slowing since the most recent global phylogeny [@Testo2016a\; `r figure("genbank")`].
 We believe there is a need therefore, not only for a global fern phylogeny, but one that is self-updating to keep pace with the continued accumulation of molecular data.
 This will eliminate the need for researchers to "rebuild the wheel" each time they want to use a globally sampled fern phylogeny.
 
@@ -173,7 +182,7 @@ We anticipate FTOL will have several impacts for the field of fern systematics a
 
 ## Locus sampling
 
-The plastid genome has been the most widely sequenced genomic compartment in ferns by far, so we used plastid loci to build our tree.
+The plastid genome has been the most widely sequenced genomic compartment in ferns by far (`r figure("genbank")`), so we used plastid loci to build our tree.
 Our sampling includes two major categories of sequence data: seven loci (*atpA*, *atpB*, *matK*, *rbcL*, *rps4*, *trnL*--*trnF*, and *rps4*--*trnS*) that have been frequently used for molecular systematics studies in ferns and are typically obtained by PCR and Sanger sequencing ("Sanger loci") and a much larger set of single-copy, coding genes typically obtained from next-generation sequencing of the plastome ("plastome loci").
 *trnL*--*trnF* includes the *trnL* intron, the 3' *trnL* exon, and the spacer between *trnL* and *trnF*.
 *rps4*--*trnS* includes the spacer between *rps4* and *trnS*.
@@ -347,7 +356,7 @@ accepted_species <-
 	left_join(
 		select(ppgi_taxonomy, genus, family, 
 					 suborder, order, class), by = "genus"
-		) %>%
+	) %>%
 	# FIXME: update class for nothogenera in PPG
 	mutate(class = case_when(
 		str_detect(
@@ -384,7 +393,7 @@ coverage_data <- left_join(
 
 # Format for text in MS
 tax_coverage <-
-coverage_data %>%
+	coverage_data %>%
 	filter(rank == "plot_group") %>%
 	arrange(coverage) %>%
 	transmute(clade = name, coverage = percent(coverage)) %>%
@@ -508,7 +517,7 @@ The plastome DNA alignment was `r number(ncol(plastome_alignment))` bp with `r p
 get_bs <- function(phy, tips) {
 	node_select <- ape::getMRCA(phy, tips)
 	as_tibble(phy) %>%
-	filter(node == node_select) %>%
+		filter(node == node_select) %>%
 		pull(label) %>%
 		parse_number() %>%
 		magrittr::multiply_by(0.01) %>%
@@ -544,6 +553,21 @@ The other clade includes Thelypteridaceae, Woodsiaceae, a clade comprised of Ono
 
 ## FTOL phylogeny
 
+```{r phy-discussion-stats}
+# Calculate number of genera sampled for Gleicheniales
+ppgi_gleich_genera_n <-
+	ppgi_taxonomy %>%
+	filter(order == "Gleicheniales") %>%
+	pull(genus) %>%
+	n_distinct()
+
+plastome_gleich_genera_n <-
+	bb_sampling %>%
+	filter(plot_group == "Gleicheniales") %>%
+	pull(genus) %>%
+	n_distinct()
+```
+
 The phylogenetic position of Equisetidae relative to other ferns has long been a point of contention in molecular systematics of ferns.
 We recovered Equisetidae as sister to Ophioglossidae (Psilotales + Ophioglossales), in agreement with other plastid phylogenomic analyses [@Grewe2013; @Ruhfel2014; @Gitzendanner2018b; @Lehtonen2019; @Kuo2018].
 This contradicts nuclear phylogenomic analyses [@Rothfels2015a; @Qi2018; @Shen2018], most plastid analyses with smaller numbers (`r ca` 3--17) of genes [@Schneider2004d; @Rai2010; @Kuo2011; @Testo2016a] and an analysis including mitochondrial data [@Knie2015], which have recovered Equisetidae as sister to all other ferns; some earlier plastid analyses based on Sanger data also recovered Equisetidae sister to Marattidae with low support [@Pryer2001; @Qiu2006; @Qiu2007].
@@ -551,11 +575,20 @@ Aside from alternative resolutions of Equisetidae dependent on nuclear envelope 
 The clear contradiction between plastid and nuclear phylogenomic data may indicate ancient hybridization or introgression, but robust support for any particular scenario is lacking.
 
 Another enigmatic relationship in ferns is the placement of Hymenophyllales.
-The monophyly of Polypodiidae (leptosporangiate ferns) is well supported across many studies and not in doubt, as is the status of Osmundales as the first lineage to diverge from the remainder of leptosporangiates.
+The monophyly of Polypodiidae (leptosporangiate ferns) is well supported across many studies and not in doubt, as is the status of Osmundales as the first lineage to diverge from the remainder of leptosporangiates [@Pryer2001; @Schneider2004d; @Schuettpelz2007; @Kuo2011; @Testo2016a].
 However, the subsequent placement of Hymenophyllales differs across studies: some recover Hymenophyllales as the next diverging lineage after Osmundales [@Pryer2001; @Testo2016a; @Schneider2004d; @Schuettpelz2006; @Schuettpelz2007], while others recover a clade comprising Hymenophyllales sister to Gleicheniales, which then together are sister to the remaining non-Osmundales leptosporangiates [@Pryer2004a; @Lehtonen2017].
 Another possibility supported by recent transcriptomic studies is Hymenophyllaceae sister to Gleicheniaceae, which are in turn sister to Dipteridaceae, resulting in a non-monophyletic Gleicheniales [@Qi2018; @Shen2018].
 We recovered a monophyletic Gleicheniales sister to Hymenophyllales with moderate support, a relationship that was also observed in some, but not all, analyses of plastome data by @Lehtonen2019 and @Kuo2018.
-However, current plastome sampling does not include all genera of Gleicheniales; additional taxon sampling may help to resolve this relationship.
+However, current plastome sampling only includes `r plastome_gleich_genera_n` out of `r ppgi_gleich_genera_n` genera of Gleicheniales; additional taxon sampling may help to resolve this relationship.
+
+Within Polypodiales, the relationship between suborders Pteridineae, Dennstaedtiineae and the eupolypods (Polypodiineae and Aspleniineae) has been difficult to resolve (here designated "P", "D", and "e", respectively).
+Most previous plastid studies based on Sanger sequencing have recovered (P, (D, e)) [@Kuo2011; @Schuettpelz2006; @Schuettpelz2007; @Testo2016a; but see @Lehtonen2011].
+We recover (D, (P, e)) with moderate support (BS `r denn_poly_bs`); this topology agrees with other phylogenomic studies based on whole plastomes [@Lu2015a; @Lehtonen2019] or nuclear data [@Rothfels2015a; @Qi2018; @Shen2018] as well as a plastid supermatrix [@Lehtonen2011].
+Recently the whole plastome study of @Du2021 recovered a novel topology comprising ((D, P), e) under some analysis settings but (P, (D, e)) under others.
+
+Taken together, our results for nodes of contention in the fern phylogeny generally agree with other plastid phylogenomic analyses and are well within the realm of plausible hypotheses generated to date.
+We do not consider any of these nodes "solved" by our analysis.
+Rather, conclusive resolution apparently still awaits additional sampling and perhaps innovation in phylogenetic methods.
 
 ## Accesibility and usage of FTOL
 
@@ -587,9 +620,9 @@ This way, FTOL will continually improve and keep pace with the currently availab
 We want to make it clear that FTOL is no way meant to be the "official" fern phylogeny; it is simply one reasonable hypothesis that has been designed to be maximally inclusive at the species level.
 FTOL cannot substitute for systematic careful studies at finer taxonomic scales that include sampling multiple individuals per species and/or other sources (`r eg`, morphologic, nuclear) of data, and such studies continue to be vital to our understanding of fern evolution.
 
-## Plastid vs. nuclear trees
+## Plastid vs. nuclear fern trees
 
-Currently, the vast majority of publicly available DNA sequence data for ferns is Sanger-sequenced plastid gene regions.
+Currently, the vast majority of publicly available DNA sequence data for ferns is Sanger-sequenced plastid gene regions `r figure("genbank")`.
 Plastid sequences are convenient for phylogenetic analysis because they are essentially a single, uniparentally inherited linkage group, thus free from recombination.
 However, the plastid tree does not necessarily agree with trees inferred from other data sources.
 Conflict between plastid and nuclear phylogenies has been frequently observed in narrowly focused (`r eg`, genus level) studies using traditional Sanger sequencing, and has recently been demonstrated at deeper levels within Polypodiaceae using phylogenomic approaches [@Wei2022].
@@ -599,7 +632,7 @@ Therefore, we have no expectation that there is a single fern tree of life; rath
 Recent studies using transcriptomics are clarifying the backbone of the fern phylogeny using many (25--2400) nuclear genes from representative species spanning the tree [@Rothfels2015a; @Qi2018; @Shen2018].
 The most comprehensively sampled phylogenomic study targeting ferns is the on-going Genealogy of Flagellate Plants (GoFLAG) project, which seeks to generate genomic data (ca. 300 single-to-low copy nuclear gene regions) for all flagellate plants (bryophytes, lycophytes, ferns, and gymnosperms) [@Breinholt2021].
 GoFLAG data have recently been used in a phylogenomic analysis and taxonomic revision of Thelypteridaceae resulting in multiple new genera [@Fawcett2021; @Fawcett2021a], and additional phylogenomic analyses of other fern groups using GoFLAG markers are to be expected in the near future.
-The rapid growth of genomic data notwithstanding, species level sampling of such nuclear phylogenomic datasets still is far less that available for plastid data.
+The rapid growth of genomic data notwithstanding, species level sampling of such nuclear phylogenomic datasets still is far less that available for plastid data `r figure("genbank")`.
 Furthermore, many subclades of ferns are under active investigation using plastid markers using both Sanger and next-gen sequencing, and plastid data for previously unsampled species will likely continue to grow at a rapid pace.
 We therefore expect that the methodology outlined here will continue to be useful to generate a maximally sampled plastid fern tree of life for several more years.
 Future efforts should focus on integrating across plastid and nuclear DNA sequences to gain better insight into the complex evolutionary history of ferns.
@@ -635,17 +668,40 @@ backbone_taxonomy <-
 	)
 ```
 
-```{r gb-make}
+```{r genbank-make}
+fern_tree_sampling <-
+	tribble(
+		~source, ~year, ~n_species,
+		"Hasebe1995", 1995, 107,
+		"Schuettpelz2007", 2007, 400,
+		"Lehtonen2011", 2011, 2957,
+		"Testo2016a", 2016, 3973,
+		"this_study", 2021, n_sanger_ferns
+	) %>%
+	mutate(source = fct_reorder(source, year))
 
-gb_acc_by_dna_type %>%
-	filter(year == 2020)
-
-ggplot(gb_acc_by_dna_type, aes(x = year, y = hits, color = type)) +
-	geom_line() +
-	geom_point()
-
+genbank_plot <-
+	ggplot(gb_species_by_year, aes(x = year, y = n_species)) +
+	geom_line(aes(color = type)) +
+	geom_point(
+		data = fern_tree_sampling,
+		aes(shape = source)
+	)
 ```
 
+```{r genbank-save, eval = params$doc_type == "doc" }
+# Save plot if rendering to doc
+ggsave(
+	result_file(figure("genbank"), "pdf"),
+	genbank_plot, width = 3.3, height = 5, units = "in")
+```
+
+```{r genbank-print, fig.width = 3.3, fig.height = 5, eval = params$doc_type == "pdf"}
+# Print plot if rendering to PDF
+genbank_plot
+```
+
+**`r figure("genbank")`**. Number of fern species in GenBank by year and genomic compartment. Points indicate number of species sampled in selected studies of global fern phylogeny [@Hasebe1995; @Schuettpelz2007; @Lehtonen2011; @Testo2016a\; this study]. @Schuettpelz2007 did not attempt exhaustive sampling but rather proportional sampling according to lineage size. The relatively small increase in number of species in 2021 is likely due to accessions that are still embargoed at the time of writing. Taxonomy of GenBank species follows NCBI [@Federhen2012]. Only accessions identified to species included; environmental samples, hybrid formulas, and names with "aff." or "cf." annotations excluded.
 
 ```{r ftol-make}
 # Coverage bar plot ----
@@ -685,38 +741,38 @@ rm(phy)
 # exclude those that are too close or stand out too much
 # https://www.jstatsoft.org/article/view/v090c01
 green_army_use_cols <-
-c(
-	"amethyst",
-	"blue",
-	"caramel",
-	"damson",
-	# "ebony",
-	# "forest",
-	"green",
-	"honeydew",
-	# "iron",
-	# "jade",
-	# "khaki",
-	# "lime",
-	"mallow",
-	"navy",
-	# "orpiment",
-	"pink",
-	# "quagmire",
-	"red",
-	"sky",
-	"turquoise",
-	"uranium",
-	"violet",
-	"wine",
-	# "xanthin",
-	# "yellow",
-	"zinnia"
-)
+	c(
+		"amethyst",
+		"blue",
+		"caramel",
+		"damson",
+		# "ebony",
+		# "forest",
+		"green",
+		"honeydew",
+		# "iron",
+		# "jade",
+		# "khaki",
+		# "lime",
+		"mallow",
+		"navy",
+		# "orpiment",
+		"pink",
+		# "quagmire",
+		"red",
+		"sky",
+		"turquoise",
+		"uranium",
+		"violet",
+		"wine",
+		# "xanthin",
+		# "yellow",
+		"zinnia"
+	)
 
 clade_cols <-
-Polychrome::green.armytage.colors() %>%
-  extract(green_army_use_cols) %>%
+	Polychrome::green.armytage.colors() %>%
+	extract(green_army_use_cols) %>%
 	extract(seq_len(nrow(plot_group_phy_order))) %>%
 	set_names(plot_group_phy_order$name)
 
@@ -744,7 +800,7 @@ b <-
 		labels = percent,
 		limits = c(0,1),
 		expand = expansion(mult = c(0, 0))
-		) +
+	) +
 	scale_fill_manual(values = clade_cols) +
 	labs(x = "Coverage") +
 	theme_bw() +
@@ -755,7 +811,7 @@ b <-
 		plot.background = element_rect(fill = "transparent", colour = NA),
 		panel.grid.major.y = element_blank(),
 		panel.grid.minor.x = element_blank()
-		)
+	)
 
 # Tree plot ----
 phy <- sanger_tree %>%
@@ -764,23 +820,23 @@ phy <- sanger_tree %>%
 
 # Make tibble for annotating major clades
 clade_tibble <-
-tibble(
-	Polypodiineae = c("Leucostegia_truncata", "Didymochlaena_fijiensis"),
-	Aspleniineae = c("Acystopteris_taiwaniana", "Rhachidosorus_pulcher"),
-	Dennstaedtiineae = c("Monachosorum_flagellare", "Dennstaedtia_auriculata"),
-	Pteridineae = c("Coniogramme_affinis", "Pteris_dispar"),
-	Lindsaeineae = c("Cystodium_sorbifolium", "Odontosoria_retusa"),
-	Saccolomatineae = c("Saccoloma_inaequale", "Orthiopteris_campylura"),
-	Cyatheales = c("Cyathea_bipinnatifida", "Culcita_macrocarpa"),
-	Salviniales = c("Marsilea_nashii", "Salvinia_oblongifolia"),
-	Schizaeales = c("Schizaea_elegans", "Lygodium_palmatum"),
-	Gleicheniales = c("Matonia_foxworthyi", "Sticherus_bifidus"),
-	Hymenophyllales = c("Cephalomanes_javanicum", "Hymenophyllum_tortuosum"),
-	Marattiales = c("Angiopteris_evecta", "Danaea_erecta"),
-	`Ophioglossales + Psilotales` = c("Psilotum_nudum", "Sceptridium_nipponicum"),
-	Osmundales = c("Osmundastrum_cinnamomeum", "Todea_barbara"),
-	Equisetales = c("Equisetum_bogotense", "Equisetum_hyemale")
-) %>%
+	tibble(
+		Polypodiineae = c("Leucostegia_truncata", "Didymochlaena_fijiensis"),
+		Aspleniineae = c("Acystopteris_taiwaniana", "Rhachidosorus_pulcher"),
+		Dennstaedtiineae = c("Monachosorum_flagellare", "Dennstaedtia_auriculata"),
+		Pteridineae = c("Coniogramme_affinis", "Pteris_dispar"),
+		Lindsaeineae = c("Cystodium_sorbifolium", "Odontosoria_retusa"),
+		Saccolomatineae = c("Saccoloma_inaequale", "Orthiopteris_campylura"),
+		Cyatheales = c("Cyathea_bipinnatifida", "Culcita_macrocarpa"),
+		Salviniales = c("Marsilea_nashii", "Salvinia_oblongifolia"),
+		Schizaeales = c("Schizaea_elegans", "Lygodium_palmatum"),
+		Gleicheniales = c("Matonia_foxworthyi", "Sticherus_bifidus"),
+		Hymenophyllales = c("Cephalomanes_javanicum", "Hymenophyllum_tortuosum"),
+		Marattiales = c("Angiopteris_evecta", "Danaea_erecta"),
+		`Ophioglossales + Psilotales` = c("Psilotum_nudum", "Sceptridium_nipponicum"),
+		Osmundales = c("Osmundastrum_cinnamomeum", "Todea_barbara"),
+		Equisetales = c("Equisetum_bogotense", "Equisetum_hyemale")
+	) %>%
 	pivot_longer(names_to = "plot_group", values_to = "taxa", cols = everything()) %>%
 	arrange(plot_group) %>%
 	group_by(plot_group) %>%
@@ -800,7 +856,7 @@ a <- ggtree(
 	layout = "circular", right = FALSE, size = 0.1,
 	# FIXME: change to phylogram when ultrametric tree is done
 	branch.length = "none"
-	) +
+) +
 	geom_cladelab(
 		data = clade_tibble,
 		mapping = aes(
@@ -808,17 +864,17 @@ a <- ggtree(
 			color = plot_group,
 			label = dummy
 		),
-	offset = 0.1,
-	barsize = 2) +
+		offset = 0.1,
+		barsize = 2) +
 	scale_color_manual(values = clade_cols) +
 	theme(legend.position = "none")
 
 ftol_plot <-
-a + inset_element(b, left = 0.85, bottom = 0.14, right = 1.3, top = .8) +
+	a + inset_element(b, left = 0.85, bottom = 0.14, right = 1.3, top = .8) +
 	plot_annotation(
 		theme = theme(
 			plot.margin = unit(c(-2,5,-2,-1.6), "cm"))
-		)
+	)
 ```
 
 ```{r ftol-save, eval = params$doc_type == "doc"}
@@ -828,12 +884,12 @@ ggsave(
 	ftol_plot, width = 7, height = 7, units = "in")
 ```
 
-```{r ftol-print, fig.width = 5, fig.height = 5, eval = params$doc_type == "pdf"}
+```{r ftol-print, fig.width = 7, fig.height = 7, eval = params$doc_type == "pdf"}
 # Print plot if rendering to PDF
 ftol_plot
 ```
 
-**`r figure("ftol")`**. Fern Tree of Life (FTOL) `r ftol_ver`. Inset plot shows coverage by major clade. Numbers next to each bar show sampled species out of total number of species.
+**`r figure("ftol")`**. Fern Tree of Life (FTOL) `r ftol_ver`. Inset plot shows coverage by major clade (order or suborder). Numbers next to each bar show sampled species out of total number of species. Taxonomy follows [@PteridophytePhylogenyGroupI2016].
 
 ```{r backbone-make}
 # Make exemplar set of species in backbone representing families
@@ -872,17 +928,17 @@ bs_tibble <- tibble(
 phy_tip <- as_tibble(phy)
 
 suborder_labels_singletons <-
- family_exemp %>% 
+	family_exemp %>% 
 	filter(outgroup == FALSE) %>%
 	group_by(plot_group) %>%
 	select(plot_group, family) %>% 
 	filter(n_distinct(family) == 1) %>%
- 	ungroup() %>%
- 	left_join(phy_tip, by = c(family = "label")) %>%
- 	select(plot_group, mrca = node)
+	ungroup() %>%
+	left_join(phy_tip, by = c(family = "label")) %>%
+	select(plot_group, mrca = node)
 
 suborder_labels <-
-  family_exemp %>% 
+	family_exemp %>% 
 	filter(outgroup == FALSE) %>%
 	group_by(plot_group) %>%
 	select(plot_group, family) %>% 
@@ -910,14 +966,14 @@ phy_plot_data <- ggplot_build(ggtree(phy)) %>%
 	magrittr::extract2("data") %>%
 	magrittr::extract2(1) %>%
 	as_tibble()
-	
+
 # Make a dataframe for plotting various clade labels
 other_clade_labels <-
-list(
-	"eupolypods" = c("Polypodiaceae", "Aspleniaceae"),
-	"Polypodiales" = c("Polypodiaceae", "Saccolomataceae"),
-	"Polypodiidae\n(leptosporangiates)" = c("Polypodiaceae", "Osmundaceae")
-) %>%
+	list(
+		"eupolypods" = c("Polypodiaceae", "Aspleniaceae"),
+		"Polypodiales" = c("Polypodiaceae", "Saccolomataceae"),
+		"Polypodiidae\n(leptosporangiates)" = c("Polypodiaceae", "Osmundaceae")
+	) %>%
 	tibble(
 		clade_label = names(.),
 		x = map_dbl(., ~node_height_from_tips(phy, .)),
@@ -929,10 +985,10 @@ list(
 	select(-`.`, -node)
 
 segment_cols <-
-rep("grey20", length(other_clade_labels$clade_label)) %>%
+	rep("grey20", length(other_clade_labels$clade_label)) %>%
 	set_names(other_clade_labels$clade_label)
 
-	
+
 set.seed(123)
 # Use the ggtree::`%<+%` operator to map the 
 # bootstrap values onto the ggtree object
@@ -1012,9 +1068,9 @@ ggsave(
 	backbone_plot, width = 7, height = 9, units = "in")
 ```
 
-```{r backbone-tree-print, fig.width = 5, fig.height = 5, eval = params$doc_type == "pdf"}
+```{r backbone-tree-print, fig.width = 7, fig.height = 9, eval = params$doc_type == "pdf"}
 # Print plot if rendering to PDF
 backbone_plot
 ```
 
-**`r figure("backbone")`**. Fern tree of life (FTOL) backbone phylogeny. One exemplar tip is shown per family. Ultrafast bootstrap support values (%) shown at nodes; unlabeled nodes are 100%. Outgroup (seed plants, lycophytes, and bryophytes) not shown. Colors of major clades correspond to those used in `r figure("ftol")`. Taxonomy follows [@PteridophytePhylogenyGroupI2016]; informal clade names in lowercase.
+**`r figure("backbone")`**. Fern tree of life (FTOL) backbone phylogeny. One exemplar tip is shown per family. Ultrafast bootstrap support values (%) shown at nodes; unlabeled nodes are 100%. Outgroup (seed plants, lycophytes, and bryophytes) not shown. Colors of major clades (orders or suborders) correspond to those used in `r figure("ftol")`. Taxonomy follows [@PteridophytePhylogenyGroupI2016]; informal clade names in lowercase.

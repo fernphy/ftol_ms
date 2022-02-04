@@ -187,6 +187,44 @@ references:
     analyses'
   type: article-journal
   volume: '25'
+- id: Du2021
+  accessed:
+  - year: 2022
+    month: 2
+    day: 2
+  author:
+  - family: Du
+    given: Xin‐Yu
+  - family: Lu
+    given: Jin‐Mei
+  - family: Zhang
+    given: Li‐Bing
+  - family: Wen
+    given: Jun
+  - family: Kuo
+    given: Li‐Yaung
+  - family: Mynssen
+    given: Claudine M.
+  - family: Schneider
+    given: Harald
+  - family: Li
+    given: De‐Zhu
+  citation-key: Du2021
+  container-title: Cladistics
+  container-title-short: Cladistics
+  DOI: 10/gpb22j
+  ISSN: 0748-3007, 1096-0031
+  issue: '5'
+  issued:
+  - year: 2021
+    month: 10
+  language: en
+  page: 518-539
+  source: DOI.org (Crossref)
+  title: Simultaneous diversification of Polypodiales and angiosperms in the Mesozoic
+  type: article-journal
+  URL: https://onlinelibrary.wiley.com/doi/10.1111/cla.12457
+  volume: '37'
 - id: Eiserhardt2018
   author:
   - family: Eiserhardt
@@ -304,6 +342,31 @@ references:
   type: article-journal
   URL: https://www.ingentaconnect.com/content/10.1600/036364421X16370109698650
   volume: '46'
+- id: Federhen2012
+  accessed:
+  - year: 2022
+    month: 2
+    day: 4
+  author:
+  - family: Federhen
+    given: S.
+  citation-key: Federhen2012
+  container-title: Nucleic Acids Research
+  container-title-short: Nucleic Acids Research
+  DOI: 10/c452q3
+  ISSN: 0305-1048, 1362-4962
+  issue: D1
+  issued:
+  - year: 2012
+    month: 1
+    day: 1
+  language: en
+  page: D136-D143
+  source: DOI.org (Crossref)
+  title: The NCBI Taxonomy database
+  type: article-journal
+  URL: https://academic.oup.com/nar/article-lookup/doi/10.1093/nar/gkr1178
+  volume: '40'
 - id: Gitzendanner2018b
   accessed:
   - year: 2022
@@ -364,6 +427,39 @@ references:
   type: article-journal
   URL: BMC Evolutionary Biology papers://ebd7d3df-d8f1-4be8-bcf7-4fb07ababf30/Paper/p2243
   volume: '13'
+- id: Hasebe1995
+  author:
+  - family: Hasebe
+    given: M
+  - family: Wolf
+    given: Paul G.
+  - family: Pryer
+    given: Kathleen M
+  - family: Ueda
+    given: K
+  - family: Ito
+    given: M
+  - family: Sano
+    given: R
+  - family: Gastony
+    given: G
+  - family: Yokoyama
+    given: J
+  - family: Manhart
+    given: J
+  - family: Murakami
+    given: Noriaki
+  citation-key: Hasebe1995
+  container-title: American Fern Journal
+  ISSN: 1938-422X
+  issue: '4'
+  issued:
+  - year: 1995
+  page: 134-181
+  title: Fern phylogeny based on *rbcL* nucleotide sequences
+  type: article-journal
+  URL: papers://ebd7d3df-d8f1-4be8-bcf7-4fb07ababf30/Paper/p1446
+  volume: '85'
 - id: Hennequin2014
   author:
   - family: Hennequin
@@ -725,6 +821,30 @@ references:
     hyperdiverse tree fern family Cyatheaceae'
   type: article-journal
   volume: '125'
+- id: Lu2015a
+  author:
+  - family: Lu
+    given: Jin-Mei
+  - family: Zhang
+    given: Ning
+  - family: Du
+    given: Xin-Yu
+  - family: Wen
+    given: Jun
+  - family: Li
+    given: De-Zhu
+  citation-key: Lu2015a
+  container-title: Journal of Systematics and Evolution
+  DOI: 10.1111/jse.12180
+  ISSN: '16744918'
+  issue: '5'
+  issued:
+  - year: 2015
+  page: 448-457
+  title: Chloroplast phylogenomics resolves key relationships in ferns
+  type: article-journal
+  URL: http://doi.wiley.com/10.1111/jse.12180
+  volume: '53'
 - id: Minh2013
   author:
   - family: Minh
@@ -1229,6 +1349,25 @@ references:
   type: article-journal
   URL: papers://ebd7d3df-d8f1-4be8-bcf7-4fb07ababf30/Paper/p1859
   volume: '428'
+- id: Schuettpelz2006
+  author:
+  - family: Schuettpelz
+    given: Eric
+  - family: Korall
+    given: Petra
+  - family: Pryer
+    given: Kathleen M
+  citation-key: Schuettpelz2006
+  container-title: Taxon
+  issue: '4'
+  issued:
+  - year: 2006
+  page: 897-906
+  title: Plastid *atpA* data provide improved support for deep relationships among
+    ferns
+  type: article-journal
+  URL: papers://ebd7d3df-d8f1-4be8-bcf7-4fb07ababf30/Paper/p597
+  volume: '55'
 - id: Schuettpelz2007
   author:
   - family: Schuettpelz
