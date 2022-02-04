@@ -30,7 +30,9 @@ tar_plan(
 	# by genomic compartment per year
 	gb_species_by_year = count_ncbi_species_by_year(
 		gb_taxa, ncbi_names, year_range = 1990:2021),
-	# Render manuscript
+	# Render manuscript ----
+	# track files used for rendering MS
+	tar_file(ref_files, list.files("ms", "references", full.names = TRUE)),
 	tar_render(
 		ms,
 		"ms/manuscript.Rmd",

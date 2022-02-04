@@ -1388,6 +1388,32 @@ references:
   URL: http://www.ingentaconnect.com/content/iapt/tax/2007/00000056/00000004/art00007
     papers://ebd7d3df-d8f1-4be8-bcf7-4fb07ababf30/Paper/p620
   volume: '56'
+- id: Schwery2016
+  accessed:
+  - year: 2022
+    month: 2
+    day: 4
+  author:
+  - family: Schwery
+    given: Orlando
+  - family: O’Meara
+    given: Brian C.
+  citation-key: Schwery2016
+  container-title: PeerJ Computer Science
+  DOI: 10/gg42w8
+  ISSN: 2376-5992
+  issued:
+  - year: 2016
+    month: 3
+    day: 30
+  language: en
+  page: e56
+  source: DOI.org (Crossref)
+  title: '*MonoPhy* : a simple R package to find and visualize monophyly issues'
+  title-short: '*MonoPhy*'
+  type: article-journal
+  URL: https://peerj.com/articles/cs-56
+  volume: '2'
 - id: Shang2018
   author:
   - family: Shang

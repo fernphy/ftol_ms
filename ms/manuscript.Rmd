@@ -39,6 +39,7 @@ library(Polychrome)
 library(patchwork)
 library(magrittr)
 library(ggrepel)
+library(ggokabeito)
 
 # Resolve conflicts
 conflict_prefer("filter", "dplyr")
@@ -269,24 +270,34 @@ We removed regions with >1% or >5% of sequences having gaps from coding regions 
 
 ## Phylogenetic analysis
 
-Phylogenetic analysis was conducted in two steps.
-First, we generated a backbone phylogeny using maximum likelihood (ML) analysis of the plastome loci in IQ TREE [@Nguyen2015] with `r number(1000)` ultrafast rapid bootstrap replicates [@Minh2013].
-We applied the 'GTR+I+G' model to a concatenated dataset with no partitioning.
+### Backbone phylogeny
 
-Next, we used the backbone phylogeny as a constraint tree to conduct phylogenetic analysis of the Sanger loci in IQ TREE.
-Settings for the ML analysis of the Sanger loci were otherwise identical to the backbone phylogenetic analysis.
+We generated a backbone phylogeny using maximum likelihood (ML) analysis of the plastome dataset in IQ-TREE [@Nguyen2015] with `r number(1000)` ultrafast rapid bootstrap replicates [@Minh2013].
+We applied the GTR+I+G model to a concatenated dataset with no partitioning.
 
-We did not conduct a more exhaustive analysis testing various partitions of the data or other phylogenetic methods as our goal is to produce a single species-level phylogeny that is a reasonable hypothesis of fern evolution, not to interrogate the outcomes of multiple, more or less equally applicable phylogenetic methods.
+### Initial Sanger phylogeny
 
-## Manual inspection
+Next, we used the backbone phylogeny as a constraint tree to conduct initial phylogenetic analysis of the concatenated Sanger dataset in IQ-TREE in with the "-fast" option and same model settings as the backbone phylogeny. We prioritized computation speed for this step, as we needed to repeat it multiple times as described in the next section.
 
-After generating the initial ML tree, we manually inspected it to identify any putative remaining rogues at finer levels that were missed by our automated detection at the family level.
-Where applicable, we updated our taxonomic database if the molecular data clearly indicated the current usage of a synonym was incorrect.
-However, this is not possible in all cases, particularly in groups that are in need of taxonomic revision (`r eg`, cheilanthoid ferns, grammitid ferns, microsoroid ferns).
-While we consider our phylogeny as an important guide for future taxonomic revisions, we did not make any taxonomic changes that would require valid publication according to the Code of Botanical Taxonomy.
+### Manual inspection of initial Sanger phylogeny
+
+We manually inspected the initial Sanger phylogeny to identify any remaining rogues or names that needed updating in the taxonomic database.
+We checked for monophyly at taxonomic levels at or above genus using the R package "MonoPhy" [@Schwery2016].
+We updated our taxonomic database if the molecular data clearly indicated the current usage of a synonym was incorrect [`r eg`, a taxonomic intruder into an otherwise expected monophyletic genus with a synonym available for that genus\; @Schwery2016].
+However, this was not possible in all cases, particularly in groups that are in need of taxonomic revision (`r eg`, cheilanthoid ferns, grammitid ferns, microsoroid ferns).
+While we consider our phylogeny as an important guide for future taxonomic revisions, we did not make any taxonomic changes that would require valid publication according to the International Code of Nomenclature for Algae, Fungi, and Plants.
 In a very small number of cases we assigned a different higher level taxonomy for recently described names if no existing combinations were available that were compatible with our taxonomic system.
 These are indicated in our supplemental data files as "comb. ined.".
-We compiled a list of putative rogue GenBank accessions, re-ran all analyses to this point after excluding rogues, then continued with the manually inspected phylogeny.
+
+Based on the results of the manual inspection, we updated the list of rogue accessions to exclude, updated the taxonomic database, then re-ran all analyses to this step.
+When re-running the analysis, it is possible that there were newly added GenBank accessions in place of the excluded rogues that themselves are rogues.
+Therefore, we repeated this process until the expected monophyly of all higher-level (`r eg` genus rank and higher) taxa that have previously been shown to be monophyletic was confirmed.
+
+### Final Sanger phylogeny
+
+After manual inspection, we generated the final Sanger phylogeny by using the backbone phylogeny as a constraint tree in ML analysis of the Sanger dataset under otherwise identical settings as those used for the backbone phylogeny.
+
+We did not conduct a more exhaustive analysis testing various partitions of the data or other phylogenetic inference methods as our goal is to produce a single species-level phylogeny that is a reasonable hypothesis of fern evolution, not to interrogate the outcomes of multiple, more or less equally applicable methods.
 
 ## Molecular dating
 
@@ -294,6 +305,7 @@ We dated the tree using treePL [@Smith2012].
 We applied a set of FIXME calibration points as minimum ages.
 Our calibration points are all based on fossils (not secondary calibration points) following a careful literature review.
 We used the species identification of each fossil to assign lineage only after consulting the original publication; previous studies [`r eg`, @Testo2016a] have used genus to assign lineage, but this can be problematic as genus concepts may vary between the original publication and current taxonomy [`r eg`, *Kuylisporites*\; @Loiseau2020].
+We tested rate smoothing parameters ranging from 0.000001 to 1000 (each varies by one order of magnitude); a value of FIXME was selected with the smallest chi-squared value for final analysis [@Smith2012].
 
 ## Reproducibility
 
@@ -680,20 +692,66 @@ fern_tree_sampling <-
 	) %>%
 	mutate(source = fct_reorder(source, year))
 
+compartment_labs <- 
+	gb_species_by_year %>%
+	filter(year == max(year)) %>%
+	transmute(
+		type,
+		label = str_to_sentence(type),
+		year,
+		n_species
+	)
+
+okabe_ito_cols <-
+palette_okabe_ito(1:9) %>%
+	set_names(
+		c("orange", "light_blue", "green", 
+			"yellow", "blue", "red",
+			"magenta", "grey", "black"))
+
+compartment_cols <- c(
+	mitochondrial = okabe_ito_cols["red"] %>% set_names(NULL),
+	nuclear = okabe_ito_cols["blue"] %>% set_names(NULL),
+	plastid = okabe_ito_cols["green"] %>% set_names(NULL),
+	total = "grey40"
+)
+
 genbank_plot <-
 	ggplot(gb_species_by_year, aes(x = year, y = n_species)) +
-	geom_line(aes(color = type)) +
+	geom_line(aes(color = type), size = .7) +
+	scale_color_manual(values = compartment_cols, guide = "none") +
+	geom_label_repel(
+		data = compartment_labs %>% filter(type %in% c("nuclear", "mitochondrial")),
+		aes(color = type, label = label),
+		segment.linetype = 2, 
+		xlim = c(2020, Inf),
+    # Do not repel from top or bottom edges.
+    ylim = c(-Inf, Inf)
+	) +
+	geom_label_repel(
+		data = compartment_labs %>% filter(type %in% c("total", "plastid")),
+		aes(color = type, label = label),
+		segment.linetype = 2, 
+		xlim = c(2020, Inf),
+    # Do not repel from top or bottom edges.
+    ylim = c(-Inf, Inf),
+		min.segment.length = 0
+	) +
 	geom_point(
 		data = fern_tree_sampling,
-		aes(shape = source)
-	)
+		aes(shape = source),
+		size = 2.5,
+	) +
+	labs(shape = "Study", y = "No. species", x = "Year") +
+	theme(legend.position = "bottom") +
+	coord_cartesian(clip = "off")
 ```
 
 ```{r genbank-save, eval = params$doc_type == "doc" }
 # Save plot if rendering to doc
 ggsave(
 	result_file(figure("genbank"), "pdf"),
-	genbank_plot, width = 3.3, height = 5, units = "in")
+	genbank_plot, width = 7, height = 5, units = "in")
 ```
 
 ```{r genbank-print, fig.width = 3.3, fig.height = 5, eval = params$doc_type == "pdf"}
