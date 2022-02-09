@@ -546,6 +546,40 @@ references:
   title: Synthesis of phylogeny and taxonomy into a comprehensive tree of life
   type: article-journal
   URL: http://www.pnas.org/lookup/doi/10.1073/pnas.1423041112
+- id: Kalyaanamoorthy2017
+  accessed:
+  - year: 2022
+    month: 2
+    day: 7
+  author:
+  - family: Kalyaanamoorthy
+    given: Subha
+  - family: Minh
+    given: Bui Quang
+  - family: Wong
+    given: Thomas K F
+  - family: Haeseler
+    given: Arndt
+    non-dropping-particle: von
+  - family: Jermiin
+    given: Lars S
+  citation-key: Kalyaanamoorthy2017
+  container-title: Nature Methods
+  container-title-short: Nat Methods
+  DOI: 10/gfzprj
+  ISSN: 1548-7091, 1548-7105
+  issue: '6'
+  issued:
+  - year: 2017
+    month: 6
+  language: en
+  page: 587-589
+  source: DOI.org (Crossref)
+  title: 'ModelFinder: fast model selection for accurate phylogenetic estimates'
+  title-short: ModelFinder
+  type: article-journal
+  URL: http://www.nature.com/articles/nmeth.4285
+  volume: '14'
 - id: Kao2020
   author:
   - family: Kao

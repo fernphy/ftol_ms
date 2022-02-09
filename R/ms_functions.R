@@ -182,3 +182,19 @@ add_plot_group <- function(data) {
 		)
 }
 
+#' Get tips of a phylogenetic tree in their plotted order
+#'
+#' After re-rooting a tree, the order of tips when the tree
+#' is plotted no longer match the order of $tip.label. Use
+#' this function to get tips in the order they are plotted.
+#' @param tree List of class "phylo"
+#' @return Character vector
+get_tips_in_ape_plot_order <- function(tree) {
+	assertthat::assert_that(inherits(tree, "phylo"))
+	# First filter out internal nodes
+	# from the the second column of the edge matrix
+	is_tip <- tree$edge[,2] <= length(tree$tip.label)
+	ordered_tips <- tree$edge[is_tip, 2]
+	# Use this vector to extract the tips in the right order
+	tree$tip.label[ordered_tips]
+}

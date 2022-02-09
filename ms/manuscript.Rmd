@@ -59,13 +59,16 @@ tar_load(
 	c(
 		sanger_alignment,
 		plastome_alignment,
-		plastome_tree,
 		plastome_metadata_renamed,
 		ppgi_taxonomy,
 		plastid_calibration_dates,
 		pteridocat,
-		sanger_alignment_tbl),
-	store = here::here("ftol_cache")
+		sanger_alignment_tbl,
+		sanger_tree_fast,
+		plastome_tree,
+		plastid_tree_dated),
+	# FIXME: change to ftol_cache when ready
+	store = here::here("working/_targets")
 )
 
 # Targets from MS workflow
@@ -76,9 +79,6 @@ tar_load(
 	),
 	store = here::here("_targets")
 )
-
-# FIXME: read in real ultrametric tree when ready
-sanger_tree <- ape::read.tree(here::here("working/sanger_alignment.phy.tre"))
 ```
 
 ```{r abstract-stats}
@@ -284,9 +284,10 @@ ModelFinder [@Kalyaanamoorthy2017] was implemented in IQ-TREE to select the best
 To reduce computational burden, we only tested models based on the General Time Reversible (GTR) model [@Tavare1986] and did not partition the dataset.
 The best-fitting model was selected automatically by IQ-TREE according to Bayesian Information Criterion (BIC) score.
 Node support was assessed with `r number(1000)` ultrafast rapid bootstrap replicates [@Minh2013]. 
+
 ### Initial Sanger phylogeny
 
-Next, we used the backbone phylogeny as a constraint tree to conduct initial phylogenetic analysis of the concatenated Sanger dataset in IQ-TREE with the "-fast" option and the same model as selected for the backbone phylogeny.
+Next, we used the backbone phylogeny as a constraint tree to conduct initial phylogenetic analysis of the concatenated Sanger dataset in IQ-TREE with the "-fast" option and the GTR+I+G model.
 We prioritized computation speed for this step, as we needed to repeat it multiple times as described in the next section.
 
 ### Removal of rogue sequences based on initial Sanger phylogeny
@@ -304,7 +305,7 @@ Therefore, we repeated this process until the monophyly of all higher-level (`r 
 ### Final Sanger phylogeny
 
 We generated the final Sanger phylogeny by using the backbone phylogeny as a constraint tree in ML analysis of the final concatenated Sanger dataset with the same model selection procedure as used for the backbone phylogeny.
-Node support was assessed with `r number(100)` standard (non-parametric) bootstrap replicates
+Node support was assessed with `r number(100)` standard (non-parametric) bootstrap replicates.
 
 We did not conduct a more exhaustive analysis testing various partitions of the data or other phylogenetic inference methods or models as our goal is to produce a single species-level phylogeny that is a reasonable hypothesis of fern evolution, not to interrogate the outcomes of multiple, more or less equally applicable methods.
 
@@ -670,9 +671,19 @@ og_taxa <-
 	filter(outgroup == TRUE) %>%
 	pull(species)
 
+plastome_tree_rooted <- phytools::reroot(
+	plastome_tree,
+	getMRCA(
+		plastome_tree,
+		c("Physcomitrium_patens", "Marchantia_polymorpha", "Anthoceros_angustus")
+	)) %>%
+	ladderize()
+
 # Make tibble of backbone tips with higher-level taxonomy
 backbone_taxonomy <-
-	tibble(species = plastome_tree$tip.label) %>%
+	tibble(
+		species = get_tips_in_ape_plot_order(plastome_tree_rooted)
+	) %>%
 	# Add higher taxonomy
 	left_join(sanger_sampling, by = "species") %>%
 	# Add column for phylogenetic order
@@ -711,7 +722,7 @@ compartment_labs <-
 	)
 
 okabe_ito_cols <-
-palette_okabe_ito(1:9) %>%
+	palette_okabe_ito(1:9) %>%
 	set_names(
 		c("orange", "light_blue", "green", 
 			"yellow", "blue", "red",
@@ -724,25 +735,43 @@ compartment_cols <- c(
 	total = "grey40"
 )
 
+# Manually specify axis buffers since we will annotate the panel border manually
+year_buffer <- 
+	max(gb_species_by_year$year) %>%
+	subtract(min(gb_species_by_year$year)) %>%
+	multiply_by(0.05)
+sp_buffer <- max(gb_species_by_year$n_species) %>%
+	subtract(min(gb_species_by_year$n_species)) %>%
+	multiply_by(0.05)
+
 genbank_plot <-
 	ggplot(gb_species_by_year, aes(x = year, y = n_species)) +
 	geom_line(aes(color = type)) +
 	scale_color_manual(values = compartment_cols, guide = "none") +
+	# Annotate panel border manually, since the automatic border gets
+	# printed on top of label annotations with theme_bw()
+	annotate(
+		"rect", 
+		xmin = min(gb_species_by_year$year) - year_buffer,
+		xmax = max(gb_species_by_year$year) + year_buffer,
+		ymin = min(gb_species_by_year$n_species) - sp_buffer,
+		ymax = max(gb_species_by_year$n_species) + sp_buffer,
+		fill = "transparent",
+		color = "grey20") +
 	geom_label_repel(
 		data = compartment_labs %>% filter(type %in% c("nuclear", "mitochondrial")),
 		aes(color = type, label = label),
 		segment.linetype = 2, 
 		xlim = c(2020, Inf),
-    # Do not repel from top or bottom edges.
-    ylim = c(-Inf, Inf)
+		# Do not repel from top or bottom edges.
+		ylim = c(-Inf, Inf)
 	) +
 	geom_label_repel(
 		data = compartment_labs %>% filter(type %in% c("total", "plastid")),
 		aes(color = type, label = label),
 		segment.linetype = 2, 
 		xlim = c(2020, Inf),
-    # Do not repel from top or bottom edges.
-    ylim = c(-Inf, Inf),
+		ylim = c(-Inf, Inf),
 		min.segment.length = 0
 	) +
 	geom_point(
@@ -750,14 +779,24 @@ genbank_plot <-
 		aes(shape = source)
 	) +
 	scale_shape(
-    limits = fern_tree_sampling$source, 
-    labels = fern_tree_sampling$label
+		limits = fern_tree_sampling$source, 
+		labels = fern_tree_sampling$label
 	) +
+	scale_x_continuous(expand = expansion(0, 0)) + 
+	scale_y_continuous(expand = expansion(0, 0)) + 
 	labs(shape = "Study", y = "No. species", x = "Year") +
-	theme(legend.position = "bottom",
-				plot.margin = margin(r = 1, t = 0.5, l = 0.5, unit = "in")) +
-	guides(shape = guide_legend(title.position = "top")) +
-	coord_cartesian(clip = "off")
+	coord_cartesian(clip = "off") +
+	guides(
+		shape = guide_legend(
+			title.position = "top",
+			nrow = 2)
+	) +
+	theme_bw() +
+	theme(
+		panel.border = element_blank(),
+		legend.position = "bottom",
+		plot.margin = margin(r = 1, t = 0.5, l = 0.5, unit = "in")
+	)
 ```
 
 ```{r genbank-save, eval = params$doc_type == "doc" }
@@ -780,32 +819,14 @@ genbank_plot
 # Make exemplar set of species in backbone representing plot groups
 plot_group_exemp_taxa <-
 	backbone_taxonomy %>%
-	# Slice to one exemplar species per family
+	# Slice to one exemplar species per major clade
 	group_by(plot_group) %>%
 	slice(1) %>%
 	ungroup() %>%
 	# Slicing arranges alphabetically, so put back in (unladderized) phylo order
-	arrange(phy_order)
-
-# Get names of exemplar tips in ladderized phylo order
-# Trim tree to exemplar species, rename by family
-phy <- ape::keep.tip(plastome_tree, plot_group_exemp_taxa$species)
-phy$tip.label <- plot_group_exemp_taxa$plot_group
-
-# Make tibble of plot groups in phylogenetic order
-plot_group_phy_order <-
-	phy %>%
-	# Reroot, ladderize, drop outgroup
-	root.phylo("og") %>%
-	ladderize() %>%
-	drop.tip("og") %>%
-	jntools::get_tips_in_ape_plot_order() %>%
-	tibble(
-		name = .,
-		phy_order = seq_along(.)
-	)
-
-rm(phy)
+	arrange(phy_order) %>%
+	# Drop outgroup
+	filter(family != "og")
 
 # Make a color palette for major clades
 # Start with list of green.armytage.colors names,
@@ -844,14 +865,14 @@ green_army_use_cols <-
 clade_cols <-
 	Polychrome::green.armytage.colors() %>%
 	extract(green_army_use_cols) %>%
-	extract(seq_len(nrow(plot_group_phy_order))) %>%
-	set_names(plot_group_phy_order$name)
+	extract(seq_len(nrow(plot_group_exemp_taxa))) %>%
+	set_names(plot_group_exemp_taxa$plot_group)
 
 # Format coverage at order-ish level for plotting
 b <-
 	coverage_data %>%
 	filter(rank == "plot_group") %>%
-	left_join(plot_group_phy_order, by = "name") %>%
+	left_join(plot_group_exemp_taxa, by = c(name = "plot_group")) %>%
 	arrange(phy_order) %>%
 	rename(clade = name) %>%
 	mutate(
@@ -885,9 +906,7 @@ b <-
 	)
 
 # Tree plot ----
-phy <- sanger_tree %>%
-	root("Anthoceros_angustus") %>%
-	ladderize()
+phy <- plastid_tree_dated
 
 # Make tibble for annotating major clades
 clade_tibble <-
@@ -925,8 +944,6 @@ clade_tibble <-
 a <- ggtree(
 	phy, 
 	layout = "circular", right = FALSE, size = 0.1,
-	# FIXME: change to phylogram when ultrametric tree is done
-	branch.length = "none"
 ) +
 	geom_cladelab(
 		data = clade_tibble,
