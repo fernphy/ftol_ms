@@ -1422,6 +1422,16 @@ references:
   URL: http://www.ingentaconnect.com/content/iapt/tax/2007/00000056/00000004/art00007
     papers://ebd7d3df-d8f1-4be8-bcf7-4fb07ababf30/Paper/p620
   volume: '56'
+- id: Schuettpelz2007b
+  author:
+  - family: Schuettpelz
+    given: Eric
+  citation-key: Schuettpelz2007b
+  issued:
+  - year: 2007
+  title: The evolution and diversification of epiphytic ferns
+  type: article-journal
+  URL: papers://ebd7d3df-d8f1-4be8-bcf7-4fb07ababf30/Paper/p598
 - id: Schwery2016
   accessed:
   - year: 2022

@@ -55,6 +55,11 @@ number <- function(...) {scales::number(big.mark = ",", ...)}
 
 ```{r load-targets}
 # Targets from FTOL workflow
+
+# Specify path to FTOL cache
+# FIXME: change to ftol_cache when ready
+ftol_cache <- here::here("working/_targets")
+
 tar_load(
 	c(
 		sanger_alignment,
@@ -65,17 +70,21 @@ tar_load(
 		pteridocat,
 		sanger_alignment_tbl,
 		sanger_tree_fast,
+		sanger_sampling,
+		monophy_by_clade,
 		plastome_tree,
-		plastid_tree_dated),
-	# FIXME: change to ftol_cache when ready
-	store = here::here("working/_targets")
+		plastid_tree_dated,
+		fossil_calibration_tips,
+		treepl_cv_results),
+	store = ftol_cache
 )
 
 # Targets from MS workflow
 tar_load(
 	c(
 		gb_species_by_year,
-		ref_files
+		ref_files,
+		other_dates
 	),
 	store = here::here("_targets")
 )
@@ -311,11 +320,57 @@ We did not conduct a more exhaustive analysis testing various partitions of the 
 
 ## Molecular dating
 
+```{r dating-methods-stats}
+# Count number of calibration points
+n_calibrations_ferns <-
+	fossil_calibration_tips %>%
+	assert(is_uniq, node_calibrated) %>%
+	filter(!affinities %in% c("Tracheophytes", "Euphyllophytes")) %>%
+	pull(node_calibrated) %>%
+	n_distinct() %>%
+	number()
+
+n_calibrations_total <-
+	fossil_calibration_tips %>%
+	assert(is_uniq, node_calibrated) %>%
+	pull(node_calibrated) %>%
+	n_distinct() %>%
+	number()
+
+# Format values used for treePL smoothing as tibble
+cv_smooth_test <-	
+	tibble(cv_result = treepl_cv_results) %>%
+	mutate(smooth = str_match(cv_result, "\\((.*)\\)") %>% 
+				 	magrittr::extract(, 2) %>%
+				 	parse_number()) %>%
+	mutate(chisq = str_match(cv_result, "\\) (.*)$") %>% 
+				 	magrittr::extract(, 2) %>%
+				 	parse_number()) %>%
+	arrange(smooth)
+
+# Extract start, end, and best smooth values
+smooth_start <- cv_smooth_test %>%
+	slice_min(n = 1, order_by = smooth) %>%
+	pull(smooth) %>%
+	number(., accuracy = .)
+
+smooth_end <- cv_smooth_test %>%
+	slice_max(n = 1, order_by = smooth) %>%
+	pull(smooth) %>%
+	number(., accuracy = .)
+
+smooth_best <-
+	cv_smooth_test %>%
+	slice_min(n = 1, order_by = chisq) %>%
+	pull(smooth) %>%
+	number(., accuracy = .)
+```
+
 We dated the tree using treePL [@Smith2012].
-We applied a set of FIXME calibration points as minimum ages.
-Our calibration points are all based on fossils following a careful literature review.
-We used the species identification of each fossil to assign lineage only after consulting the original publication; previous studies [`r eg`, @Testo2016a] have used genus to assign lineage, but this can be problematic as genus concepts may vary between the original publication and current taxonomy [`r eg`, *Kuylisporites*\; @Loiseau2020].
-We tested rate smoothing parameters ranging from 0.000001 to 1000 (each varies by one order of magnitude); a value of FIXME was selected with the smallest chi-squared value for final analysis [@Smith2012].
+We applied a set of `r n_calibrations_total` calibration points as minimum ages, including `r n_calibrations_ferns` calibration points within ferns.
+Our calibration points are all based on fossils.
+We assigned fossils to lineages only after consulting the original publication (as opposed to only using the fossil name), since taxon concepts may vary between the original publication and currently applied taxonomy [`r eg`, *Kuylisporites*\; @Loiseau2020].
+We tested rate smoothing parameters in treePL ranging from `r smooth_start` to `r smooth_end` (each varies by one order of magnitude); a value of `r smooth_best` was selected with the smallest chi-squared value for final analysis [@Smith2012].
 
 ## Reproducibility
 
@@ -418,7 +473,7 @@ tax_coverage <-
 	coverage_data %>%
 	filter(rank == "plot_group") %>%
 	arrange(coverage) %>%
-	transmute(clade = name, coverage = percent(coverage)) %>%
+	transmute(clade = name, coverage = percent(coverage, accuracy = 0.1)) %>%
 	split(.$clade)
 
 # Format overall sampling for printing in MS
@@ -443,7 +498,7 @@ total_sampling <-
 	) %>%
 	# Calculate coverage
 	mutate(
-		coverage_p = percent(n / n_accepted),
+		coverage_p = percent(n / n_accepted, accuracy = 0.1),
 		coverage = glue("{number(n, accuracy = 1)}/{number(n_accepted, accuracy = 1)}")) %>% #nolint
 	# Split for printing
 	split(.$rank)
@@ -487,7 +542,7 @@ bb_total_sampling <-
 	# Calculate coverage
 	mutate(
 		coverage_p = percent(n / n_accepted),
-		coverage = glue("{number(n, accuracy = 1)}/{number(n_accepted, accuracy = 1)}")) %>% #nolint
+		coverage = glue("{number(n, accuracy = 1)}/{number(n_accepted, accuracy = 0.1)}")) %>% #nolint
 	# Split for printing
 	split(.$rank)
 ```
@@ -565,11 +620,78 @@ There are two major clades within eupolypods, Polypodiineae (eupolypods I) and A
 
 Within Polypodiineae, Hypodematiaceae is sister to all remaining species, which diverge successfully in the order Didymochlaenaceae, Dryopteridaceae, Lomariopsidaceae, Nephrolepidaceae, Tectariaceae, Oleandraceae, then finally Polypodiaceae sister to Davalliaceae.
 
-Within Aspleniineae, we recover two large clades.
-One clade consists of Cyctopteridaceae, Rhacidosoraceae, Diplaziopsidaceae, and a clade comprised of Aspleniaceae and Hemidictyaceae.
-The other clade includes Thelypteridaceae, Woodsiaceae, a clade comprised of Onocleaceae and Blechnaceae, and a clade comprised of Athyriaceae and Desmophlebiaceae.
+Within Aspleniineae, Cystopteridaceae is sister to the remaining species, which are split into two clades. 
+One clade consists of Rhacidosoraceae, Diplaziopsidaceae, Desmophlebiaceae, Hemidictyaceae and Aspleniaceae.
+The other clade includes Thelypteridaceae, Woodsiaceae, a clade comprised of Onocleaceae and Blechnaceae, and Athyriaceae.
 
 ## Divergence times
+
+```{r divergence-times-stats}
+# Count number of tips in clades by taxonomy for double checking
+n_tips_in_clades <-
+	sanger_sampling %>%
+	filter(outgroup == FALSE) %>%
+	select(species, family, order) %>%
+	pivot_longer(names_to = "level", values_to = "taxon", -species) %>%
+	group_by(taxon) %>%
+	summarize(number_tips_by_tax = n())
+
+tree_height <- max(phytools::nodeHeights(plastid_tree_dated))
+
+# Define function for calculating age based on two genera
+get_age_from_genus_pair <- function(tip_pair) {
+	sanger_sampling %>%
+	filter(genus %in% tip_pair) %>%
+	group_by(genus) %>%
+	slice(1) %>%
+	pull(species) %>%
+  ape::getMRCA(plastid_tree_dated, .) %>%
+	phytools::nodeheight(plastid_tree_dated, .) %>%
+	magrittr::subtract(tree_height, .) %>%
+	number(accuracy = 0.1)
+}
+
+# Calculate age of various clades
+fern_age <- get_age_from_genus_pair(c("Equisetum", "Polypodium"))
+lepto_age <- get_age_from_genus_pair(c("Osmunda", "Polypodium"))
+polypodiales_age <- get_age_from_genus_pair(c("Lindsaea", "Polypodium"))
+eupoly_i_age <- get_age_from_genus_pair(c("Hypodematium", "Polypodium"))
+eupoly_ii_age <- get_age_from_genus_pair(c("Cystopteris", "Asplenium"))
+
+# Get ages for large clades
+clade_ages <-
+	sanger_sampling %>%
+	select(family, order) %>%
+	unique() %>%
+	pivot_longer(names_to = "level", values_to = "taxon", everything()) %>%
+	filter(!is.na(taxon)) %>%
+	unique() %>%
+	left_join(
+		unique(select(monophy_by_clade, taxon, monophyly, mrca, number_tips)),
+		by = "taxon") %>%
+	mutate(across(c(mrca, number_tips), parse_number)) %>%
+	assert(in_set(c("Yes", "Monotypic")), monophyly) %>%
+	filter(monophyly == "Yes") %>%
+	mutate(
+		# Height is distance above root
+		height = map_dbl(mrca, ~phytools::nodeheight(
+			tree = plastid_tree_dated, node = .))
+	) %>%
+	mutate(
+		# Age is the total length of the tree minus height
+		age = tree_height - height
+	) %>%
+	# Double check that n_tips is as expected
+	# (so the correct node is being used)
+	left_join(n_tips_in_clades, by = "taxon") %>%
+	verify(all(number_tips == number_tips_by_tax)) %>%
+	select(-number_tips_by_tax)
+```
+
+We estimate the crown age of ferns to be `r fern_age` ma.
+Ages of other major crown groups are leptosporangiates (`r lepto_age` ma), Polypodiales (`r polypodiales_age` ma), eupolypods I (`r eupoly_i_age` ma), and eupolypods II (`r eupoly_ii_age` ma).
+Except for eupolypods II, these ages are all slightly older than those reported in the most recent global fern phylogeny [@Testo2016a].
+Ages of fern families differed from previous studies, with some families estimated as having older crown ages while some had younger (`r figure("divtimes")`).
 
 # Discussion
 
@@ -611,6 +733,17 @@ Recently the whole plastome study of @Du2021 recovered a novel topology comprisi
 Taken together, our results for nodes of contention in the fern phylogeny generally agree with other plastid phylogenomic analyses and are well within the realm of plausible hypotheses generated to date.
 We do not consider any of these nodes "solved" by our analysis.
 Rather, conclusive resolution apparently still awaits additional sampling and perhaps innovation in phylogenetic methods.
+
+## Revisiting fossil calibration points in ferns
+
+Although we recovered slightly older ages for ferns and other large clades relative to the most recent globally sampled fern phylogeny [@Testo2016a], our estimated ages for families do not show a clear pattern, with some older and some younger than other studies (`r figure("divtimes")`).
+This may be due to the fact that we used a completely revised set of fossil calibration points relative to previous studies.
+Several of the recent studies analyzing divergence times for global fern phylogenies all used a similar set of 24--26 fossil calibration points [@Schuettpelz2007b; @Testo2016a] or secondary calibration points based on studies using this set [@Rothfels2015a].
+However, we found several of these calibration points were not appropriately applied due to differences in taxonomic concepts between the original fossil publication and the phylogeny in which they were used.
+Moreover, our set of calibration points more than doubles the number used by previous studies.
+Therefore, it is perhaps not surprising that we obtained different estimates for the age of many families, whereas previous studies tended to estimate similar ages by re-using the same (or very similar), more limited set of calibration points (SI Fig 1).
+
+<<FIXME: add discussion of specific groups once we have final ages>>
 
 ## Plastid vs. nuclear fern trees
 
@@ -681,9 +814,7 @@ plastome_tree_rooted <- phytools::reroot(
 
 # Make tibble of backbone tips with higher-level taxonomy
 backbone_taxonomy <-
-	tibble(
-		species = get_tips_in_ape_plot_order(plastome_tree_rooted)
-	) %>%
+	tibble(species = get_tips_in_ape_plot_order(plastome_tree_rooted)) %>%
 	# Add higher taxonomy
 	left_join(sanger_sampling, by = "species") %>%
 	# Add column for phylogenetic order
@@ -786,15 +917,12 @@ genbank_plot <-
 	scale_y_continuous(expand = expansion(0, 0)) + 
 	labs(shape = "Study", y = "No. species", x = "Year") +
 	coord_cartesian(clip = "off") +
-	guides(
-		shape = guide_legend(
-			title.position = "top",
-			nrow = 2)
-	) +
+	guides(shape = guide_legend(nrow = 2)) +
 	theme_bw() +
 	theme(
 		panel.border = element_blank(),
 		legend.position = "bottom",
+		legend.title = element_blank(),
 		plot.margin = margin(r = 1, t = 0.5, l = 0.5, unit = "in")
 	)
 ```
@@ -983,6 +1111,8 @@ ftol_plot
 # Make exemplar set of species in backbone representing families
 family_exemp <-
 	backbone_taxonomy %>%
+	# Drop outgroups %>%
+	filter(family != "og") %>%
 	# Slice to one exemplar species per family
 	group_by(family) %>%
 	slice(1) %>%
@@ -991,18 +1121,16 @@ family_exemp <-
 	arrange(phy_order)
 
 # Trim tree to exemplar species, rename by family
-phy <- keep.tip(plastome_tree, family_exemp$species)
-phy$tip.label <- family_exemp$family
+phy <- keep.tip(plastome_tree_rooted, family_exemp$species)
+new_tip_label <-
+	tibble(species = phy$tip.label) %>%
+	left_join(family_exemp, by = "species") %>%
+	pull(family)
+phy$tip.label <- new_tip_label
 # Convert BS support values to numeric
 phy$node.label <- parse_number(phy$node.label)
-# Reroot, ladderize, drop outgroup
-phy <-
-	phy %>%
-	root.phylo("og") %>%
-	ladderize() %>%
-	drop.tip("og") %>%
-	# Scale to total height of 100 for easy plotting
-	rescale_tree(100)
+# Scale to total height of 100 for easy plotting
+phy <- rescale_tree(phy, 100)
 
 # Make tibble for printing BS values
 bs_tibble <- tibble(
@@ -1075,7 +1203,6 @@ other_clade_labels <-
 segment_cols <-
 	rep("grey20", length(other_clade_labels$clade_label)) %>%
 	set_names(other_clade_labels$clade_label)
-
 
 set.seed(123)
 # Use the ggtree::`%<+%` operator to map the 
@@ -1162,3 +1289,105 @@ backbone_plot
 ```
 
 **`r figure("backbone")`**. Fern tree of life (FTOL) backbone phylogeny. One exemplar tip is shown per family. Ultrafast bootstrap support values (%) shown at nodes; unlabeled nodes are 100%. Outgroup (seed plants, lycophytes, and bryophytes) not shown. Colors of major clades (orders or suborders) correspond to those used in `r figure("ftol")`. Taxonomy follows [@PteridophytePhylogenyGroupI2016]; informal clade names in lowercase.
+
+```{r div-times-make}
+# Convert family ages to long format
+family_ages_median <-
+clade_ages %>%
+	filter(level == "family") %>%
+	select(family = taxon, current_best = age) %>%
+	left_join(other_dates, by = "family") %>%
+	mutate(family = fct_reorder(family, current_best)) %>%
+	pivot_longer(values_to = "age", -family) %>%
+	separate(name, into = c("author", "age_type"), sep = "_") %>%
+	assert(not_na, author, age_type) %>%
+	filter(age_type %in% c("best", "median"))
+
+# Convert family errors to almost long format
+family_ages_errors <-
+	clade_ages %>%
+	filter(level == "family") %>%
+	select(family = taxon, current_best = age) %>%
+	left_join(other_dates, by = "family") %>%
+	mutate(family = fct_reorder(family, current_best)) %>%
+	select(family, matches("ts|rothfels")) %>%
+	select(-matches("median"))
+
+family_ages_errors <-
+	bind_rows(
+		transmute(family_ages_errors, family,
+					 high = ts_high, low = ts_low, author = "ts"),
+		transmute(family_ages_errors, family,
+					 high = rothfels_high, low = rothfels_low, author = "rothfels")
+	)
+
+# Define shapes and colors for points
+ages_shapes <- c(
+	current = 16, # circle
+	rothfels = 17, # triangle
+	schuettpelz = 15, # square
+	ts = 18 # diamond
+)
+
+ages_colors <- c(
+	current = palette_okabe_ito(order = "vermillion"),
+	rothfels = palette_okabe_ito(order = "bluishgreen"),
+	schuettpelz = palette_okabe_ito(order = "blue"),
+	ts = palette_okabe_ito(order = "orange")
+)
+
+# Format names of papers for printing
+ages_sampling <-
+	tribble(
+		~source, ~year, ~label,
+		"schuettpelz", 2009, "Schuettpelz & Pryer 2009",
+		"rothfels", 2015, "Rothfels et al. 2015",
+		"ts", 2016, "Testo and Sundue 2016",
+		"current", 2021, "This study",
+	) %>%
+	mutate(source = fct_reorder(source, year))
+	
+div_times_plot <-
+ggplot() +
+	geom_errorbarh(
+		data = family_ages_errors,
+		aes(xmax = high, xmin = low, color = author, y = family),
+		position = position_dodge(width = 0.5)
+	) +
+	geom_point(
+		data = filter(family_ages_median, age_type %in% c("best", "median")),
+		aes(x = age, y = family, color = author, shape = author),
+		position = position_dodge(width = 0.5)) +
+	scale_shape_manual(
+		values = ages_shapes,
+		limits = ages_sampling$source, 
+		labels = ages_sampling$label) +
+	scale_color_manual(
+		values = ages_colors,
+		limits = ages_sampling$source, 
+		labels = ages_sampling$label) +
+	labs(x = "Age (millions of years)") +
+	guides(shape = guide_legend(nrow = 2)) +
+	theme_bw() +
+	theme(
+		axis.title.y = element_blank(),
+		legend.title = element_blank(),
+		legend.position = "bottom"
+	)
+```
+
+```{r div-times-save, eval = params$doc_type == "doc"}
+# Save plot if rendering to doc
+ggsave(
+	result_file(figure("divtimes"), "pdf"),
+	div_times_plot, width = 7, height = 8, units = "in")
+```
+
+```{r div-times-print, fig.width = 7, fig.height = 9, eval = params$doc_type == "pdf"}
+# Print plot if rendering to PDF
+div_times_plot
+```
+
+**`r figure("divtimes")`**. Crown age of fern families (mya) estimated by selected studies.
+For studies that used methods with confidence intervals, error bars indicate lower and upper 95% highest posterior density levels and point indicates median [@Rothfels2015a; @Testo2016a].
+For other studies, point indicates best (most likely) estimate [@Schuettpelz2007b\; this study].

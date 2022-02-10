@@ -210,3 +210,33 @@ count_ncbi_species_by_year <- function(gb_taxa, ncbi_names, year_range) {
 	map_df(year_range, ~sum_species(gb_species, .))
 }
 
+# Etc ----
+
+#' Parse divergene dates in the Testo and Sundue 2016 SI file
+#' 
+#' Testo WL, Sundue MA (2016) A 4000-species dataset provides new insight into 
+#' the evolution of ferns. Molecular Phylogenetics and Evolution 105:200–211. 
+#' https://doi.org/10.1016/j.ympev.2016.09.003
+#'
+#' @param testo_sundue_2016_si_path Path to Testo and Sundue 2016 SI file
+#'
+#' @return Tibble
+#' 
+parse_ts_dates <- function(testo_sundue_2016_si_path) {
+	readxl::read_excel(
+		testo_sundue_2016_si_path,
+		# Divergence dates are in the 5th sheet
+		sheet = 5,
+		skip = 1
+	) %>%
+		janitor::clean_names() %>%
+		rename(
+			ts_median = median_age_2,
+			ts_low = x95_percent_hpd_low_3,
+			ts_high = x95_percent_hpd_high_4,
+			rothfels_median = median_age_5,
+			rothfels_low = x95_percent_hpd_low_6,
+			rothfels_high = x95_percent_hpd_high_7,
+			schuettpelz_best = best_age
+		)
+}

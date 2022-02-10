@@ -30,6 +30,12 @@ tar_plan(
 	# by genomic compartment per year
 	gb_species_by_year = count_ncbi_species_by_year(
 		gb_taxa, ncbi_names, year_range = 1990:2021),
+	# Read in estimated clade ages from Testo and Sundue 2016 SI
+	tar_files_input(
+		testo_sundue_2016_si_path,
+		"_targets/user/data_raw/1-s2.0-S1055790316302287-mmc2.xlsx"
+	),
+	other_dates = parse_ts_dates(testo_sundue_2016_si_path),
 	# Render manuscript ----
 	# track files used for rendering MS
 	tar_file(ref_files, list.files("ms", "references", full.names = TRUE)),
