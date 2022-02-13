@@ -58,6 +58,13 @@
       "Repository": "CRAN",
       "Hash": "dab19adae4440ae55aa8a9d238b246bb"
     },
+    "RcppEigen": {
+      "Package": "RcppEigen",
+      "Version": "0.3.3.9.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "ddfa72a87fdf4c80466a20818be91d00"
+    },
     "XML": {
       "Package": "XML",
       "Version": "3.99-0.8",
@@ -120,13 +127,6 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "0c54cf3a08cc0e550fbd64ad33166143"
-    },
-    "bib2df": {
-      "Package": "bib2df",
-      "Version": "1.1.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "f2cf33875b859a757ad919a4471cdc0f"
     },
     "bit": {
       "Package": "bit",
@@ -324,13 +324,6 @@
       "Repository": "CRAN",
       "Hash": "bb0eec2fe32e88d9e2836c2f73ea2077"
     },
-    "english": {
-      "Package": "english",
-      "Version": "1.2-6",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "eae5ce5432c3e995bc4aab2e612df7a5"
-    },
     "evaluate": {
       "Package": "evaluate",
       "Version": "0.14",
@@ -408,12 +401,31 @@
       "Repository": "CRAN",
       "Hash": "3f6bcfb0ee5d671d9fd1893d2faa79cb"
     },
+    "ggforce": {
+      "Package": "ggforce",
+      "Version": "0.3.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "4c64a588b497f8c088e1d308ddd40bc6"
+    },
     "ggfun": {
       "Package": "ggfun",
       "Version": "0.0.5",
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "be6dbe9ddc9cc77fb9277611eff20a96"
+    },
+    "ggokabeito": {
+      "Package": "ggokabeito",
+      "Version": "0.1.0.9000",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "malcolmbarrett",
+      "RemoteRepo": "ggokabeito",
+      "RemoteRef": "main",
+      "RemoteSha": "3221890f5316f565bdc118b5ab1bbb8044fcdb8c",
+      "Hash": "72d453859ad064d65bcbdc5a06ff881c"
     },
     "ggplot2": {
       "Package": "ggplot2",
@@ -431,10 +443,15 @@
     },
     "ggrepel": {
       "Package": "ggrepel",
-      "Version": "0.9.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "08ab869f37e6a7741a64ab9069bcb67d"
+      "Version": "0.9.1.9999",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "slowkow",
+      "RemoteRepo": "ggrepel",
+      "RemoteRef": "master",
+      "RemoteSha": "60a2ad091e57379e1ebfa87d773ffc202eb18387",
+      "Hash": "4f2c6668204167ea0c94210d35aef6fc"
     },
     "ggtree": {
       "Package": "ggtree",
@@ -533,13 +550,6 @@
       "Repository": "CRAN",
       "Hash": "a525aba14184fec243f9eaec62fbed43"
     },
-    "humaniformat": {
-      "Package": "humaniformat",
-      "Version": "0.6.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "d521cf9db39ca79250a00029661fb7cd"
-    },
     "ids": {
       "Package": "ids",
       "Version": "1.0.1",
@@ -561,17 +571,12 @@
       "Repository": "CRAN",
       "Hash": "7ab57a6de7f48a8dc84910d1eca42883"
     },
-    "jntools": {
-      "Package": "jntools",
-      "Version": "0.1.0",
-      "Source": "GitHub",
-      "RemoteType": "github",
-      "RemoteHost": "api.github.com",
-      "RemoteUsername": "joelnitta",
-      "RemoteRepo": "jntools",
-      "RemoteRef": "master",
-      "RemoteSha": "9d64a36799e4f5adcb15431f678385a5e1753fd6",
-      "Hash": "6e16cd40b64b3796321768f621d320a9"
+    "janitor": {
+      "Package": "janitor",
+      "Version": "2.1.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "6de84a8c67fb247e721166049c84695f"
     },
     "jquerylib": {
       "Package": "jquerylib",
@@ -761,6 +766,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "2ebe8c2ec200da649738b0fc35a9b1a1"
+    },
+    "polyclip": {
+      "Package": "polyclip",
+      "Version": "1.10-0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "cb167f328b3ada4ec5cf67a7df4c900a"
     },
     "prettyunits": {
       "Package": "prettyunits",
@@ -956,6 +968,13 @@
       "Repository": "CRAN",
       "Hash": "00344c227c7bd0ab5d78052c5d736c44"
     },
+    "snakecase": {
+      "Package": "snakecase",
+      "Version": "0.11.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "4079070fc210c7901c0832a3aeab894f"
+    },
     "sourcetools": {
       "Package": "sourcetools",
       "Version": "0.1.7",
@@ -1058,6 +1077,13 @@
       "RemoteRef": "master",
       "RemoteSha": "976d5643862aeff3583c4698c5f7237e24db9a7a",
       "Hash": "707ffbbf3c90b63bce5c906cc6c84f15"
+    },
+    "tweenr": {
+      "Package": "tweenr",
+      "Version": "1.0.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "6cc663f970a529dbf776f11d5bcd1a2e"
     },
     "tzdb": {
       "Package": "tzdb",
