@@ -240,3 +240,136 @@ parse_ts_dates <- function(testo_sundue_2016_si_path) {
 			schuettpelz_best = best_age
 		)
 }
+
+# Monophyly ----
+
+#' Add "major clade" to Sanger sampling table
+#'
+#' "major clade" includes pteridophyte suborder or order, and combines
+#' Ophioglossales + Psilotales into one group
+#'
+#' @param data Tibble including columns "suborder" and "order".
+#'
+#' @return Tibble withh column "major_clade" added
+#'
+add_major_clade <- function(data) {
+	data %>%
+		mutate(
+			major_clade = coalesce(suborder, order),
+			major_clade = case_when(
+				major_clade %in% c("Ophioglossales", "Psilotales") ~ "Ophioglossales + Psilotales", #nolint
+				TRUE ~ major_clade
+			)
+		)
+}
+
+
+#' Make tibble summarizing sampling of Sanger dataset
+#'
+#' @param plastome_metadata_renamed Plastome data with final (resolved) species
+#' names.
+#' @param sanger_tree Sanger ML tree.
+#' @param ppgi_taxonomy PPGI taxonomy
+#'
+#' @return Tibble with columns "species",  "genus", "order", "suborder",
+#' "family"  "subfamily"  "major_clade" "outgroup"
+#'
+make_sanger_sampling_tbl <- function(
+	plastome_metadata_renamed,
+	sanger_tree, ppgi_taxonomy
+) {
+	
+	# check monophyly ----
+	# Make tibble of outgroup species
+	og_species <-
+		plastome_metadata_renamed %>%
+		select(species, outgroup) %>%
+		filter(outgroup == TRUE)
+	
+	# Make tibble with one row per species in Sanger sampling
+	tibble(species = sanger_tree$tip.label) %>%
+		# Add higher-level taxonomy
+		mutate(
+			genus = str_split(species, "_") %>% map_chr(1)
+		) %>%
+		left_join(
+			select(
+				ppgi_taxonomy, order, suborder, family, subfamily, genus), by = "genus"
+		) %>%
+		# Add major_clade
+		add_major_clade() %>%
+		# Add outgroup status
+		left_join(og_species, by = "species") %>%
+		mutate(outgroup = replace_na(outgroup, FALSE)) %>%
+		verify(sum(outgroup) == nrow(og_species)) %>%
+		# Check for match for tips with tree
+		verify(all(species %in% sanger_tree$tip.label)) %>%
+		verify(all(sanger_tree$tip.label %in% .$species))
+}
+
+#' Get results of monophyly test for various taxa
+#'
+#' @param solution Result of assessing monophyly with assess_monophy().
+#' @param taxlevels Numeric vector: taxonomic levels to extract.
+#'
+#' @return Tibble
+#'
+get_result_monophy <- function(solution, taxlevels) {
+	MonoPhy::GetResultMonophyly(solution, taxlevels = taxlevels) %>%
+		magrittr::extract2(1) %>%
+		rownames_to_column("taxon") %>%
+		as_tibble() %>%
+		janitor::clean_names()
+}
+
+#' Get summary of monophyly test
+#'
+#' @param solution Result of assessing monophyly with assess_monophy().
+#' @param taxlevels Numeric vector: taxonomic levels to extract.
+#'
+#' @return Tibble
+get_summary_monophy <- function(solution, taxlevels) {
+	mp_sum <- MonoPhy::GetSummaryMonophyly(solution, taxlevels = taxlevels)
+	
+	mp_sum %>%
+		magrittr::extract2(1) %>%
+		rownames_to_column("var") %>%
+		as_tibble() %>%
+		mutate(tax_level = names(mp_sum)) %>%
+		janitor::clean_names() %>%
+		select(tax_level, var, taxa, tips)
+}
+
+#' Assess monophyly
+#'
+#' Wrapper around MonoPhy::AssessMonophyly()
+#'
+#' @param taxon_sampling Dataframe of taxa to assess for monophyly. Must
+#' include column "species"
+#' @param tree Phylogenetic tree.
+#' @param og_taxa Character vector; pair of taxa to define the outgroup to
+#' root the tree.
+#' @param tax_levels Character vector; names of columns in `taxon_sampling`
+#' to check for monophyly.
+#'
+#' @return List; results of MonoPhy::AssessMonophyly()
+#'
+assess_monophy <- function(
+	taxon_sampling, tree,
+	og_taxa = NULL,
+	tax_levels) {
+	tax_levels <- c("species", tax_levels) %>% unique()
+	# Root tree
+	if (!is.null(og_taxa)) {
+		tree <- phytools::reroot(
+			tree,
+			getMRCA(tree, og_taxa)
+		)
+	}
+	# Check monophyly
+	taxon_sampling %>%
+		verify("species" %in% colnames(.)) %>%
+		select(species, all_of(tax_levels)) %>%
+		as.data.frame() %>%
+		MonoPhy::AssessMonophyly(tree, .)
+}

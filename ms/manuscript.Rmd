@@ -70,7 +70,6 @@ tar_load(
 		pteridocat,
 		sanger_alignment_tbl,
 		sanger_tree_fast,
-		sanger_sampling,
 		monophy_by_clade,
 		plastome_tree,
 		plastid_tree_dated,
@@ -98,21 +97,10 @@ og_species <-
 	filter(outgroup == TRUE)
 
 # Make tibble with one row per species in Sanger sampling
-sanger_sampling <- tibble(
-	species = rownames(sanger_alignment)
-) %>%
-	# Add higher-level taxonomy
-	mutate(genus = str_split(species, "_") %>% map_chr(1)) %>%
-	left_join(
-		select(ppgi_taxonomy, genus, family, suborder, order), by = "genus"
-	) %>% 
-	# Add plot_group
-	add_plot_group() %>%
-	# Add outgroup status
-	left_join(og_species, by = "species") %>%
-	mutate(outgroup = replace_na(outgroup, FALSE)) %>%
-	verify(nrow(.) == nrow(sanger_alignment)) %>%
-	verify(sum(outgroup) == nrow(og_species))
+sanger_sampling <- make_sanger_sampling_tbl(
+	plastome_metadata_renamed,
+	sanger_tree = plastid_tree_dated,
+	ppgi_taxonomy = ppgi_taxonomy)
 
 # Count number of fern species in Sanger data
 n_sanger_ferns <-
@@ -627,15 +615,7 @@ The other clade includes Thelypteridaceae, Woodsiaceae, a clade comprised of Ono
 ## Divergence times
 
 ```{r divergence-times-stats}
-# Count number of tips in clades by taxonomy for double checking
-n_tips_in_clades <-
-	sanger_sampling %>%
-	filter(outgroup == FALSE) %>%
-	select(species, family, order) %>%
-	pivot_longer(names_to = "level", values_to = "taxon", -species) %>%
-	group_by(taxon) %>%
-	summarize(number_tips_by_tax = n())
-
+# Get overall tree height
 tree_height <- max(phytools::nodeHeights(plastid_tree_dated))
 
 # Define function for calculating age based on two genera
@@ -658,34 +638,36 @@ polypodiales_age <- get_age_from_genus_pair(c("Lindsaea", "Polypodium"))
 eupoly_i_age <- get_age_from_genus_pair(c("Hypodematium", "Polypodium"))
 eupoly_ii_age <- get_age_from_genus_pair(c("Cystopteris", "Asplenium"))
 
-# Get ages for large clades
-clade_ages <-
-	sanger_sampling %>%
-	select(family, order) %>%
-	unique() %>%
-	pivot_longer(names_to = "level", values_to = "taxon", everything()) %>%
-	filter(!is.na(taxon)) %>%
-	unique() %>%
-	left_join(
-		unique(select(monophy_by_clade, taxon, monophyly, mrca, number_tips)),
-		by = "taxon") %>%
-	mutate(across(c(mrca, number_tips), parse_number)) %>%
-	assert(in_set(c("Yes", "Monotypic")), monophyly) %>%
+# Get ages for families
+sanger_sampling_family <- select(sanger_sampling, species, family)
+
+# Only use monophyletic families
+mono_test_family <- assess_monophy(
+	taxon_sampling = sanger_sampling_family,
+	tree = plastid_tree_dated,
+	tax_levels = "family"
+) %>%
+	get_result_monophy(1)
+
+family_ages <-
+mono_test_family %>%
 	filter(monophyly == "Yes") %>%
 	mutate(
-		# Height is distance above root
-		height = map_dbl(mrca, ~phytools::nodeheight(
-			tree = plastid_tree_dated, node = .))
+		mrca = parse_number(mrca),
+		stem_node = map_dbl(
+			mrca,
+			~phangorn::Ancestors(plastid_tree_dated, ., type = "parent"))
 	) %>%
+	select(family = taxon, stem_node) %>%
+mutate(
+	# Height is distance above root
+	height = map_dbl(stem_node, ~phytools::nodeheight(
+		tree = plastid_tree_dated, node = .))
+) %>%
 	mutate(
 		# Age is the total length of the tree minus height
 		age = tree_height - height
-	) %>%
-	# Double check that n_tips is as expected
-	# (so the correct node is being used)
-	left_join(n_tips_in_clades, by = "taxon") %>%
-	verify(all(number_tips == number_tips_by_tax)) %>%
-	select(-number_tips_by_tax)
+	)
 ```
 
 We estimate the crown age of ferns to be `r fern_age` ma.
@@ -1293,9 +1275,8 @@ backbone_plot
 ```{r div-times-make}
 # Convert family ages to long format
 family_ages_median <-
-clade_ages %>%
-	filter(level == "family") %>%
-	select(family = taxon, current_best = age) %>%
+family_ages %>%
+	select(family, current_best = age) %>%
 	left_join(other_dates, by = "family") %>%
 	mutate(family = fct_reorder(family, current_best)) %>%
 	pivot_longer(values_to = "age", -family) %>%
@@ -1305,9 +1286,8 @@ clade_ages %>%
 
 # Convert family errors to almost long format
 family_ages_errors <-
-	clade_ages %>%
-	filter(level == "family") %>%
-	select(family = taxon, current_best = age) %>%
+	family_ages %>%
+	select(family, current_best = age) %>%
 	left_join(other_dates, by = "family") %>%
 	mutate(family = fct_reorder(family, current_best)) %>%
 	select(family, matches("ts|rothfels")) %>%
