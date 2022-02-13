@@ -1,0 +1,133 @@
+---
+title: "Supplemental Information"
+output: 
+  bookdown::word_document2:
+    pandoc_args: [ "--csl", "frontiers.csl"]
+    toc: no
+    number_sections: no
+    reference_docx: Frontiers_Template.docx
+editor_options: 
+  chunk_output_type: console
+params:
+  doc_type: doc
+---
+
+---
+bibliography: 
+- `r here::here("ms/references.yaml")`
+- `r here::here("ms/references_other.yaml")`
+- `r here::here("ms/references_other.bib")`
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+	echo = FALSE, warning = FALSE, message = FALSE, results = 'hide')
+
+# Load packages
+library(conflicted)
+library(rmarkdown)
+library(bookdown)
+library(targets)
+library(assertr)
+library(ape)
+library(scales)
+library(tidyverse)
+library(rgnparser)
+library(ggtree)
+library(glue)
+library(Polychrome)
+library(patchwork)
+library(magrittr)
+library(ggrepel)
+library(ggokabeito)
+library(ggforce)
+
+# Resolve conflicts
+conflict_prefer("filter", "dplyr")
+conflict_prefer("extract", "magrittr")
+
+# Load functions
+source(here::here("R/ms_functions.R"))
+
+# Specify percentage format
+percent <- function(...) {scales::percent(...)}
+number <- function(...) {scales::number(big.mark = ",", ...)}
+```
+
+```{r load-targets}
+# Targets from FTOL workflow
+
+# Specify path to FTOL cache
+# FIXME: change to ftol_cache when ready
+ftol_cache <- here::here("working/_targets")
+
+tar_load(
+	c(
+		sanger_sampling,
+		monophy_by_clade,
+		plastid_tree_dated),
+	store = ftol_cache
+)
+
+# Targets from MS workflow
+tar_load(
+	c(
+		gb_species_by_year,
+		ref_files,
+		other_dates
+	),
+	store = here::here("_targets")
+)
+```
+
+```{r age-biplot}
+# Count number of tips in clades by taxonomy for double checking
+n_tips_in_clades <-
+	sanger_sampling %>%
+	filter(outgroup == FALSE) %>%
+	select(species, family, order) %>%
+	pivot_longer(names_to = "level", values_to = "taxon", -species) %>%
+	group_by(taxon) %>%
+	summarize(number_tips_by_tax = n())
+
+# Get ages for large clades
+clade_ages <-
+	sanger_sampling %>%
+	select(family, order) %>%
+	unique() %>%
+	pivot_longer(names_to = "level", values_to = "taxon", everything()) %>%
+	filter(!is.na(taxon)) %>%
+	unique() %>%
+	left_join(
+		unique(select(monophy_by_clade, taxon, monophyly, mrca, number_tips)),
+		by = "taxon") %>%
+	mutate(across(c(mrca, number_tips), parse_number)) %>%
+	assert(in_set(c("Yes", "Monotypic")), monophyly) %>%
+	filter(monophyly == "Yes") %>%
+	mutate(
+		# Height is distance above root
+		height = map_dbl(mrca, ~phytools::nodeheight(
+			tree = plastid_tree_dated, node = .))
+	) %>%
+	mutate(
+		# Age is the total length of the tree minus height
+		age = max(phytools::nodeHeights(plastid_tree_dated)) - height
+	) %>%
+	# Double check that n_tips is as expected
+	# (so the correct node is being used)
+	left_join(n_tips_in_clades, by = "taxon") %>%
+	verify(all(number_tips == number_tips_by_tax)) %>%
+	select(-number_tips_by_tax)
+
+clade_ages %>%
+	filter(level == "family") %>%
+	select(family = taxon, current_best = age) %>%
+	left_join(other_dates, by = "family") %>%
+	select(matches("best|median")) %>%
+	ggplot(aes(x = .panel_x, y = .panel_y)) +
+	geom_point() +
+	geom_autodensity(na.rm = TRUE) +
+	facet_matrix(vars(everything()), layer.diag = 2, grid.y.diag = FALSE)
+```
+
+Figure 1: Biplot comparing crown ages of fern families (millions of years) across different studies.
