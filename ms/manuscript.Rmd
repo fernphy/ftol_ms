@@ -47,6 +47,7 @@ conflict_prefer("extract", "magrittr")
 
 # Load functions
 source(here::here("R/ms_functions.R"))
+source(here::here("R/functions.R"))
 
 # Specify percentage format
 percent <- function(...) {scales::percent(...)}
@@ -373,16 +374,16 @@ A docker image to run the code is available at https://hub.docker.com/r/joelnitt
 ```{r sampling-stats, message=FALSE}
 # FTOL sampling ----
 
-# Helper function to add plot_group:
+# Helper function to add major_clade:
 # a "rank" that may be at order or suborder level for plotting
-add_plot_group <- function(data) {
+add_major_clade <- function(data) {
 	data %>%
 		mutate(
-			plot_group = coalesce(suborder, order),
-			plot_group = case_when(
-				plot_group %in% c("Ophioglossales", "Psilotales") ~ 
+			major_clade = coalesce(suborder, order),
+			major_clade = case_when(
+				major_clade %in% c("Ophioglossales", "Psilotales") ~ 
 					"Ophioglossales + Psilotales",
-				TRUE ~ plot_group
+				TRUE ~ major_clade
 			)
 		)
 }
@@ -392,8 +393,8 @@ ftol_sampling_by_rank <-
 	sanger_sampling %>%
 	filter(outgroup == FALSE) %>%
 	select(-outgroup) %>%
-	# add plot_group
-	add_plot_group() %>%
+	# add major_clade
+	add_major_clade() %>%
 	# drop suborder
 	select(-suborder) %>%
 	pivot_longer(names_to = "rank", values_to = "name", -species) %>%
@@ -432,8 +433,8 @@ accepted_species <-
 	assert(not_na, class) %>%
 	filter(class == "Polypodiopsida") %>%
 	select(-class) %>%
-	# Add plot_group
-	add_plot_group() %>%
+	# Add major_clade
+	add_major_clade() %>%
 	# drop suborder
 	select(-suborder) 
 
@@ -459,7 +460,7 @@ coverage_data <- left_join(
 # Format for text in MS
 tax_coverage <-
 	coverage_data %>%
-	filter(rank == "plot_group") %>%
+	filter(rank == "major_clade") %>%
 	arrange(coverage) %>%
 	transmute(clade = name, coverage = percent(coverage, accuracy = 0.1)) %>%
 	split(.$clade)
@@ -673,7 +674,7 @@ mutate(
 We estimate the crown age of ferns to be `r fern_age` ma.
 Ages of other major crown groups are leptosporangiates (`r lepto_age` ma), Polypodiales (`r polypodiales_age` ma), eupolypods I (`r eupoly_i_age` ma), and eupolypods II (`r eupoly_ii_age` ma).
 Except for eupolypods II, these ages are all slightly older than those reported in the most recent global fern phylogeny [@Testo2016a].
-Ages of fern families differed from previous studies, with some families estimated as having older crown ages while some had younger (`r figure("divtimes")`).
+Estimated stem ages of fern families were generally older than previous studies. (`r figure("divtimes")`).
 
 # Discussion
 
@@ -689,7 +690,7 @@ ppgi_gleich_genera_n <-
 
 plastome_gleich_genera_n <-
 	bb_sampling %>%
-	filter(plot_group == "Gleicheniales") %>%
+	filter(major_clade == "Gleicheniales") %>%
 	pull(genus) %>%
 	n_distinct()
 ```
@@ -718,12 +719,12 @@ Rather, conclusive resolution apparently still awaits additional sampling and pe
 
 ## Revisiting fossil calibration points in ferns
 
-Although we recovered slightly older ages for ferns and other large clades relative to the most recent globally sampled fern phylogeny [@Testo2016a], our estimated ages for families do not show a clear pattern, with some older and some younger than other studies (`r figure("divtimes")`).
+We recovered older crown ages for ferns and other large clades as well as older stem ages for families relative to previous studies (`r figure("divtimes")`).
 This may be due to the fact that we used a completely revised set of fossil calibration points relative to previous studies.
 Several of the recent studies analyzing divergence times for global fern phylogenies all used a similar set of 24--26 fossil calibration points [@Schuettpelz2007b; @Testo2016a] or secondary calibration points based on studies using this set [@Rothfels2015a].
 However, we found several of these calibration points were not appropriately applied due to differences in taxonomic concepts between the original fossil publication and the phylogeny in which they were used.
 Moreover, our set of calibration points more than doubles the number used by previous studies.
-Therefore, it is perhaps not surprising that we obtained different estimates for the age of many families, whereas previous studies tended to estimate similar ages by re-using the same (or very similar), more limited set of calibration points (SI Fig 1).
+It is likely that this expanded sampling has yielded older estimates for the stem age of many families, whereas previous studies tended to estimate similar ages by re-using the same (or very similar), more limited set of calibration points (SI Fig 1).
 
 <<FIXME: add discussion of specific groups once we have final ages>>
 
@@ -806,9 +807,9 @@ backbone_taxonomy <-
 		family = case_when(
 			outgroup == TRUE ~ "og",
 			TRUE ~ family),
-		plot_group = case_when(
+		major_clade = case_when(
 			outgroup == TRUE ~ "og",
-			TRUE ~ plot_group)
+			TRUE ~ major_clade)
 	)
 ```
 
@@ -927,10 +928,10 @@ genbank_plot
 # Coverage bar plot ----
 
 # Make exemplar set of species in backbone representing plot groups
-plot_group_exemp_taxa <-
+major_clade_exemp_taxa <-
 	backbone_taxonomy %>%
 	# Slice to one exemplar species per major clade
-	group_by(plot_group) %>%
+	group_by(major_clade) %>%
 	slice(1) %>%
 	ungroup() %>%
 	# Slicing arranges alphabetically, so put back in (unladderized) phylo order
@@ -975,14 +976,14 @@ green_army_use_cols <-
 clade_cols <-
 	Polychrome::green.armytage.colors() %>%
 	extract(green_army_use_cols) %>%
-	extract(seq_len(nrow(plot_group_exemp_taxa))) %>%
-	set_names(plot_group_exemp_taxa$plot_group)
+	extract(seq_len(nrow(major_clade_exemp_taxa))) %>%
+	set_names(major_clade_exemp_taxa$major_clade)
 
 # Format coverage at order-ish level for plotting
 b <-
 	coverage_data %>%
-	filter(rank == "plot_group") %>%
-	left_join(plot_group_exemp_taxa, by = c(name = "plot_group")) %>%
+	filter(rank == "major_clade") %>%
+	left_join(major_clade_exemp_taxa, by = c(name = "major_clade")) %>%
 	arrange(phy_order) %>%
 	rename(clade = name) %>%
 	mutate(
@@ -1037,15 +1038,15 @@ clade_tibble <-
 		Osmundales = c("Osmundastrum_cinnamomeum", "Todea_barbara"),
 		Equisetales = c("Equisetum_bogotense", "Equisetum_hyemale")
 	) %>%
-	pivot_longer(names_to = "plot_group", values_to = "taxa", cols = everything()) %>%
-	arrange(plot_group) %>%
-	group_by(plot_group) %>%
+	pivot_longer(names_to = "major_clade", values_to = "taxa", cols = everything()) %>%
+	arrange(major_clade) %>%
+	group_by(major_clade) %>%
 	summarize(taxa = list(taxa)) %>%
 	mutate(
 		mrca = map_chr(taxa, ~getMRCA(phy, .))
 	) %>%
 	transmute(
-		plot_group,
+		major_clade,
 		mrca,
 		dummy = ""
 	) %>%
@@ -1059,7 +1060,7 @@ a <- ggtree(
 		data = clade_tibble,
 		mapping = aes(
 			node = mrca,
-			color = plot_group,
+			color = major_clade,
 			label = dummy
 		),
 		offset = 0.1,
@@ -1128,34 +1129,34 @@ phy_tip <- as_tibble(phy)
 suborder_labels_singletons <-
 	family_exemp %>% 
 	filter(outgroup == FALSE) %>%
-	group_by(plot_group) %>%
-	select(plot_group, family) %>% 
+	group_by(major_clade) %>%
+	select(major_clade, family) %>% 
 	filter(n_distinct(family) == 1) %>%
 	ungroup() %>%
 	left_join(phy_tip, by = c(family = "label")) %>%
-	select(plot_group, mrca = node)
+	select(major_clade, mrca = node)
 
 suborder_labels <-
 	family_exemp %>% 
 	filter(outgroup == FALSE) %>%
-	group_by(plot_group) %>%
-	select(plot_group, family) %>% 
+	group_by(major_clade) %>%
+	select(major_clade, family) %>% 
 	filter(n_distinct(family) > 1) %>%
 	summarize(taxa = list(family)) %>%
 	mutate(
 		mrca = map_chr(taxa, ~getMRCA(phy, .))
 	) %>%
 	transmute(
-		plot_group,
+		major_clade,
 		mrca
 	) %>%
 	mutate(mrca = parse_number(mrca)) %>%
 	bind_rows(suborder_labels_singletons) %>%
 	mutate(
 		clade_label = case_when(
-			plot_group == "Aspleniineae" ~ "Aspleniineae\n(eupolypods II)",
-			plot_group == "Polypodiineae" ~ "Polypodiineae\n(eupolypods I)",
-			TRUE ~ plot_group
+			major_clade == "Aspleniineae" ~ "Aspleniineae\n(eupolypods II)",
+			major_clade == "Polypodiineae" ~ "Polypodiineae\n(eupolypods I)",
+			TRUE ~ major_clade
 		)
 	)
 
@@ -1200,7 +1201,7 @@ backbone_plot <-
 		data = suborder_labels,
 		mapping = aes(
 			node = mrca,
-			fill = plot_group
+			fill = major_clade
 		),
 		alpha = 0.2,
 		align = "right",
@@ -1368,6 +1369,6 @@ ggsave(
 div_times_plot
 ```
 
-**`r figure("divtimes")`**. Crown age of fern families (mya) estimated by selected studies.
+**`r figure("divtimes")`**. Stem age of fern families (mya) estimated by selected studies.
 For studies that used methods with confidence intervals, error bars indicate lower and upper 95% highest posterior density levels and point indicates median [@Rothfels2015a; @Testo2016a].
 For other studies, point indicates best (most likely) estimate [@Schuettpelz2007b\; this study].
