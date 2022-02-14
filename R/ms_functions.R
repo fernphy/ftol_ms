@@ -169,6 +169,23 @@ node_height_from_tips <- function(phy, tips) {
 }
 
 # Etc -----
+
+#' Function to get support value in BS%
+#'
+#' @param phy an object of class "phylo".
+#' @param tips a vector of mode numeric or character specifying the tips
+#'
+#' @return Bootstrap support as % of that node
+get_bs <- function(phy, tips) {
+	node_select <- ape::getMRCA(phy, tips)
+	as_tibble(phy) %>%
+		filter(node == node_select) %>%
+		pull(label) %>%
+		parse_number() %>%
+		magrittr::multiply_by(0.01) %>%
+		percent()
+}
+
 # Helper function to add plot_group:
 # a "rank" that may be at order or suborder level for plotting
 add_plot_group <- function(data) {

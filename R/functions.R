@@ -221,7 +221,7 @@ count_ncbi_species_by_year <- function(gb_taxa, ncbi_names, year_range) {
 	map_df(year_range, ~sum_species(gb_species, .))
 }
 
-# Etc ----
+# Data loading ----
 
 #' Parse divergene dates in the Testo and Sundue 2016 SI file
 #' 
@@ -252,7 +252,25 @@ parse_ts_dates <- function(testo_sundue_2016_si_path) {
 		)
 }
 
-# Monophyly ----
+# Rmarkdown ----
+
+# Specify format for percent and number in Rmd
+percent <- function(...) {scales::percent(...)}
+number <- function(...) {scales::number(big.mark = ",", ...)}
+
+# Monophyly and ages ----
+
+#' Get parent node from a tip taxon
+#'
+#' @param tree Phylogenetic tree.
+#' @param species Single tip of the tree.
+#'
+#' @return Number of the parent node of the species
+#' 
+get_parent <- function(tree, species) {
+	node <- which(tree$tip.label == species)
+	phangorn::Ancestors(tree, node, type = "parent")
+}
 
 #' Add "major clade" to Sanger sampling table
 #'
@@ -273,7 +291,6 @@ add_major_clade <- function(data) {
 			)
 		)
 }
-
 
 #' Make tibble summarizing sampling of Sanger dataset
 #'
@@ -384,3 +401,99 @@ assess_monophy <- function(
 		as.data.frame() %>%
 		MonoPhy::AssessMonophyly(tree, .)
 }
+
+
+#' Calculate crown age based on two genera
+#'
+#' @param tip_pair Character vector of length two: the two genera to be used
+#' to define the clade
+#' @param sanger_sampling Tibble with one row per species in the tree, including
+#' columns "genus", "family", etc.
+#' @param plastid_tree_dated Dated phylogeny
+#'
+#' @return Character vector: age of the clade defined by the two genera
+#' 
+get_crown_age_from_genus_pair <- function(tip_pair, sanger_sampling, plastid_tree_dated) {
+	tree_height <- max(phytools::nodeHeights(plastid_tree_dated))
+	sanger_sampling %>%
+		filter(genus %in% tip_pair) %>%
+		group_by(genus) %>%
+		slice(1) %>%
+		pull(species) %>%
+		ape::getMRCA(plastid_tree_dated, .) %>%
+		phytools::nodeheight(plastid_tree_dated, .) %>%
+		magrittr::subtract(tree_height, .) %>%
+		number(accuracy = 0.1)
+}
+
+
+#' Calculate stem age of families
+#' 
+#' Will only include monophyltic and monotypic families
+#'
+#' @param sanger_sampling Tibble with one row per species in the tree, including
+#' columns "genus", "family", etc.
+#' @param plastid_tree_dated Dated phylogeny 
+#' @param ppgi_taxonomy PPGI taxonomic system for ferns and lycophytes
+#'
+#' @return Tibble with columns "family" and "age" (stem age of the family)
+get_stem_family_age <- function(
+	sanger_sampling, 
+	plastid_tree_dated, ppgi_taxonomy) {
+	
+	# Get overall tree height
+	tree_height <- max(phytools::nodeHeights(plastid_tree_dated))
+	
+	# Get ages for families
+	family_monophy <- 
+		select(sanger_sampling, species, family) %>%
+		assess_monophy(
+			taxon_sampling = .,
+			tree = plastid_tree_dated,
+			tax_levels = "family"
+		) %>%
+		get_result_monophy(1) %>%
+		rename(family = taxon) %>%
+		# Filter to ferns
+		left_join(unique(select(ppgi_taxonomy, family, class)), by = "family") %>%
+		filter(class == "Polypodiopsida") %>%
+		select(-class)
+	
+	# Get stem nodes of monotypic families
+	family_monotypic_stem_node <-
+		family_monophy %>%
+		filter(monophyly == "Monotypic") %>%
+		left_join(select(sanger_sampling, family, species), by = "family") %>%
+		assert(is_uniq, family) %>%
+		mutate(stem_node = map_dbl(species, ~get_parent(plastid_tree_dated, .))) %>%
+		assert(not_na, stem_node) %>%
+		select(family, stem_node)
+	
+	# Get stem nodes of monophyletic families
+	family_monophyletic_stem_node <-
+		family_monophy %>%
+		filter(monophyly == "Yes") %>%
+		mutate(
+			mrca = parse_number(mrca),
+			stem_node = map_dbl(
+				mrca,
+				~phangorn::Ancestors(plastid_tree_dated, ., type = "parent"))
+		) %>%
+		select(family, stem_node)
+	
+	# Combine nodes, get ages
+	bind_rows(family_monotypic_stem_node, family_monophyletic_stem_node) %>%
+		mutate(
+			# Height is distance above root
+			height = map_dbl(stem_node, ~phytools::nodeheight(
+				tree = plastid_tree_dated, node = .))
+		) %>%
+		mutate(
+			# Age is the total length of the tree minus height
+			age = tree_height - height
+		) %>%
+		assert(is_uniq, family) %>%
+		assert(not_na, everything()) %>%
+		select(family, age)
+}
+
