@@ -36,9 +36,20 @@ fetch_metadata <- function(
 	)
 	
 	# Define internal function to download genbank data into tibble
+	# - make "safe" version of rentrez::entrez_summary to catch errors
+	safe_entrez_summary <- purrr::safely(rentrez::entrez_summary)
 	entrez_summary_gb <- function(id, col_select) {
+
 		# Download data
-		rentrez::entrez_summary(db = "nucleotide", id = id) %>%
+		res <- safe_entrez_summary(db = "nucleotide", id = id)
+		
+		# Early exit if error with entrez
+		if (!is.null(res$error)) {
+			warning("No esummary records found in file, returning empty tibble")
+			return(tibble(taxid = NA))
+		}
+		
+		res$result %>%
 			# Extract selected columns from result
 			purrr::map_dfr(magrittr::extract, col_select) %>%
 			# Make sure taxid column is character
