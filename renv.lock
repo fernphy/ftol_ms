@@ -72,6 +72,13 @@
       "Repository": "CRAN",
       "Hash": "e031418365a7f7a766181ab5a41a5716"
     },
+    "RCurl": {
+      "Package": "RCurl",
+      "Version": "1.98-1.6",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "53a4a5e55370f1a1a4afd92356252946"
+    },
     "Rcpp": {
       "Package": "Rcpp",
       "Version": "1.0.7",
@@ -183,6 +190,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "9fe98599ca456d6552421db0d6772d8f"
+    },
+    "bitops": {
+      "Package": "bitops",
+      "Version": "1.0-7",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "b7d8d8ee39869c18d8846a184dd8a1af"
     },
     "blob": {
       "Package": "blob",
@@ -373,6 +387,18 @@
       "Repository": "CRAN",
       "Hash": "1f37fa4ab2f5f7eded42f78b9a887182"
     },
+    "deeptime": {
+      "Package": "deeptime",
+      "Version": "0.2.1.9002",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "willgearty",
+      "RemoteRepo": "deeptime",
+      "RemoteRef": "master",
+      "RemoteSha": "e5d9f158ebddd0197364e6c4efe797aea2da15a1",
+      "Hash": "88e9158684066e0acbb4af8daf6282cb"
+    },
     "digest": {
       "Package": "digest",
       "Version": "0.6.29",
@@ -492,6 +518,13 @@
       "Repository": "CRAN",
       "Hash": "3f6bcfb0ee5d671d9fd1893d2faa79cb"
     },
+    "ggfittext": {
+      "Package": "ggfittext",
+      "Version": "0.9.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "42aafda63a2012fb3b928fef01d96698"
+    },
     "ggforce": {
       "Package": "ggforce",
       "Version": "0.3.3",
@@ -505,6 +538,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "be6dbe9ddc9cc77fb9277611eff20a96"
+    },
+    "ggnewscale": {
+      "Package": "ggnewscale",
+      "Version": "0.4.5",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "5d2d9029aa89360eb283e3d10ab8bf42"
     },
     "ggokabeito": {
       "Package": "ggokabeito",
@@ -543,6 +583,13 @@
       "RemoteRef": "master",
       "RemoteSha": "60a2ad091e57379e1ebfa87d773ffc202eb18387",
       "Hash": "4f2c6668204167ea0c94210d35aef6fc"
+    },
+    "ggtext": {
+      "Package": "ggtext",
+      "Version": "0.1.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "03d8caec959ac70e2d13bad1ac40667c"
     },
     "ggtree": {
       "Package": "ggtree",
@@ -591,6 +638,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "5b79228594f02385d4df4979284879ae"
+    },
+    "gridtext": {
+      "Package": "gridtext",
+      "Version": "0.1.4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "5ae1f617531ca2ae244647d9b21b5e74"
     },
     "gtable": {
       "Package": "gtable",
@@ -801,6 +855,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "b3d98a967ec17c80f795719529812fa0"
+    },
+    "markdown": {
+      "Package": "markdown",
+      "Version": "1.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "61e4a10781dd00d7d81dd06ca9b94e95"
     },
     "memoise": {
       "Package": "memoise",
@@ -1191,6 +1252,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "3838071b66e0c566d55cc26bd6e27bf4"
+    },
+    "shades": {
+      "Package": "shades",
+      "Version": "1.4.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "3a2cf5eecb2cbca814d01d56bfb51494"
     },
     "shiny": {
       "Package": "shiny",
