@@ -2,6 +2,7 @@ library(targets)
 library(tarchetypes)
 library(tidyverse)
 library(assertr)
+library(glue)
 
 source("R/functions.R")
 
@@ -24,12 +25,20 @@ tar_plan(
 		plastome_metadata_renamed,
 		store = ftol_cache
 	),
+	plastome_tree = tar_read(
+		plastome_tree,
+		store = ftol_cache
+	),
 	plastid_tree_dated = tar_read(
 		plastid_tree_dated,
 		store = ftol_cache
 	),
 	ppgi_taxonomy = tar_read(
 		ppgi_taxonomy,
+		store = ftol_cache
+	),
+	pteridocat = tar_read(
+		pteridocat,
 		store = ftol_cache
 	),
 	
@@ -58,6 +67,20 @@ tar_plan(
 	# by genomic compartment per year
 	gb_species_by_year = count_ncbi_species_by_year(
 		gb_taxa, ncbi_names, year_range = 1990:2021),
+	
+	# Coverage ----
+	# Make tibble of accepted species in pteridocat
+	accepted_species = get_accepted_species(pteridocat, ppgi_taxonomy),
+	# Calculate coverage by rank and overall coverage for FTOL
+	coverage_by_rank = calculate_ftol_coverage(
+		sanger_sampling, accepted_species, "cov_by_rank"),
+	total_coverage = calculate_ftol_coverage(
+		sanger_sampling, accepted_species, "total_sampling"),
+	# Calculate coverage by rank and overall coverage for backbone tree
+	bb_coverage_by_rank = calculate_backbone_coverage(
+		plastome_tree, sanger_sampling, accepted_species, "cov_by_rank"),
+	bb_total_coverage = calculate_backbone_coverage(
+		plastome_tree, sanger_sampling, accepted_species, "total_sampling"),
 	
 	# Analyze monophyly and ages ----
 	# - Make Sanger sampling table

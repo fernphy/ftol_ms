@@ -80,7 +80,12 @@ tar_load(
 # Targets from MS workflow
 tar_load(
 	c(
+		accepted_species,
 		sanger_sampling,
+		coverage_by_rank,
+		total_coverage,
+		bb_coverage_by_rank,
+		bb_total_coverage,
 		gb_species_by_year,
 		ref_files,
 		other_dates,
@@ -366,153 +371,23 @@ A docker image to run the code is available at https://hub.docker.com/r/joelnitt
 
 ## Taxon sampling
 
-```{r sampling-stats, message=FALSE}
-# FTOL sampling ----
-
-# Tally FTOL sampling by rank
-ftol_sampling_by_rank <-
-	sanger_sampling %>%
-	filter(outgroup == FALSE) %>%
-	select(-outgroup) %>%
-	# drop suborder
-	select(-suborder) %>%
-	pivot_longer(names_to = "rank", values_to = "name", -species) %>%
-	group_by(rank) %>%
-	count(name) %>%
-	ungroup
-
-# Make list of all accepted species
-accepted_species <-
-	pteridocat %>% 
-	# Only keep accepted names
-	filter(str_detect(taxonomicStatus, "accepted")) %>%
-	# Only keep species
-	# FIXME: need to add rank for newly added names in pteridocat_maker
-	# then don't need is.na()
-	filter(taxonRank == "species" | is.na(taxonRank)) %>%
-	select(scientificName) %>%
-	mutate(
-		rgnparser::gn_parse_tidy(scientificName) %>% 
-			select(species = canonicalsimple),
-		species = str_replace_all(species, " ", "_")
-	) %>%
-	# Map on higher level taxonomy
-	mutate(genus = str_split(scientificName, " ") %>% map_chr(1)) %>%
-	left_join(
-		select(ppgi_taxonomy, genus, family, 
-					 suborder, order, class), by = "genus"
-	) %>%
-	# FIXME: update class for nothogenera in PPG
-	mutate(class = case_when(
-		str_detect(
-			scientificName, "Schizoloma|Phlebosia|Cystocarpium") ~ "Polypodiopsida",
-		TRUE ~ class
-	)) %>%
-	# Drop lycophytes
-	assert(not_na, class) %>%
-	filter(class == "Polypodiopsida") %>%
-	select(-class) %>%
-	# Add major_clade
-	add_major_clade() %>%
-	# drop suborder
-	select(-suborder) 
-
-# Tally accepted sampling by rank
-accepted_sampling_by_rank <-
-	accepted_species %>%
-	select(-scientificName) %>%
-	pivot_longer(names_to = "rank", values_to = "name", -species) %>%
-	group_by(rank) %>%
-	count(name) %>%
-	ungroup %>%
-	# Note that nothogenera have no family or order
-	filter(!is.na(name))
-
-# Format coverage at order-ish level for plotting
-coverage_data <- left_join(
-	ftol_sampling_by_rank,
-	rename(accepted_sampling_by_rank, n_accepted = n),
-	by = c("rank", "name")
-) %>%
-	mutate(coverage = n/n_accepted)
-
-# Format for text in MS
+```{r sampling-stats, message = FALSE}
+# Format FTOL sampling as list
 tax_coverage <-
-	coverage_data %>%
+	coverage_by_rank %>%
 	filter(rank == "major_clade") %>%
-	arrange(coverage) %>%
-	transmute(clade = name, coverage = percent(coverage, accuracy = 0.1)) %>%
+	transmute(
+		# Be sure to change to factor so list is correct order
+		# when splitting
+		clade = fct_reorder(name, coverage),
+		coverage = percent(coverage, accuracy = 0.1)) %>%
 	split(.$clade)
 
-# Format overall sampling for printing in MS
-total_sampling <-
-	# Start with FTOL sampling by genus, family, order
-	ftol_sampling_by_rank %>% 
-	count(rank) %>%
-	# Add n species
-	bind_rows(
-		sanger_sampling %>%
-			filter(outgroup == FALSE) %>%
-			select(-outgroup) %>%
-			summarize(n = n(), rank = "species")
-	) %>%
-	# Join to accepted number of species, genus, family, order
-	left_join(
-		count(accepted_sampling_by_rank, rank, name = "n_accepted") %>%
-			bind_rows(
-				summarize(accepted_species, n_accepted = n(), rank = "species")
-			),
-		by = "rank"
-	) %>%
-	# Calculate coverage
-	mutate(
-		coverage_p = percent(n / n_accepted, accuracy = 0.1),
-		coverage = glue("{number(n, accuracy = 1)}/{number(n_accepted, accuracy = 1)}")) %>% #nolint
-	# Split for printing
-	split(.$rank)
+# Format overall FTOL sampling as list
+total_sampling <- split(total_coverage, total_coverage$rank)
 
-# Plastome (backbone) sampling ----
-bb_sampling <-
-	tibble(species = plastome_tree$tip.label) %>%
-	# Add higher taxonomy
-	left_join(sanger_sampling, by = "species")
-
-bb_sampling_by_rank <-
-	bb_sampling %>%
-	# Drop OG
-	filter(outgroup == FALSE) %>%
-	select(-outgroup) %>%
-	pivot_longer(names_to = "rank", values_to = "name", -species) %>%
-	group_by(rank) %>%
-	count(name) %>%
-	ungroup
-
-# Format sampling for printing in MS
-bb_total_sampling <-
-	# Start with backbone sampling by genus, family, order
-	bb_sampling_by_rank %>% 
-	count(rank) %>%
-	# Add n species
-	bind_rows(
-		bb_sampling %>%
-			filter(outgroup == FALSE) %>%
-			select(-outgroup) %>%
-			summarize(n = n(), rank = "species")
-	) %>%
-	# Join to accepted number of species, genus, family, order
-	left_join(
-		count(accepted_sampling_by_rank, rank, name = "n_accepted") %>%
-			bind_rows(
-				summarize(accepted_species, n_accepted = n(), rank = "species")
-			),
-		by = "rank"
-	) %>%
-	# Calculate coverage
-	mutate(
-		coverage_p = percent(n / n_accepted),
-		coverage = glue("{number(n, accuracy = 1)}/{number(n_accepted, accuracy = 0.1)}")) %>% #nolint
-	# Split for printing
-	split(.$rank)
+# Format overall plastome (backbone) sampling as list
+bb_total_sampling <- split(bb_total_coverage, bb_total_coverage$rank)
 ```
 
 Taxon sampling for the current version of FTOL includes `r total_sampling$species$coverage` species (`r total_sampling$species$coverage_p`), `r total_sampling$genus$coverage` genera (`r total_sampling$genus$coverage_p`), `r total_sampling$family$coverage` families, and `r total_sampling$order$coverage` orders of ferns (all coverage values are relative to the number of accepted species in Pteridocat).
@@ -596,9 +471,10 @@ ppgi_gleich_genera_n <-
 	n_distinct()
 
 plastome_gleich_genera_n <-
-	bb_sampling %>%
-	filter(major_clade == "Gleicheniales") %>%
-	pull(genus) %>%
+	bb_coverage_by_rank %>%
+	left_join(select(ppgi_taxonomy, name = genus, order), by = "name") %>%
+	filter(order == "Gleicheniales") %>%
+	pull(name) %>%
 	n_distinct()
 ```
 
@@ -784,7 +660,6 @@ clade_cols_tib <-
 			TRUE ~ code
 		)) %>%
 	assert(is_uniq, code)
-
 ```
 
 ```{r genbank-make}
@@ -920,7 +795,7 @@ clade_labs <- clade_labs_tib$label %>%
 	
 # Format coverage at order-ish level for plotting
 b <-
-	coverage_data %>%
+	coverage_by_rank %>%
 	filter(rank == "major_clade") %>%
 	left_join(major_clade_exemp_taxa, by = c(name = "major_clade")) %>%
 	arrange(phy_order) %>%

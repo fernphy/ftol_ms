@@ -258,6 +258,220 @@ parse_ts_dates <- function(testo_sundue_2016_si_path) {
 percent <- function(...) {scales::percent(...)}
 number <- function(...) {scales::number(big.mark = ",", ...)}
 
+# Coverage ----
+
+#' Make a tibble of accepted species in pteridocat taxonomic database
+#'
+#' @param pteridocat Taxonomic database of pteridophytes at species level
+#' @param ppgi_taxonomy Pteridophyte phylogeny group I taxonomy (genus level
+#' and above)
+#'
+#' @return Tibble of accepted species with higher level taxonomy
+#' 
+get_accepted_species <- function(pteridocat, ppgi_taxonomy) {
+	pteridocat %>% 
+		# Only keep accepted names
+		filter(str_detect(taxonomicStatus, "accepted")) %>%
+		# Only keep species
+		# FIXME: need to add rank for newly added names in pteridocat_maker
+		# then don't need is.na()
+		filter(taxonRank == "species" | is.na(taxonRank)) %>%
+		select(scientificName) %>%
+		mutate(
+			rgnparser::gn_parse_tidy(scientificName) %>% 
+				select(species = canonicalsimple),
+			species = str_replace_all(species, " ", "_")
+		) %>%
+		# Map on higher level taxonomy
+		mutate(genus = str_split(scientificName, " ") %>% map_chr(1)) %>%
+		left_join(
+			select(ppgi_taxonomy, genus, family, 
+						 suborder, order, class), by = "genus"
+		) %>%
+		# FIXME: update class for nothogenera in PPG
+		mutate(class = case_when(
+			str_detect(
+				scientificName, "Schizoloma|Phlebosia|Cystocarpium") ~ "Polypodiopsida",
+			TRUE ~ class
+		)) %>%
+		# Drop lycophytes
+		assert(not_na, class) %>%
+		filter(class == "Polypodiopsida") %>%
+		select(-class) %>%
+		# Add major_clade
+		add_major_clade() %>%
+		# drop suborder
+		select(-suborder) 
+}
+
+#' Calculate coverage of species and other taxonomic ranks in FTOL
+#'
+#' @param sanger_sampling Tibble including sampling statistics in Sanger 
+#' dataset (one row per species, with columns for higher-level taxonomy
+#' and outgroup status)
+#' @param accepted_species Tibble of accepted species in pteridocat
+#' @param ret_type Type of output to return:
+#' - cov_by_rank: Returns coverage by taxonmic rank
+#' - total_sampling: Returns overall sampling coverage
+#' 
+#' @return Tibble
+#'
+calculate_ftol_coverage <- function(
+	sanger_sampling, 
+	accepted_species, ret_type = c("cov_by_rank", "total_sampling")) {
+	
+	# Tally accepted sampling by rank
+	accepted_sampling_by_rank <- tally_accepted_sampling_by_rank(
+		accepted_species)
+	
+	# Tally FTOL sampling by rank
+	ftol_sampling_by_rank <-
+		sanger_sampling %>%
+		# Exclude outgroup
+		filter(outgroup == FALSE) %>%
+		select(-outgroup) %>%
+		# drop suborder
+		select(-suborder) %>%
+		pivot_longer(names_to = "rank", values_to = "name", -species) %>%
+		group_by(rank) %>%
+		count(name) %>%
+		ungroup
+	
+	# Calculate coverage by rank
+	coverage_by_rank <- left_join(
+		ftol_sampling_by_rank,
+		rename(accepted_sampling_by_rank, n_accepted = n),
+		by = c("rank", "name")
+	) %>%
+		mutate(coverage = n/n_accepted)
+	
+	# Format overall sampling for printing in MS
+	total_sampling <-
+		# Start with FTOL sampling by genus, family, order
+		ftol_sampling_by_rank %>% 
+		count(rank) %>%
+		# Add n species
+		bind_rows(
+			sanger_sampling %>%
+				filter(outgroup == FALSE) %>%
+				select(-outgroup) %>%
+				summarize(n = n(), rank = "species")
+		) %>%
+		# Join to accepted number of species, genus, family, order
+		left_join(
+			count(accepted_sampling_by_rank, rank, name = "n_accepted") %>%
+				bind_rows(
+					summarize(accepted_species, n_accepted = n(), rank = "species")
+				),
+			by = "rank"
+		) %>%
+		# Calculate coverage
+		mutate(
+			coverage_p = percent(n / n_accepted, accuracy = 0.1),
+			coverage = glue("{number(n, accuracy = 1)}/{number(n_accepted, accuracy = 1)}")) # nolint
+	
+	switch(
+		ret_type,
+		"cov_by_rank" = coverage_by_rank,
+		"total_sampling" = total_sampling,
+		stop("Must choose 'cov_by_rank'  or 'total_sampling' for 'ret_type'")
+	)
+	
+}
+
+#' Tally the number of accepted species in pteridocat by rank
+#'
+#' @param accepted_species Tibble of accepted species in pteridocat
+#'
+#' @return Tibble
+#' 
+tally_accepted_sampling_by_rank <- function(accepted_species) {
+	accepted_species %>%
+		select(-scientificName) %>%
+		pivot_longer(names_to = "rank", values_to = "name", -species) %>%
+		group_by(rank) %>%
+		count(name) %>%
+		ungroup %>%
+		# Note that nothogenera have no family or order
+		filter(!is.na(name))
+}
+
+#' Calculate coverage of species and other taxonomic ranks in plastome
+#' (backbone) tree
+#'
+#' @param plastome_tree Plastome (backbone) tree
+#' @param sanger_sampling Tibble including sampling statistics in Sanger 
+#' dataset (one row per species, with columns for higher-level taxonomy
+#' and outgroup status)
+#' @param accepted_species Tibble of accepted species in pteridocat
+#' @param ret_type Type of output to return:
+#' - cov_by_rank: Returns coverage by taxonmic rank
+#' - total_sampling: Returns overall sampling coverage
+#'
+#' @return Tibble
+#' 
+calculate_backbone_coverage <- function(
+	plastome_tree, sanger_sampling,
+	accepted_species, ret_type = c("cov_by_rank", "total_sampling")) {
+	
+	# Tally accepted sampling by rank
+	accepted_sampling_by_rank <- tally_accepted_sampling_by_rank(accepted_species)
+	
+	# Tally backbone sampling by rank
+	bb_sampling <-
+		tibble(species = plastome_tree$tip.label) %>%
+		# Add higher taxonomy
+		left_join(sanger_sampling, by = "species") %>%
+		# Drop OG
+		filter(outgroup == FALSE) %>%
+		select(-outgroup) %>%# drop suborder
+		# drop suborder
+		select(-suborder)
+	
+	# Calculate coverage by rank
+	bb_sampling_by_rank <-
+		bb_sampling %>%
+		pivot_longer(names_to = "rank", values_to = "name", -species) %>%
+		group_by(rank) %>%
+		count(name) %>%
+		ungroup %>%
+		left_join(
+			rename(accepted_sampling_by_rank, n_accepted = n),
+			by = c("rank", "name")
+		) %>%
+		mutate(coverage = n/n_accepted)
+	
+	# Format sampling for printing in MS
+	bb_total_sampling <-
+		# Start with backbone sampling by genus, family, order
+		bb_sampling_by_rank %>% 
+		count(rank) %>%
+		# Add n species
+		bind_rows(
+			summarize(bb_sampling, n = n(), rank = "species")
+		) %>%
+		# Join to accepted number of species, genus, family, order
+		left_join(
+			count(accepted_sampling_by_rank, rank, name = "n_accepted") %>%
+				bind_rows(
+					summarize(accepted_species, n_accepted = n(), rank = "species")
+				),
+			by = "rank"
+		) %>%
+		# Calculate coverage
+		mutate(
+			coverage_p = percent(n / n_accepted),
+			coverage = glue("{number(n, accuracy = 1)}/{number(n_accepted, accuracy = 0.1)}"))
+	
+	switch(
+		ret_type,
+		"cov_by_rank" = bb_sampling_by_rank,
+		"total_sampling" = bb_total_sampling,
+		stop("Must choose 'cov_by_rank'  or 'total_sampling' for 'ret_type'")
+	)
+	
+}
+
 # Monophyly and ages ----
 
 #' Get parent node from a tip taxon
