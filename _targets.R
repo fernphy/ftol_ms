@@ -59,7 +59,7 @@ tar_plan(
 	gb_species_by_year = count_ncbi_species_by_year(
 		gb_taxa, ncbi_names, year_range = 1990:2021),
 	
-	# Calculate ages ----
+	# Analyze monophyly and ages ----
 	# - Make Sanger sampling table
 	sanger_sampling = make_sanger_sampling_tbl(
 		plastome_metadata_renamed,

@@ -38,8 +38,10 @@ library(glue)
 library(Polychrome)
 library(patchwork)
 library(magrittr)
+library(deeptime)
 library(ggrepel)
 library(ggokabeito)
+library(ggtext)
 
 # Resolve conflicts
 conflict_prefer("filter", "dplyr")
@@ -716,6 +718,73 @@ backbone_taxonomy <-
 			outgroup == TRUE ~ "og",
 			TRUE ~ major_clade)
 	)
+
+# Make exemplar set of species in backbone representing plot groups
+major_clade_exemp_taxa <-
+	backbone_taxonomy %>%
+	# Slice to one exemplar species per major clade
+	group_by(major_clade) %>%
+	slice(1) %>%
+	ungroup() %>%
+	# Slicing arranges alphabetically, so put back in (unladderized) phylo order
+	arrange(phy_order) %>%
+	# Drop outgroup
+	filter(family != "og")
+
+# Make a color palette for major clades
+# Start with list of green.armytage.colors names,
+# exclude those that are too close or stand out too much
+# https://www.jstatsoft.org/article/view/v090c01
+green_army_use_cols <-
+	c(
+		"amethyst",
+		"blue",
+		"caramel",
+		"damson",
+		# "ebony",
+		# "forest",
+		"green",
+		"honeydew",
+		# "iron",
+		# "jade",
+		# "khaki",
+		# "lime",
+		"mallow",
+		"navy",
+		# "orpiment",
+		"pink",
+		# "quagmire",
+		"red",
+		"sky",
+		"turquoise",
+		"uranium",
+		"violet",
+		"wine",
+		# "xanthin",
+		# "yellow",
+		"zinnia"
+	)
+
+clade_cols <-
+	Polychrome::green.armytage.colors() %>%
+	extract(green_army_use_cols) %>%
+	extract(seq_len(nrow(major_clade_exemp_taxa))) %>%
+	set_names(major_clade_exemp_taxa$major_clade)
+
+clade_cols_tib <-
+	tibble(
+		color = clade_cols,
+		major_clade = names(clade_cols)
+	) %>%
+	mutate(
+		code = substr(major_clade, 1, 2),
+		code = case_when(
+			major_clade == "Saccolomatineae" ~ "Sac",
+			major_clade == "Salviniales" ~ "Sal",
+			TRUE ~ code
+		)) %>%
+	assert(is_uniq, code)
+
 ```
 
 ```{r genbank-make}
@@ -827,63 +896,28 @@ ggsave(
 genbank_plot
 ```
 
-**`r figure("genbank")`**. Number of fern species in GenBank by year and genomic compartment. Points indicate number of species sampled in selected studies of global fern phylogeny [@Hasebe1995; @Schuettpelz2007; @Lehtonen2011; @Testo2016a\; this study]. @Schuettpelz2007 did not attempt exhaustive sampling but rather proportional sampling according to lineage size. The relatively small increase in number of species in 2021 is likely due to accessions that are still embargoed at the time of writing. Taxonomy of GenBank species follows NCBI [@Federhen2012]. Only accessions identified to species included; environmental samples, hybrid formulas, and names with "aff." or "cf." annotations excluded.
+**`r figure("genbank")`**.
+Number of fern species in GenBank by year and genomic compartment.
+Points indicate number of species sampled in selected studies of global fern phylogeny [@Hasebe1995; @Schuettpelz2007; @Lehtonen2011; @Testo2016a\; this study].
+@Schuettpelz2007 did not attempt exhaustive sampling but rather proportional sampling according to lineage size.
+The relatively small increase in number of species in 2021 is likely due to accessions that are still embargoed at the time of writing.
+Taxonomy of GenBank species follows NCBI [@Federhen2012].
+Only accessions identified to species included; environmental samples, hybrid formulas, and names with "aff." or "cf." annotations excluded.
 
 ```{r ftol-make}
 # Coverage bar plot ----
 
-# Make exemplar set of species in backbone representing plot groups
-major_clade_exemp_taxa <-
-	backbone_taxonomy %>%
-	# Slice to one exemplar species per major clade
-	group_by(major_clade) %>%
-	slice(1) %>%
-	ungroup() %>%
-	# Slicing arranges alphabetically, so put back in (unladderized) phylo order
-	arrange(phy_order) %>%
-	# Drop outgroup
-	filter(family != "og")
+# Format y-axis text: show major clade abbreviations in bold
+clade_labs_tib <-
+	clade_cols_tib %>%
+	select(major_clade, code) %>%
+	mutate(
+		clade_short = map2_chr(major_clade, code, ~str_remove(.x, .y)),
+		label = glue("<b>{code}</b>{clade_short}"))
 
-# Make a color palette for major clades
-# Start with list of green.armytage.colors names,
-# exclude those that are too close or stand out too much
-# https://www.jstatsoft.org/article/view/v090c01
-green_army_use_cols <-
-	c(
-		"amethyst",
-		"blue",
-		"caramel",
-		"damson",
-		# "ebony",
-		# "forest",
-		"green",
-		"honeydew",
-		# "iron",
-		# "jade",
-		# "khaki",
-		# "lime",
-		"mallow",
-		"navy",
-		# "orpiment",
-		"pink",
-		# "quagmire",
-		"red",
-		"sky",
-		"turquoise",
-		"uranium",
-		"violet",
-		"wine",
-		# "xanthin",
-		# "yellow",
-		"zinnia"
-	)
-
-clade_cols <-
-	Polychrome::green.armytage.colors() %>%
-	extract(green_army_use_cols) %>%
-	extract(seq_len(nrow(major_clade_exemp_taxa))) %>%
-	set_names(major_clade_exemp_taxa$major_clade)
-
+clade_labs <- clade_labs_tib$label %>%
+	set_names(., clade_labs_tib$major_clade)
+	
 # Format coverage at order-ish level for plotting
 b <-
 	coverage_data %>%
@@ -910,10 +944,11 @@ b <-
 		expand = expansion(mult = c(0, 0))
 	) +
 	scale_fill_manual(values = clade_cols) +
+	scale_y_discrete(labels = clade_labs) +
 	labs(x = "Coverage") +
 	theme_bw() +
 	theme(
-		axis.text.y = element_text(size = 6),
+		axis.text.y = element_markdown(size = 6),
 		axis.title.y = element_blank(),
 		legend.position = "none",
 		plot.background = element_rect(fill = "transparent", colour = NA),
@@ -922,62 +957,62 @@ b <-
 	)
 
 # Tree plot ----
-phy <- plastid_tree_dated
-
 # Make tibble for annotating major clades
-clade_tibble <-
-	tibble(
-		Polypodiineae = c("Leucostegia_truncata", "Didymochlaena_fijiensis"),
-		Aspleniineae = c("Acystopteris_taiwaniana", "Rhachidosorus_pulcher"),
-		Dennstaedtiineae = c("Monachosorum_flagellare", "Dennstaedtia_auriculata"),
-		Pteridineae = c("Coniogramme_affinis", "Pteris_dispar"),
-		Lindsaeineae = c("Cystodium_sorbifolium", "Odontosoria_retusa"),
-		Saccolomatineae = c("Saccoloma_inaequale", "Orthiopteris_campylura"),
-		Cyatheales = c("Cyathea_bipinnatifida", "Culcita_macrocarpa"),
-		Salviniales = c("Marsilea_nashii", "Salvinia_oblongifolia"),
-		Schizaeales = c("Schizaea_elegans", "Lygodium_palmatum"),
-		Gleicheniales = c("Matonia_foxworthyi", "Sticherus_bifidus"),
-		Hymenophyllales = c("Cephalomanes_javanicum", "Hymenophyllum_tortuosum"),
-		Marattiales = c("Angiopteris_evecta", "Danaea_erecta"),
-		`Ophioglossales + Psilotales` = c("Psilotum_nudum", "Sceptridium_nipponicum"),
-		Osmundales = c("Osmundastrum_cinnamomeum", "Todea_barbara"),
-		Equisetales = c("Equisetum_bogotense", "Equisetum_hyemale")
+clade_tibble <- 
+	# Use assess_monophy to get MRCA of each major clade
+	# They should all by monophyletic anyways
+	select(sanger_sampling, species, major_clade) %>%
+	assess_monophy(
+		taxon_sampling = .,
+		tree = plastid_tree_dated,
+		tax_levels = "major_clade"
 	) %>%
-	pivot_longer(names_to = "major_clade", values_to = "taxa", cols = everything()) %>%
-	arrange(major_clade) %>%
-	group_by(major_clade) %>%
-	summarize(taxa = list(taxa)) %>%
-	mutate(
-		mrca = map_chr(taxa, ~getMRCA(phy, .))
-	) %>%
-	transmute(
-		major_clade,
-		mrca,
-		dummy = ""
-	) %>%
-	mutate(mrca = parse_number(mrca))
+	get_result_monophy(1) %>%
+	filter(!taxon %in% c(
+		"Selaginellales", "Lycopodiales", "Isoëtales", "Isoetales")) %>%
+	verify(all(monophyly == "Yes")) %>%
+	transmute(major_clade = taxon, mrca = parse_number(mrca)) %>%
+	left_join(clade_cols_tib, by = "major_clade")
 
-a <- ggtree(
-	phy, 
-	layout = "circular", right = FALSE, size = 0.1,
-) +
+# Helper function to label clades with different offset
+# For some reason, using the same offset.text around the plot
+# results in different positions of text relative to bars. 
+# Account for this by manual adjusting offset.text
+ftol_geom_cladelab <- function(code_select, offset_text) {
 	geom_cladelab(
-		data = clade_tibble,
+		data = filter(clade_tibble, code %in% code_select),
 		mapping = aes(
 			node = mrca,
 			color = major_clade,
-			label = dummy
+			label = code
 		),
 		offset = 0.1,
-		barsize = 2) +
+		offset.text = offset_text,
+		fontsize = 2.5,
+		textcolour = "black",
+		barsize = 2)
+}
+
+a <- ggtree(
+	plastid_tree_dated, layout = "circular", right = FALSE, size = 0.1) + 
+	ftol_geom_cladelab(
+		clade_tibble$code[clade_tibble$code %in% c("Eq", "Op", "Ma", "Os", "Gl")], 10) +
+	ftol_geom_cladelab(
+		clade_tibble$code[clade_tibble$code %in% c("Hy", "Sc", "Sal")], 14) +
+	ftol_geom_cladelab(
+		clade_tibble$code[clade_tibble$code %in% c("Cy", "Sac", "Li", "De")], 17) +
+	ftol_geom_cladelab("Pt", 26) +
+	ftol_geom_cladelab("As", 34) +
+	ftol_geom_cladelab("Po", 17) +
 	scale_color_manual(values = clade_cols) +
 	theme(legend.position = "none")
-
+	
+# Assemble plots ----
 ftol_plot <-
 	a + inset_element(b, left = 0.85, bottom = 0.14, right = 1.3, top = .8) +
 	plot_annotation(
 		theme = theme(
-			plot.margin = unit(c(-2,5,-2,-1.6), "cm"))
+			plot.margin = unit(c(-2,5,-2,-1.4), "cm"))
 	)
 ```
 
@@ -993,7 +1028,13 @@ ggsave(
 ftol_plot
 ```
 
-**`r figure("ftol")`**. Fern Tree of Life (FTOL). Inset plot shows coverage by major clade (order or suborder). Numbers next to each bar show sampled species out of total number of species. Taxonomy follows [@PteridophytePhylogenyGroupI2016].
+**`r figure("ftol")`**.
+Fern Tree of Life (FTOL).
+Tree rooted on bryophytes.
+Inset plot shows coverage by major clade (order or suborder).
+Bold part of each clade name is its code, which is also indicated on the tree.
+Numbers next to each bar show sampled species out of total number of species.
+Taxonomy follows [@PteridophytePhylogenyGroupI2016].
 
 ```{r backbone-make}
 # Make exemplar set of species in backbone representing families
@@ -1176,7 +1217,12 @@ ggsave(
 backbone_plot
 ```
 
-**`r figure("backbone")`**. Fern tree of life (FTOL) backbone phylogeny. One exemplar tip is shown per family. Ultrafast bootstrap support values (%) shown at nodes; unlabeled nodes are 100%. Outgroup (seed plants, lycophytes, and bryophytes) not shown. Colors of major clades (orders or suborders) correspond to those used in `r figure("ftol")`. Taxonomy follows [@PteridophytePhylogenyGroupI2016]; informal clade names in lowercase.
+**`r figure("backbone")`**.
+Fern tree of life (FTOL) backbone phylogeny.
+One exemplar tip is shown per family.
+Ultrafast bootstrap support values (%) shown at nodes; unlabeled nodes are 100%.
+Outgroup (seed plants, lycophytes, and bryophytes) not shown.
+Colors of major clades (orders or suborders) correspond to those used in `r figure("ftol")`. Taxonomy follows [@PteridophytePhylogenyGroupI2016]; informal clade names in lowercase.
 
 ```{r div-times-make}
 # Convert family ages to long format
@@ -1184,11 +1230,18 @@ family_ages_median <-
 family_stem_ages %>%
 	select(family, current_best = age) %>%
 	left_join(other_dates, by = "family") %>%
+		left_join(
+		unique(select(sanger_sampling, family, major_clade)),
+		by = "family"
+	) %>%
+	left_join(clade_cols_tib, by = "major_clade"
+	) %>%
 	mutate(family = fct_reorder(family, current_best)) %>%
-	pivot_longer(values_to = "age", -family) %>%
+	pivot_longer(values_to = "age", -c(family, color, code, major_clade)) %>%
 	separate(name, into = c("author", "age_type"), sep = "_") %>%
 	assert(not_na, author, age_type) %>%
-	filter(age_type %in% c("best", "median"))
+	filter(age_type %in% c("best", "median")) %>%
+	assert(not_na, major_clade, color)
 
 # Convert family errors to almost long format
 family_ages_errors <-
@@ -1233,6 +1286,27 @@ ages_sampling <-
 	) %>%
 	mutate(source = fct_reorder(source, year))
 	
+# Format y-axis text: show major clade in parentheses
+family_labs_tbl <-
+family_ages_median %>%
+	select(family, code) %>%
+	unique() %>%
+	mutate(label = glue("{family} ({code})"))
+family_labs <- family_labs_tbl$label %>%
+	set_names(., family_labs_tbl$family)
+	
+# Provide names of periods in caption
+# Make sure to read and check that they are all there!
+period_names <-
+	periods %>%
+	# Filter to range including Ordovician to Neogene
+	filter(min_age < 475) %>%
+	filter(min_age > 1) %>%
+	arrange(desc(min_age)) %>%
+	mutate(label = glue("{abbr} ({name})")) %>%
+	pull(label) %>%
+	paste(collapse = ", ")
+
 div_times_plot <-
 ggplot(mapping = aes(y = family)) +
 	geom_errorbarh(
@@ -1252,7 +1326,18 @@ ggplot(mapping = aes(y = family)) +
 		values = ages_colors,
 		limits = ages_sampling$source, 
 		labels = ages_sampling$label) +
-	labs(x = "Age (millions of years)") +
+	scale_y_discrete(labels = family_labs) +
+	scale_x_reverse("Age (millions of years)") +
+	coord_geo(
+		dat = list("periods", "eras"),
+		pos = list("b", "b"),
+		abbrv = list(TRUE, FALSE),
+		xlim = c(500, 0),
+		fill = "transparent",
+		color = "grey20",
+		lab_color = "grey30",
+		height = unit(1, "lines"),
+		size = 3) +
 	guides(shape = guide_legend(nrow = 2)) +
 	theme_bw() +
 	theme(
@@ -1274,6 +1359,9 @@ ggsave(
 div_times_plot
 ```
 
-**`r figure("divtimes")`**. Stem age of fern families (mya) estimated by selected studies.
+**`r figure("divtimes")`**.
+Stem age of fern families (mya) estimated by selected studies.
 For studies that used methods with confidence intervals, error bars indicate lower and upper 95% highest posterior density levels and point indicates median [@Rothfels2015a; @Testo2016a].
 For other studies, point indicates best (most likely) estimate [@Schuettpelz2007b\; this study].
+Codes in parentheses after family names indicate major clade as in `r figure("ftol")`.
+Period name abbreviations as follows: `r period_names`.
