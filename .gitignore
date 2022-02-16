@@ -8,3 +8,4 @@ manuscript.docx
 results
 _targets
 ~*.docx
+*.log
