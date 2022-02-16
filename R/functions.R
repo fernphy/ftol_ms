@@ -707,16 +707,16 @@ get_stem_family_age <- function(
 
 # Formatting ----
 
-# Specify percentage format
-percent <- function(...) {scales::percent(...)}
-
-# Specify number format
-number <- function(...) {scales::number(big.mark = ",", ...)}
-
 # Abbreviations
 ie <- "*i.e.*"
 eg <- "*e.g.*"
 ca <- "*ca.*"
+
+# Specify custom percentage format
+percent <- function(...) {scales::percent(...)}
+
+# Specify custom number format
+number <- function(...) {scales::number(big.mark = ",", ...)}
 
 #' Convert a data.frame of counts to percentages, with automatic formatting
 #'
@@ -834,8 +834,8 @@ result_file <- function (result_num, extension) {
 # (except I never use the caption in the function, and instead replace with 'blank')
 figure_full <- captioner::captioner(prefix = "Figure ", auto_space = FALSE)
 table_full <- captioner::captioner(prefix = "Table ", auto_space = FALSE)
-s_figure_full <- captioner::captioner(prefix = "Figure S ", auto_space = FALSE)
-s_table_full <- captioner::captioner(prefix = "Table S ", auto_space = FALSE)
+s_figure_full <- captioner::captioner(prefix = "Figure S", auto_space = FALSE)
+s_table_full <- captioner::captioner(prefix = "Table S", auto_space = FALSE)
 
 # - Make a short function that prints only the object type and number, e.g., "Fig. 1"
 figure <- pryr::partial(figure_full, display = "cite", caption = "blank")
@@ -952,7 +952,7 @@ get_tips_in_ape_plot_order <- function(tree) {
 base_freq_missing <- function(
 	seqs, missing_base_codes = c("n", "-", "?"), 
 	start = 1, end = ncol(seqs),
-	freq = TRUE) {
+	freq = FALSE) {
 	assertthat::assert_that(is.matrix(seqs))
 	assertthat::assert_that(end > start)
 	base_freq <- ape::base.freq(seqs[, start:end], all = TRUE, freq = freq)

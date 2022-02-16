@@ -115,5 +115,10 @@ tar_plan(
 		ms,
 		"ms/manuscript.Rmd",
 		output_dir = "results"
+	),
+	tar_render(
+		si,
+		"ms/si.Rmd",
+		output_dir = "results"
 	)
 )

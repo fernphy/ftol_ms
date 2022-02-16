@@ -1,15 +1,36 @@
 ---
 title: "Supplemental Information"
+mainfont: Roboto-Regular.ttf
+fontsize: 11pt
+mainfontoptions: 
+  - BoldFont=Roboto-Bold.ttf
+  - ItalicFont=Roboto-Italic.ttf
+  - BoldItalicFont=Roboto-BoldItalic.ttf
 output: 
-  bookdown::word_document2:
-    pandoc_args: [ "--csl", "frontiers.csl"]
+  bookdown::pdf_document2:
+    citation_package: default
     toc: no
     number_sections: no
-    reference_docx: Frontiers_Template.docx
+    fig_caption: yes
+    keep_tex: no
+    latex_engine: xelatex
+    pandoc_args: [ "--csl", "frontiers.csl"]
+header-includes: 
+  - \usepackage{float} # keep figures from floating away
+  - \usepackage{booktabs} # need for kable tables
+  - \usepackage{colortbl} # need for kable tables
+  - \makeatletter\renewcommand*{\fps@figure}{H}\makeatother # keep figures from floating away
+  - \usepackage{fancyhdr} # enable header
+  - \pagestyle{fancy}  # enable header
+  - \fancypagestyle{plain}{\pagestyle{fancy}} # show header on first page
+  - \renewcommand{\headrulewidth}{0pt} # delete line beneath header
+  - \fancyhead[RE,RO]{Nitta \textit{et al}. Fern Tree of Life SI} # add header on right side
+  - \fancyhead[LO,LE]{} # suppress automatic section header on left side
+  - \cfoot{\thepage} # footer
 editor_options: 
   chunk_output_type: console
 params:
-  doc_type: doc
+  doc_type: manual
 ---
 
 ---
@@ -19,42 +40,21 @@ bibliography:
 - `r here::here("ms/references_other.bib")`
 ---
 
-```{r setup, include = FALSE}
+```{r setup-si, include = FALSE}
 knitr::opts_chunk$set(
 	echo = FALSE, warning = FALSE, message = FALSE, results = 'hide')
-
 # Load packages
-library(conflicted)
-library(rmarkdown)
-library(bookdown)
-library(targets)
-library(assertr)
-library(ape)
-library(scales)
-library(tidyverse)
-library(rgnparser)
-library(ggtree)
-library(glue)
-library(Polychrome)
-library(patchwork)
-library(magrittr)
-library(ggrepel)
-library(ggokabeito)
-library(ggforce)
-
-# Resolve conflicts
-conflict_prefer("filter", "dplyr")
-conflict_prefer("extract", "magrittr")
-
-# Load functions
-source(here::here("R/ms_functions.R"))
-
-# Specify percentage format
-percent <- function(...) {scales::percent(...)}
-number <- function(...) {scales::number(big.mark = ",", ...)}
+library(ggupset)
+library(kableExtra)
+source(here::here("R/ms_packages.R"))
 ```
 
-```{r load-targets}
+```{r load-functions-si, eval = params$doc_type == "manual"}
+# Load functions (only if running interactively)
+source(here::here("R/functions.R"))
+```
+
+```{r load-targets-si}
 # Targets from FTOL workflow
 
 # Specify path to FTOL cache
@@ -63,9 +63,9 @@ ftol_cache <- here::here("working/_targets")
 
 tar_load(
 	c(
+		sanger_alignment_tbl,
 		sanger_sampling,
-		monophy_by_clade,
-		plastid_tree_dated),
+		sanger_accessions_selection),
 	store = ftol_cache
 )
 
@@ -80,54 +80,90 @@ tar_load(
 )
 ```
 
-```{r age-biplot}
-# Count number of tips in clades by taxonomy for double checking
-n_tips_in_clades <-
-	sanger_sampling %>%
-	filter(outgroup == FALSE) %>%
-	select(species, family, order) %>%
-	pivot_longer(names_to = "level", values_to = "taxon", -species) %>%
-	group_by(taxon) %>%
-	summarize(number_tips_by_tax = n())
+```{r load-captions, cache = FALSE}
+# Source captions numbers from MS
+# 
+# So that caption numbers are in order of appearance in MS
 
-# Get ages for large clades
-clade_ages <-
-	sanger_sampling %>%
-	select(family, order) %>%
-	unique() %>%
-	pivot_longer(names_to = "level", values_to = "taxon", everything()) %>%
-	filter(!is.na(taxon)) %>%
-	unique() %>%
-	left_join(
-		unique(select(monophy_by_clade, taxon, monophyly, mrca, number_tips)),
-		by = "taxon") %>%
-	mutate(across(c(mrca, number_tips), parse_number)) %>%
-	assert(in_set(c("Yes", "Monotypic")), monophyly) %>%
-	filter(monophyly == "Yes") %>%
-	mutate(
-		# Height is distance above root
-		height = map_dbl(mrca, ~phytools::nodeheight(
-			tree = plastid_tree_dated, node = .))
-	) %>%
-	mutate(
-		# Age is the total length of the tree minus height
-		age = max(phytools::nodeHeights(plastid_tree_dated)) - height
-	) %>%
-	# Double check that n_tips is as expected
-	# (so the correct node is being used)
-	left_join(n_tips_in_clades, by = "taxon") %>%
-	verify(all(number_tips == number_tips_by_tax)) %>%
-	select(-number_tips_by_tax)
+# Run inline code when purling
+options(knitr.purl.inline = TRUE)
 
-clade_ages %>%
-	filter(level == "family") %>%
-	select(family = taxon, current_best = age) %>%
-	left_join(other_dates, by = "family") %>%
-	select(matches("best|median")) %>%
-	ggplot(aes(x = .panel_x, y = .panel_y)) +
-	geom_point() +
-	geom_autodensity(na.rm = TRUE) +
-	facet_matrix(vars(everything()), layer.diag = 2, grid.y.diag = FALSE)
+# Make a temporary file to write out just inline R code from the SI Rmd
+temp_file <- tempfile()
+
+# Generate R script including inline R code from the ms Rmd
+knitr::purl(here::here("ms/manuscript.Rmd"), output = temp_file)
+
+# Trim this R script down to only functions that define figure and table captions
+read_lines(temp_file) %>%
+  magrittr::extract(
+    str_detect(., "^figure\\(|^table\\(|^s_figure\\(|^s_table\\(|^figure_num\\(|^table_num\\(|^s_figure_num\\(|^s_table_num\\(")
+  ) %>%
+  unique %>%
+  write_lines(temp_file)
+
+# Source the code. This will load the caption functions in the right order.
+source(temp_file, local = TRUE)
+
+# Delete the temporary file
+fs::file_delete(temp_file)
 ```
 
-Figure 1: Biplot comparing crown ages of fern families (millions of years) across different studies.
+```{r join_by, results = "as-is"}
+# Make table showing method of joining accessions across loci
+sanger_accessions_selection %>% 
+	left_join(select(sanger_sampling, species, outgroup), by = "species") %>%
+	# FIXME why is this NA?
+	# filter(is.na(outgroup)) %>%
+	filter(outgroup == FALSE) %>%
+	select(-outgroup) %>%
+	assert(not_na, join_by, species) %>%
+	assert(is_uniq, species) %>%
+	tabyl(join_by) %>%
+	arrange(n) %>%
+	adorn_totals() %>%
+	mutate(
+		join_by = str_to_sentence(join_by) %>%
+			str_replace_all("Monophy", "Monophyletic"),
+		n = number(n),
+		percent = case_when(
+			join_by != "Total" ~ percent(percent) %>% 
+				str_replace_all("%", "\\\\%"),
+			TRUE ~ ""
+		)
+	) %>%
+	rename(
+		"Method" = join_by,
+		`\\textit{n}` = n,
+		`\\%` = percent
+	) %>%
+  kbl(booktabs = TRUE, escape = FALSE, format = "latex") %>%
+  kable_styling(latex_options = c("striped", "HOLD_position"))
+```
+
+**`r s_table("join_by")`**. Methods used to join accessions across loci for Sanger dataset. Count is number of species.
+
+\clearpage
+
+```{r locus-upset, fig.width = 7, fig.height = 5}
+# Make tibble with one row per locus per species
+sanger_alignment_tbl %>%
+	mutate(taxon = map(align_trimmed, rownames)) %>%
+	select(locus = target, species = taxon) %>%
+	unnest(cols = species) %>%
+	# Exclude outgroups
+	left_join(
+		unique(select(sanger_sampling, species, outgroup)), by = "species") %>%
+	filter(outgroup == FALSE) %>%
+	select(-outgroup) %>%
+	group_by(species) %>%
+	summarize(locus = list(locus)) %>%
+	ggplot(aes(x = locus)) +
+	geom_bar() +
+	labs(x = "Locus combination", y = "Count (num. species)") +
+	scale_x_upset(n_intersections = 20)
+```
+
+**`r s_figure("locus-upset")`**.
+Frequency of locus combinations by species, Sanger dataset.
+Only top 20 combinations shown.

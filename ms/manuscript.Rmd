@@ -9,7 +9,7 @@ output:
 editor_options: 
   chunk_output_type: console
 params:
-  doc_type: doc
+  doc_type: manual
 ---
 
 ---
@@ -22,33 +22,12 @@ bibliography:
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
 	echo = FALSE, warning = FALSE, message = FALSE, results = 'hide')
-
 # Load packages
-library(conflicted)
-library(rmarkdown)
-library(bookdown)
-library(targets)
-library(assertr)
-library(ape)
-library(scales)
-library(tidyverse)
-library(rgnparser)
-library(ggtree)
-library(glue)
-library(Polychrome)
-library(patchwork)
-library(magrittr)
-library(deeptime)
-library(ggrepel)
-library(ggokabeito)
-library(ggtext)
-library(janitor)
+source(here::here("R/ms_packages.R"))
+```
 
-# Resolve conflicts
-conflict_prefer("filter", "dplyr")
-conflict_prefer("extract", "magrittr")
-
-# Load functions
+```{r load-functions, eval = params$doc_type == "manual"}
+# Load functions (only if running interactively)
 source(here::here("R/functions.R"))
 ```
 
@@ -61,6 +40,15 @@ ftol_cache <- here::here("working/_targets")
 
 tar_load(
 	c(
+		accs_exclude,
+		fern_sanger_seqs_raw,
+		raw_fasta_all,
+		sanger_seqs_combined_filtered,
+		sanger_seqs_rogues_removed,
+		sanger_accessions_selection,
+		plastome_seqs_combined_filtered,
+		plastome_metadata_raw_all,
+		plastome_metadata_renamed,
 		sanger_alignment,
 		plastome_alignment,
 		plastome_metadata_renamed,
@@ -214,7 +202,7 @@ The plastome loci include all seven Sanger loci.
 ## Dataset construction
 
 All sequences were downloaded from GenBank.
-GenBank queries were formatted including terms "Polypodiopsida[ORGN]" to target ferns and "[PDAT]" to specify sequence date range (e.g., 1980/01/01[PDAT]:2021/12/12[PDAT]) so that a given query always results in the same set of sequences regardless of when the query is made.
+GenBank queries were formatted including locus name, "Polypodiopsida[ORGN]", and "[PDAT]" to specify sequence date range (e.g., 1980/01/01[PDAT]:2021/12/12[PDAT]) so that a given query always results in the same set of sequences regardless of when the query is made.
 Names including the terms "aff." or "cf.", hybrid formulas, and environmental DNA samples were excluded.
 There is no formal definition of genomic vs. Sanger sequences in GenBank, so we used an empirical sequence length cutoff to distinguish between Sanger (=< `r number(7000)` bp) or plastome sequences (> `r number(7000)` bp) with the "[SLEN]" term.
 
@@ -393,6 +381,112 @@ A docker image to run the code is available at https://hub.docker.com/r/joelnitt
 
 # Results
 
+## GenBank mining
+
+```{r genbank-stats}
+# Helper function to count number of GenBank accessions in a dataset
+count_accs <- function(data) {
+	data %>%
+	pull(accession) %>%
+	n_distinct() %>%
+	number()
+}
+
+# Manual list of accessions to exclude
+n_accs_exclude <-
+accs_exclude %>%
+	pull(accession) %>%
+	n_distinct() %>%
+	number()
+
+# Sanger ----
+
+# Number of GenBank accessions resulting from inital query
+n_accs_query <- count_accs(fern_sanger_seqs_raw)
+
+# Number of GenBank accessions recovered with superCRUNCH
+n_accs_extract <- count_accs(raw_fasta_all)
+
+# Number of GenBank accessions after excluding manual rogues,
+# names that couldn't be resolved
+n_accs_first_filter <- count_accs(sanger_seqs_combined_filtered)
+
+# Number of GenBank accessions after further excluding
+# rogues based on BLAST
+n_accs_second_filter <- count_accs(sanger_seqs_rogues_removed)
+
+# Number of GenBank accessions in final selection
+# first convert to long form
+sanger_accessions_selection_long <-
+ sanger_accessions_selection %>%
+	select(contains("accession")) %>%
+	pivot_longer(values_to = "accession", everything()) %>%
+	filter(!is.na(accession))
+
+# Count number of raw accessions in final selection
+n_accs_raw_final <- count_accs(sanger_accessions_selection_long)
+
+# Count number of accessions in final selection, split by locus
+n_accs_final <- 
+	sanger_accessions_selection_long %>%
+	# Count accessions containing different loci as distinct
+	mutate(
+		name = str_remove_all(name, "accession_"),
+		accession = paste(name, accession, sep = "_")) %>%
+	count_accs()
+
+# Analyze join by method
+join_by_count <-
+sanger_accessions_selection %>% 
+	assert(not_na, join_by, species) %>%
+	assert(is_uniq, species) %>%
+	tabyl(join_by) %>%
+	mutate(join_by = fct_reorder(join_by, n)) %>%
+	mutate(
+			percent = percent(percent, accuracy = 0.1),
+			n = number(n, accuracy = 1)) %>%
+	split(.$join_by)
+	
+# Plastome ----
+# Don't include OG in calculations
+n_plast_accs_query <-
+	plastome_metadata_raw_all %>%
+	left_join(
+		select(plastome_metadata_renamed, accession, outgroup),
+		by = "accession") %>%
+	# excluded accessions lack outgroup info, but are all ferns
+	mutate(outgroup = replace_na(FALSE)) %>%
+	assert(not_na, outgroup) %>%
+	filter(outgroup == FALSE) %>%
+	count_accs()
+n_plast_first_filter <-
+	plastome_metadata_renamed %>%
+  assert(not_na, outgroup) %>%
+	filter(outgroup == FALSE) %>%
+	count_accs()
+n_accs_plast_final <- 
+	plastome_seqs_combined_filtered %>%
+	left_join(
+		select(plastome_metadata_renamed, accession, outgroup),
+		by = "accession") %>%
+	assert(not_na, outgroup) %>%
+	filter(outgroup == FALSE) %>%
+	count_accs()
+```
+
+The initial GenBank query for the seven Sanger loci resulted in `r n_accs_query` accessions ("accessions" in this case includes some cases where a single accession contains multiple loci).
+Extraction of target loci with superCRUNCH recovered `r n_accs_extract` accessions.
+Manual inspection of the initial tree resulted in a list of `r n_accs_exclude` accessions to be excluded as rogues.
+`r n_accs_first_filter` accessions were retained after excluding these rogues and species names that could not be resolved to an accepted name in the taxonomic database.
+`r n_accs_second_filter` accessions were retained after excluding rogues identified by the all-by-all BLAST search.
+The final selection of Sanger loci (one set of concatenated accessions per species or one accession per species if conditions for concatenation not met) included `r n_accs_raw_final` accessions (`r n_accs_final` sequences when counting distinct loci within each accession separately).
+The most frequent method for joining accessions across loci was by `r last(join_by_count)$join_by` (`r last(join_by_count)$n` species; `r last(join_by_count)$percent`).
+`r join_by_count$unjoined$n` species (`r join_by_count$unjoined$percent`) had accessions that could not be joined or only included one of the seven loci (`r s_table("join_by")`).
+
+The initial GenBank query for fern plastomes resulted in `r n_plast_accs_query` accessions.
+`r n_plast_first_filter` accessions were retained after excluding rogues and species names that could not be resolved.
+Selection of the longest set of concatenated sequences per species resulted in `r n_accs_plast_final` accessions (species).
+
 ## Taxon and locus sampling
 
 ```{r sampling-stats, message = FALSE}
@@ -526,7 +620,7 @@ Coverage varied by major clade from `r tax_coverage %>% first %>% extract2("cove
 The number of fern species sampled per locus in the Sanger dataset ranged from `r first(locus_total)$n` (*`r first(locus_total)$locus`*) to `r last(locus_total)$n`  (*`r last(locus_total)$locus`*).
 `r sp_mult_loci$true$n` species (`r sp_mult_loci$true$percent`) were sampled for more than one locus.
 Mean `r locus_summ$mean` ± `r locus_summ$sd` loci were sampled per species (all errors standard deviation unless otherwise mentioned).
-The most frequent type of locus sampling per species was *rbcL* alone (`r locus_comb$rbcL$n` species).
+The most frequent type of locus sampling per species was *rbcL* alone (`r locus_comb$rbcL$n` species) (`r s_figure("locus-upset")`).
 The second most frequent type of locus sampling per species was all seven loci together (`r nth(locus_comb, length(locus_comb) - 1)$n` species). 
 Locus sampling per species in the plastome dataset ranged from `r bb_locus_summ$min` to `r bb_locus_summ$max` (mean `r bb_locus_summ$mean` ± `r bb_locus_summ$sd` loci per species).
 `r bb_with_all_loci$true$n` species (`r bb_with_all_loci$true$percent` of plastome species) included all 79 loci.
@@ -535,8 +629,10 @@ Locus sampling per species in the plastome dataset ranged from `r bb_locus_summ$
 
 ```{r dna-stats}
 # Calculate frequency of missing bases in each dataset overall
-plastome_missing_freq <- base_freq_missing(plastome_alignment)
-sanger_missing_freq <- base_freq_missing(sanger_alignment)
+plastome_missing_freq <- base_freq_missing(plastome_alignment) %>%
+	percent(accuracy = 0.1)
+sanger_missing_freq <- base_freq_missing(sanger_alignment) %>%
+	percent(accuracy = 0.1)
 
 # Calculate frequency of missing bases by locus for Sanger loci
 # Concatenate Sanger loci again here to be sure order is the same
@@ -572,8 +668,8 @@ sanger_missing_by_gene <-
 	split(.$gene)
 ```
 
-The Sanger DNA alignment was `r number(ncol(sanger_alignment))` bp with `r percent(sanger_missing_freq, accuracy = 0.1)` missing data (missing bases or gaps) overall; rates of missing data by locus ranged from `r sanger_missing_by_gene %>% first() %>% extract2("missing")` (`r sanger_missing_by_gene %>% first() %>% extract2("gene")`) to `r sanger_missing_by_gene %>% last() %>% extract2("missing")` (`r sanger_missing_by_gene %>% last() %>% extract2("gene")`).
-The plastome DNA alignment was `r number(ncol(plastome_alignment))` bp with `r percent(plastome_missing_freq, accuracy = 0.1)` missing data. 
+The Sanger DNA alignment was `r number(ncol(sanger_alignment))` bp with `r sanger_missing_freq` missing data (missing bases or gaps) overall; rates of missing data by locus ranged from `r sanger_missing_by_gene %>% first() %>% extract2("missing")` (`r sanger_missing_by_gene %>% first() %>% extract2("gene")`) to `r sanger_missing_by_gene %>% last() %>% extract2("missing")` (`r sanger_missing_by_gene %>% last() %>% extract2("gene")`).
+The plastome DNA alignment was `r number(ncol(plastome_alignment))` bp with `r plastome_missing_freq` missing data. 
 
 ## Topology
 
