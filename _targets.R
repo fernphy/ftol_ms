@@ -41,6 +41,12 @@ tar_plan(
 		pteridocat,
 		store = ftol_cache
 	),
+  tar_files_input(
+  	fossil_ferns_path,
+  	fs::path(ftol_cache, "user/data_raw/Fossils_Ferns.csv")
+  ),
+	fossil_ferns_raw = read_csv(fossil_ferns_path, skip = 1) %>%
+		janitor::clean_names(),
 	
 	# GenBank ----
 	# Analyze number of fern accessions and species in GenBank by type of DNA 
@@ -58,7 +64,8 @@ tar_plan(
 		pattern = map(gb_query)
 	),
 	# - Load NCBI taxonomy
-	tar_file(taxdump_zip_file, "working/taxdmp_2022-02-01.zip"),
+	tar_file(taxdump_zip_file, fs::path(
+		ftol_cache, "user/data_raw/taxdmp_2022-02-01.zip")),
 	ncbi_names = load_ncbi_names(
 		taxdump_zip_file,
 		unique(gb_taxa$taxid)

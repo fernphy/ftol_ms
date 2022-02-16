@@ -709,6 +709,37 @@ references:
   title: 'Order-level fern plastome phylogenomics: new insights from Hymenophyllales'
   type: article-journal
   volume: '105'
+- id: Lai2019
+  accessed:
+  - year: 2022
+    month: 2
+    day: 16
+  author:
+  - family: Lai
+    given: Jiangshan
+  - family: Lortie
+    given: Christopher J.
+  - family: Muenchen
+    given: Robert A.
+  - family: Yang
+    given: Jian
+  - family: Ma
+    given: Keping
+  citation-key: Lai2019
+  container-title: Ecosphere
+  container-title-short: Ecosphere
+  DOI: 10/gfs6jz
+  ISSN: 2150-8925, 2150-8925
+  issue: '1'
+  issued:
+  - year: 2019
+    month: 1
+  language: en
+  source: DOI.org (Crossref)
+  title: Evaluating the popularity of R in ecology
+  type: article-journal
+  URL: https://onlinelibrary.wiley.com/doi/10.1002/ecs2.2567
+  volume: '10'
 - id: Landau2021
   accessed:
   - year: 2021
@@ -825,36 +856,6 @@ references:
   title: Dynamism in plastome structure observed across the phylogenetic tree of ferns
   type: article-journal
   volume: '190'
-- id: Loiseau2020
-  author:
-  - family: Loiseau
-    given: Oriane
-  - family: Weigand
-    given: Anna
-  - family: Noben
-    given: Sarah
-  - family: Rolland
-    given: Jonathan
-  - family: Silvestro
-    given: Daniele
-  - family: Kessler
-    given: Michael
-  - family: Lehnert
-    given: Marcus
-  - family: Salamin
-    given: Nicolas
-  citation-key: Loiseau2020
-  container-title: Annals of Botany
-  DOI: 10.1093/aob/mcz145
-  ISSN: '10958290'
-  issue: '1'
-  issued:
-  - year: 2020
-  page: 93-103
-  title: 'Slowly but surely: Gradual diversification and phenotypic evolution in the
-    hyperdiverse tree fern family Cyatheaceae'
-  type: article-journal
-  volume: '125'
 - id: Lu2015a
   author:
   - family: Lu
@@ -879,6 +880,25 @@ references:
   type: article-journal
   URL: http://doi.wiley.com/10.1111/jse.12180
   volume: '53'
+- id: Maurin2020
+  accessed:
+  - year: 2022
+    month: 2
+    day: 15
+  author:
+  - family: Maurin
+    given: Kévin J. L.
+  citation-key: Maurin2020
+  container-title: arXiv:2008.07054 [q-bio]
+  issued:
+  - year: 2020
+    month: 8
+    day: 18
+  source: arXiv.org
+  title: An empirical guide for producing a dated phylogeny with treePL in a maximum
+    likelihood framework
+  type: article-journal
+  URL: http://arxiv.org/abs/2008.07054
 - id: Minh2013
   author:
   - family: Minh
@@ -1383,6 +1403,60 @@ references:
   type: article-journal
   URL: papers://ebd7d3df-d8f1-4be8-bcf7-4fb07ababf30/Paper/p1859
   volume: '428'
+- id: Schoch2020
+  accessed:
+  - year: 2022
+    month: 2
+    day: 15
+  author:
+  - family: Schoch
+    given: Conrad L
+  - family: Ciufo
+    given: Stacy
+  - family: Domrachev
+    given: Mikhail
+  - family: Hotton
+    given: Carol L
+  - family: Kannan
+    given: Sivakumar
+  - family: Khovanskaya
+    given: Rogneda
+  - family: Leipe
+    given: Detlef
+  - family: Mcveigh
+    given: Richard
+  - family: O’Neill
+    given: Kathleen
+  - family: Robbertse
+    given: Barbara
+  - family: Sharma
+    given: Shobha
+  - family: Soussov
+    given: Vladimir
+  - family: Sullivan
+    given: John P
+  - family: Sun
+    given: Lu
+  - family: Turner
+    given: Seán
+  - family: Karsch-Mizrachi
+    given: Ilene
+  citation-key: Schoch2020
+  container-title: Database
+  DOI: 10/gg7tjn
+  ISSN: 1758-0463
+  issued:
+  - year: 2020
+    month: 1
+    day: 1
+  language: en
+  page: baaa062
+  source: DOI.org (Crossref)
+  title: 'NCBI Taxonomy: a comprehensive update on curation, resources and tools'
+  title-short: NCBI Taxonomy
+  type: article-journal
+  URL: https://academic.oup.com/database/article/doi/10.1093/database/baaa062/5881509
+  volume: '2020'
 - id: Schuettpelz2006
   author:
   - family: Schuettpelz
