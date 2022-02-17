@@ -252,6 +252,48 @@ parse_ts_dates <- function(testo_sundue_2016_si_path) {
 		)
 }
 
+#' Parse divergene dates in the Du et al. 2021 SI file
+#' 
+#' Du X, Lu J, Zhang L, et al (2021) Simultaneous diversification of 
+#' Polypodiales and angiosperms in the Mesozoic. Cladistics 37:518–539. 
+#' https://doi.org/10/gpb22j
+#'
+#' @param du_2021_si_path Path to Du et al. 2021 SI file
+#'
+#' @return Tibble
+#' 
+parse_du_dates <- function(du_2021_si_path) {
+	# Extract dates in original format
+	du_dates_raw <-
+		docxtractr::read_docx(du_2021_si_path) %>%
+		docxtractr::docx_extract_all_tbls(
+			guess_header = TRUE, preserve = FALSE, trim = TRUE) %>%
+		# Table of interest is the third one in the SI
+		magrittr::extract2(3)
+	
+	# Convert to longish format
+	du_dates_raw %>%
+		janitor::clean_names() %>%
+		pivot_longer(names_to = "author", values_to = "age", -lineage) %>%
+		mutate(age = str_remove_all(age, "\\(|,|\\)|ca\\.") %>%
+					 	str_squish()) %>%
+		separate(age,
+						 c("median", "low", "high"),
+						 sep = " ", fill = "right", convert = TRUE) %>%
+		mutate(
+			median = na_if(median, "\\") %>%
+				parse_number(),
+			affinities_group = str_match(
+				lineage,
+				"stem|crown") %>%
+				magrittr::extract(,1),
+			affinities = str_remove_all(lineage, "The|stem|crown|of") %>%
+				str_squish()
+		) %>%
+		assert(not_na, affinities_group) %>%
+		select(author, lineage, affinities, affinities_group, median, low, high)
+}
+
 # Coverage ----
 
 #' Make a tibble of accepted species in pteridocat taxonomic database
@@ -846,8 +888,8 @@ s_table <- pryr::partial(s_table_full, display = "cite", caption = "blank")
 # - Make a short function that prints only the number (e.g., "1")
 figure_num <- function(name) {figure(name) %>% str_remove("Figure ")}
 table_num <- function(name) {table(name) %>% str_remove("Table ")}
-s_figure_num <- function(name) {s_figure(name) %>% str_remove("Figure S ")}
-s_table_num <- function(name) {s_table(name) %>% str_remove("Table S ")}
+s_figure_num <- function(name) {s_figure(name) %>% str_remove("Figure ")}
+s_table_num <- function(name) {s_table(name) %>% str_remove("Table ")}
 
 # Pagebreaks ----
 

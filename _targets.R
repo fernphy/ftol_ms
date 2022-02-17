@@ -41,10 +41,10 @@ tar_plan(
 		pteridocat,
 		store = ftol_cache
 	),
-  tar_files_input(
-  	fossil_ferns_path,
-  	fs::path(ftol_cache, "user/data_raw/Fossils_Ferns.csv")
-  ),
+	tar_files_input(
+		fossil_ferns_path,
+		fs::path(ftol_cache, "user/data_raw/Fossils_Ferns.csv")
+	),
 	fossil_ferns_raw = read_csv(fossil_ferns_path, skip = 1) %>%
 		janitor::clean_names(),
 	
@@ -107,6 +107,11 @@ tar_plan(
 	# - Stem age of fern families
 	family_stem_ages = get_stem_family_age(
 		sanger_sampling, plastid_tree_dated, ppgi_taxonomy),
+	# - Read in Du 2021 dates
+	tar_files_input(
+		du_2021_si_path,
+		"_targets/user/data_raw/cla12457-sup-0003-tables1-s5.docx"),
+	du_dates_all = parse_du_dates(du_2021_si_path),
 	
 	# Render manuscript ----
 	# track files used for rendering MS

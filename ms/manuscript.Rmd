@@ -61,6 +61,7 @@ tar_load(
 		plastome_tree,
 		plastid_tree_dated,
 		fossil_calibration_tips,
+		ts_fossil_calibration_tips,
 		treepl_cv_results),
 	store = ftol_cache
 )
@@ -362,7 +363,7 @@ smooth_best <-
 	number(., accuracy = .)
 ```
 
-We dated the ML tree using treePL [@Smith2012].
+We rooted the ML tree on bryophytes and estimated divergence dates using penalized likelihood with treePL [@Smith2012].
 We selected `r n_calibrations_ferns` fern fossils to use as calibration points from a curated list of `r n_fern_fossils_total` fern fossil taxa.
 In the case of redundant fossils (those calibrating the same node in the phylogeny; `r eg`, stems of families that are sister to each other, such as Dipteridaceae and Matoniaceae) we selected the fossil with the oldest age (`r ie`, the upper limit of the oldest stratigraphic period assigned to the fossil). 
 We assigned fossils to lineages only after consulting the original publication (as opposed to only using the fossil species or genus) so we could reassess the identification relative to changes in taxonomy and hypotheses of phylogenetic relationships.
@@ -748,14 +749,14 @@ Rather, conclusive resolution apparently still awaits additional sampling and pe
 
 ## Revisiting fossil calibration points in ferns
 
-We recovered older crown ages for ferns and other large clades as well as older stem ages for families relative to previous studies (`r figure("divtimes")`).
+We recovered older crown ages for ferns and other large clades as well as older stem ages for families relative to previous studies (Figures `r figure_num("divtimes")`, `r s_figure_num("du-ages")`).
 This may be due to the fact that we used a completely revised set of fossil calibration points relative to previous studies, which not only resulted in a more densely calibrated tree but also a higher number of fern families with minimum fossil ages.
 Several of the recent studies analyzing divergence times for global fern phylogenies all used a similar set of 24--26 fossil calibration points [@Schuettpelz2007b; @Testo2016a] or secondary calibration points based on studies using this set [@Rothfels2015a].
 However, we found several of these calibration points were not appropriately applied due to differences in taxonomic concepts between the original fossil publication and the phylogeny in which they were used.
 Moreover, our set of calibration points more than doubles the number used by previous studies.
-It is likely that this expanded sampling has yielded older estimates for the stem age of many families, whereas previous studies tended to estimate similar ages by re-using the same (or very similar), more limited set of calibration points (SI Fig 1).
+It is likely that this expanded sampling has yielded older estimates for the stem age of many families, whereas previous studies tended to estimate similar ages by re-using the same (or very similar), more limited set of calibration points (Figures `r figure_num("divtimes")`, `r s_figure_num("du-ages")`).
 
-<<FIXME: add discussion of specific groups once we have final ages>>
+<<FIXME: add discussion of some specific groups once we have final ages>>
 
 ## Plastid vs. nuclear fern trees
 
@@ -810,6 +811,8 @@ This way, FTOL will continually improve and keep pace with the currently availab
 # Figures
 
 ```{r plot-prep}
+## ---- plot-prep-main
+
 # Make vector of outgroup taxa
 og_taxa <-
 	sanger_sampling %>%
@@ -906,6 +909,24 @@ clade_cols_tib <-
 			TRUE ~ code
 		)) %>%
 	assert(is_uniq, code)
+
+# Make tibble for annotating major clades
+clade_tibble <- 
+	# Use assess_monophy to get MRCA of each major clade
+	# They should all by monophyletic anyways
+	select(sanger_sampling, species, major_clade) %>%
+	assess_monophy(
+		taxon_sampling = .,
+		tree = plastid_tree_dated,
+		tax_levels = "major_clade"
+	) %>%
+	get_result_monophy(1) %>%
+	# Exclude lycophytes
+	filter(!taxon %in% c(
+		"Selaginellales", "Lycopodiales", "Isoëtales", "Isoetales")) %>%
+	verify(all(monophyly == "Yes")) %>%
+	transmute(major_clade = taxon, mrca = parse_number(mrca)) %>%
+	left_join(clade_cols_tib, by = "major_clade")
 ```
 
 ```{r genbank-make}
@@ -1078,22 +1099,6 @@ b <-
 	)
 
 # Tree plot ----
-# Make tibble for annotating major clades
-clade_tibble <- 
-	# Use assess_monophy to get MRCA of each major clade
-	# They should all by monophyletic anyways
-	select(sanger_sampling, species, major_clade) %>%
-	assess_monophy(
-		taxon_sampling = .,
-		tree = plastid_tree_dated,
-		tax_levels = "major_clade"
-	) %>%
-	get_result_monophy(1) %>%
-	filter(!taxon %in% c(
-		"Selaginellales", "Lycopodiales", "Isoëtales", "Isoetales")) %>%
-	verify(all(monophyly == "Yes")) %>%
-	transmute(major_clade = taxon, mrca = parse_number(mrca)) %>%
-	left_join(clade_cols_tib, by = "major_clade")
 
 # Helper function to label clades with different offset
 # For some reason, using the same offset.text around the plot
@@ -1346,41 +1351,43 @@ Outgroup (seed plants, lycophytes, and bryophytes) not shown.
 Colors of major clades (orders or suborders) correspond to those used in `r figure("ftol")`. Taxonomy follows @PteridophytePhylogenyGroupI2016; informal clade names in lowercase.
 
 ```{r div-times-make}
-# Convert family ages to long format
-family_ages_median <-
-family_stem_ages %>%
-	select(family, current_best = age) %>%
-	left_join(other_dates, by = "family") %>%
-		left_join(
-		unique(select(sanger_sampling, family, major_clade)),
-		by = "family"
-	) %>%
-	left_join(clade_cols_tib, by = "major_clade"
-	) %>%
-	mutate(family = fct_reorder(family, current_best)) %>%
-	pivot_longer(values_to = "age", -c(family, color, code, major_clade)) %>%
-	separate(name, into = c("author", "age_type"), sep = "_") %>%
-	assert(not_na, author, age_type) %>%
-	filter(age_type %in% c("best", "median")) %>%
-	assert(not_na, major_clade, color)
+# Convert family ages to almost-long format
 
-# Convert family errors to almost long format
-family_ages_errors <-
-	family_stem_ages %>%
-	select(family, current_best = age) %>%
-	left_join(other_dates, by = "family") %>%
-	mutate(family = fct_reorder(family, current_best)) %>%
-	select(family, matches("ts|rothfels")) %>%
-	select(-matches("median"))
+# Helper function for subsetting dates to get into
+# almost-long format
+subset_ages <- function(other_dates, author_sel) {
+	other_dates %>%
+		select(family, contains(glue("{author_sel}_"))) %>%
+		rename_with(~str_remove_all(., glue("{author_sel}_"))) %>%
+		mutate(author = author_sel)
+}
 
-family_ages_errors <-
-	bind_rows(
-		transmute(family_ages_errors, family,
-					 high = ts_high, low = ts_low, author = "ts"),
-		transmute(family_ages_errors, family,
-					 high = rothfels_high, low = rothfels_low, author = "rothfels")
+# Combine dates in almost-long format:
+# one row per family/study combination,
+# cols for median, high, and low date
+all_ages <-
+bind_rows(
+	subset_ages(other_dates, "ts"),
+	subset_ages(other_dates, "rothfels"),
+	select(other_dates, family, median = schuettpelz_best) %>%
+		mutate(author = "schuettpelz"),
+	transmute(
+		family_stem_ages,
+		family,
+		author = "current",
+		median = age
 	)
-
+) %>%
+	left_join(
+		unique(select(sanger_sampling, family, major_clade)), by = "family") %>%
+	left_join(clade_tibble, by = "major_clade") %>%
+	# (some median dates are NA if that family wasn't included in a study)
+	assert(not_na, family, major_clade, code, author) %>%
+	# Set family as a factor ordered by current age estimate
+	left_join(family_stem_ages, by = "family") %>%
+	mutate(family = fct_reorder(family, age)) %>%
+	select(-age)
+ 
 # Define shapes and colors for points
 ages_shapes <- c(
 	current = 16, # circle
@@ -1409,10 +1416,11 @@ ages_sampling <-
 	
 # Format y-axis text: show major clade in parentheses
 family_labs_tbl <-
-family_ages_median %>%
+all_ages %>%
 	select(family, code) %>%
 	unique() %>%
 	mutate(label = glue("{family} ({code})"))
+
 family_labs <- family_labs_tbl$label %>%
 	set_names(., family_labs_tbl$family)
 	
@@ -1429,15 +1437,12 @@ period_names <-
 	paste(collapse = ", ")
 
 div_times_plot <-
-ggplot(mapping = aes(y = family)) +
-	geom_errorbarh(
-		data = family_ages_errors,
-		aes(xmax = high, xmin = low, color = author),
-		position = position_dodge(width = 0.5)
-	) +
-	geom_point(
-		data = filter(family_ages_median, age_type %in% c("best", "median")),
-		aes(x = age, color = author, shape = author),
+ggplot(all_ages) +
+	geom_pointrange(
+		aes(
+			x = median, xmin = low, xmax = high,
+			y = family,
+			color = author, shape = author),
 		position = position_dodge(width = 0.5)) +
 	scale_shape_manual(
 		values = ages_shapes,
@@ -1447,7 +1452,7 @@ ggplot(mapping = aes(y = family)) +
 		values = ages_colors,
 		limits = ages_sampling$source, 
 		labels = ages_sampling$label) +
-	scale_y_discrete(labels = family_labs) +
+	scale_y_discrete(labels = family_labs, expand = expansion(add = 0.7)) +
 	scale_x_reverse("Age (millions of years)") +
 	coord_geo(
 		dat = list("periods", "eras"),
@@ -1458,6 +1463,9 @@ ggplot(mapping = aes(y = family)) +
 		color = "grey20",
 		lab_color = "grey30",
 		height = unit(1, "lines"),
+		# FIXME: change this to true when issue gets resolved
+		# https://github.com/willgearty/deeptime/issues/41
+		expand = FALSE,
 		size = 3) +
 	guides(shape = guide_legend(nrow = 2)) +
 	theme_bw() +

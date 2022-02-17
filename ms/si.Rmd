@@ -65,7 +65,9 @@ tar_load(
 	c(
 		sanger_alignment_tbl,
 		sanger_sampling,
-		sanger_accessions_selection),
+		sanger_accessions_selection,
+		plastome_tree,
+		plastid_tree_dated),
 	store = ftol_cache
 )
 
@@ -74,7 +76,9 @@ tar_load(
 	c(
 		gb_species_by_year,
 		ref_files,
-		other_dates
+		other_dates,
+		du_dates_all,
+		family_stem_ages
 	),
 	store = here::here("_targets")
 )
@@ -145,6 +149,20 @@ sanger_accessions_selection %>%
 
 \clearpage
 
+```{r plot-prep-load}
+# Load the plot prep code from the main MS
+knitr::read_chunk(
+	here::here("ms/manuscript.Rmd"),
+	labels = "plot-prep-main",
+	from = "og_taxa <-",
+	to = "left_join\\(clade_cols_tib"
+	)
+```
+
+<!-- Run the plot prep code -->
+```{r, plot-prep-main}
+```
+
 ```{r locus-upset, fig.width = 7, fig.height = 5}
 # Make tibble with one row per locus per species
 sanger_alignment_tbl %>%
@@ -167,3 +185,162 @@ sanger_alignment_tbl %>%
 **`r s_figure("locus-upset")`**.
 Frequency of locus combinations by species, Sanger dataset.
 Only top 20 combinations shown.
+
+\clearpage
+
+```{r du-ages, fig.width = 7, fig.height = 5}
+# Helper function for subsetting dates to get into
+# almost-long format
+subset_ages <- function(other_dates, author_sel) {
+	other_dates %>%
+		select(family, contains(glue("{author_sel}_"))) %>%
+		rename_with(~str_remove_all(., glue("{author_sel}_"))) %>%
+		mutate(author = author_sel)
+}
+
+# Filter Du ages to just stem families
+du_dates_stem_fam <-
+	du_dates_all %>%
+	filter(
+		str_detect(affinities, "eae$"),
+		affinities_group == "stem",
+		str_detect(author, "^r")) %>%
+	select(family = affinities, author, median, low, high)
+	
+# Make tibble of Du
+du_schemes <- du_dates_stem_fam %>%
+	select(scheme = author) %>%
+	unique() %>%
+	mutate(
+		code = str_split(scheme, "_") %>%
+			map_chr(last) %>%
+			str_to_upper()) %>%
+	arrange(code)
+
+# Combine dates in almost-long format:
+# one row per family/author combination,
+# cols for median, high, and low date
+all_ages_with_du <-
+	bind_rows(
+		du_dates_stem_fam,
+		subset_ages(other_dates, "ts"),
+		subset_ages(other_dates, "rothfels"),
+		select(other_dates, family, median = schuettpelz_best) %>%
+			mutate(author = "schuettpelz"),
+		transmute(
+			family_stem_ages,
+			family,
+			author = "current",
+			median = age
+		)
+	) %>%
+	filter(family %in% du_dates_stem_fam$family) %>%
+	left_join(
+		unique(select(sanger_sampling, family, major_clade)), by = "family") %>%
+	left_join(clade_tibble, by = "major_clade") %>%
+	# (some median dates are NA if that family wasn't included in a author)
+	assert(not_na, family, major_clade, code, author) %>%
+	# Set family as a factor ordered by current age estimate
+	left_join(family_stem_ages, by = "family") %>%
+	mutate(family = fct_reorder(family, age)) %>%
+	select(-age)
+
+# Define shapes and colors for points
+du_ages_colors <- c(
+	current = palette_okabe_ito(order = "vermillion"),
+	rothfels = palette_okabe_ito(order = "bluishgreen"),
+	schuettpelz = palette_okabe_ito(order = "blue"),
+	ts = palette_okabe_ito(order = "orange"),
+	rep(
+		palette_okabe_ito(order = "gray"),
+		length(du_schemes$scheme)) %>%
+		set_names(du_schemes$scheme)
+)
+
+du_ages_shapes <- c(
+	current = 16, # circle
+	rothfels = 16,
+	schuettpelz = 16,
+	ts = 16,
+	seq_along(du_schemes$scheme) %>%
+		subtract(1) %>%
+		set_names(du_schemes$scheme)
+)
+
+# Cross doesn't work because we can't distinguish error bars
+du_ages_shapes[du_ages_shapes == 3] <- 6
+
+# Format names of papers for printing
+du_ages_sampling <-
+	tribble(
+		~source, ~year, ~label,
+		"schuettpelz", 2009, "Schuettpelz & Pryer 2009",
+		"rothfels", 2015, "Rothfels et al. 2015",
+		"ts", 2016, "Testo and Sundue 2016",
+		"current", 2021, "This study",
+	) %>%
+	bind_rows(
+		du_schemes %>%
+			mutate(
+				year = 2020 + 0.1*seq_along(du_schemes$scheme),
+				label = paste("Du et al. 2021 scheme", code)
+			) %>%
+			transmute(source = scheme, year, label)
+	) %>%
+	mutate(source = fct_reorder(source, year))
+
+
+# Format y-axis text: show major clade in parentheses
+family_labs_tbl <-
+	all_ages_with_du %>%
+	select(family, code) %>%
+	unique() %>%
+	mutate(label = glue("{family} ({code})"))
+
+family_labs <- family_labs_tbl$label %>%
+	set_names(., family_labs_tbl$family)
+
+ggplot(all_ages_with_du) +
+	geom_pointrange(
+		aes(
+			x = median, xmin = low, xmax = high,
+			y = family,
+			color = author, shape = author),
+		position = position_dodge(width = 0.5)) +
+	scale_shape_manual(
+		values = du_ages_shapes,
+		limits = du_ages_sampling$source, 
+		labels = du_ages_sampling$label) +
+	scale_color_manual(
+		values = du_ages_colors,
+		limits = du_ages_sampling$source, 
+		labels = du_ages_sampling$label) +
+	scale_y_discrete(labels = family_labs, expand = expansion(add = 0.7)) +
+	scale_x_reverse("Age (millions of years)") +
+	coord_geo(
+		dat = list("periods", "eras"),
+		pos = list("b", "b"),
+		abbrv = list(TRUE, FALSE),
+		xlim = c(250, 0),
+		fill = "transparent",
+		color = "grey20",
+		lab_color = "grey30",
+		height = unit(1, "lines"),
+		# FIXME: change this to true when issue gets resolved
+		# https://github.com/willgearty/deeptime/issues/41
+		expand = FALSE,
+		size = 3) +
+	theme_bw() +
+	theme(
+		axis.title.y = element_blank(),
+		legend.title = element_blank()
+	)
+```
+
+**`r s_figure("du-ages")`**.
+Stem age of fern families (Ma) estimated by selected studies, only including families that were sampled across all studies.
+For studies that used methods with confidence intervals, error bars indicate lower and upper 95% highest posterior density levels and point indicates median [@Rothfels2015a; @Testo2016a; @Du2021].
+For other studies, point indicates best (most likely) estimate [@Schuettpelz2007b\; this study].
+@Du2021 used six different dating schemes; for details, see that paper.
+Codes in parentheses after family names indicate major clade as in `r figure("ftol")`.
+Period name abbreviations as follows: FIXME.
