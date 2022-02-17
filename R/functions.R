@@ -313,13 +313,20 @@ get_accepted_species <- function(pteridocat, ppgi_taxonomy) {
 		# then don't need is.na()
 		filter(taxonRank == "species" | is.na(taxonRank)) %>%
 		select(scientificName) %>%
+		mutate(scientificName = str_squish(scientificName)) %>%
 		mutate(
 			rgnparser::gn_parse_tidy(scientificName) %>% 
 				select(species = canonicalsimple),
 			species = str_replace_all(species, " ", "_")
 		) %>%
 		# Map on higher level taxonomy
-		mutate(genus = str_split(scientificName, " ") %>% map_chr(1)) %>%
+		mutate(
+			genus = case_when(
+				str_detect(scientificName, "^x |^× ") ~ 
+					str_split(scientificName, " ") %>% map_chr(2),
+			TRUE ~ str_split(scientificName, " ") %>% map_chr(1)
+			)
+    ) %>%
 		left_join(
 			select(ppgi_taxonomy, genus, family, 
 						 suborder, order, class), by = "genus"

@@ -254,8 +254,8 @@ We refer to the resulting taxonomic database as "pteridocat", and have made it f
 There are differences between pteridocat and PPGI, mostly at the genus level.
 In the time since PPGI was published, several new genera have been published.
 Furthermore, multiple genera included in PPGI were known to be non-monophyletic and included on a tentative basis [@PteridophytePhylogenyGroupI2016].
-Pteridocat includes newly published genera and some genera that were not recognized by PPGI.
-Differences between pteridocat and PPGI are summarized in Table S1.
+Pteridocat includes newly published genera and some genera that were not recognized by PPGI as well as nothogenera, which were not included in PPGI [@Liu2020a].
+Differences between pteridocat and PPGI are summarized in `r s_table("genera_diff")`.
 
 ## Removal of rogue sequences using BLAST
 

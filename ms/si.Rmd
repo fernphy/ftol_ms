@@ -73,13 +73,15 @@ tar_load(
 		sanger_accessions_selection,
 		plastome_tree,
 		plastid_tree_dated,
-		fossil_calibration_tips),
+		fossil_calibration_tips,
+		ppgi_taxonomy),
 	store = ftol_cache
 )
 
 # Targets from MS workflow
 tar_load(
 	c(
+		accepted_species,
 		gb_species_by_year,
 		ref_files,
 		other_dates,
@@ -120,6 +122,67 @@ source(temp_file, local = TRUE)
 fs::file_delete(temp_file)
 ```
 
+```{r genera-diff}
+
+# FIXME: need to update ppgi csv file
+# Add one missing nothogenus
+ppgi_taxonomy_mod <-
+	bind_rows(
+		ppgi_taxonomy,
+		tibble(
+			genus = "Phlebosia",
+			notes = "Nothogenus"
+		)
+	)
+
+# Verify that all accepted genera are accounted for
+accepted_species %>%
+	count(genus, name = "n_species") %>%
+	anti_join(select(ppgi_taxonomy_mod, genus, notes)) %>%
+	verify(nrow(.) == 0, success_fun = success_logical)
+
+# Make table of Pteridocat genera not in PPGI
+pteridocat_not_in_ppgi <-
+accepted_species %>%
+	count(genus, name = "n_species") %>%
+	left_join(select(ppgi_taxonomy_mod, genus, notes), by = "genus") %>%
+	assert(not_na, notes) %>%
+	assert(is_uniq, genus) %>%
+	filter(notes != "original PPGI 2016") %>%
+	transmute(
+		diff = "Pteridocat not in PPGI",
+		genus,
+		n_species,
+		note = notes
+	)
+
+# Make table of PPGI genera not in Pteridocat
+ppgi_not_in_pteridocat <-
+ppgi_taxonomy_mod %>%
+	filter(notes == "original PPGI 2016",
+				 class == "Polypodiopsida") %>%
+	anti_join(accepted_species, by = "genus") %>%
+	count(genus) %>%
+	transmute(
+		diff = "PPGI not in Pteridocat",
+		genus,
+		# FIXME: need to add n species from PPGI and note
+		n_species = NA,
+		note = NA
+	)
+
+genera_diff_table <- 
+	bind_rows(pteridocat_not_in_ppgi, ppgi_not_in_pteridocat)
+
+write_csv(genera_diff_table, result_file(s_table("genera_diff"), "csv"))
+```
+
+**`r s_table("genera_diff")`**.
+Differences in genera included as accepted in Pteridocat taxonomic database (https://github.com/pteridophy/pteridocat) vs. @PteridophytePhylogenyGroupI2016 (`r result_file(s_table("genera_diff"), "csv") %>% fs::path_file()`).
+"diff" is type of difference (Pteridocat genus not in PPGI or PPGI genus not in Pteridocat).
+"n_species" is the number of accepted species in each genus in the system that includes the genus.
+References in "notes" column provided at end of Supplementary Materials.
+
 ```{r fossils}
 # Filter raw fossil data to just fossils used, write out as CSV
 fossils_table <-
@@ -148,7 +211,10 @@ fossil_ferns_raw %>%
 write_csv(fossils_table, result_file(s_table("fossils"), "csv"))
 ```
 
-**`r s_table("fossils")`**. Fossils used as calibration points for molecular dating (`r result_file(s_table("fossils"), "csv")`). "n_fos" is the fossil ID number used in our fossil database (https://github.com/pteridophy/fossils). "minimum_age" (Ma) is the age used for calibration; "lower" is the lower limit of the oldest stratigraphic age for the fossil; "upper" is the upper limit of the oldest stratigraphic age for the fossil.
+**`r s_table("fossils")`**.
+Fossils used as calibration points for molecular dating (`r result_file(s_table("fossils"), "csv") %>% fs::path_file()`).
+"n_fos" is the fossil ID number used in our fossil database (https://github.com/pteridophy/fossils).
+"minimum_age" (Ma) is the age used for calibration; "lower" is the lower limit of the oldest stratigraphic age for the fossil; "upper" is the upper limit of the oldest stratigraphic age for the fossil.
 
 \newpage
 
@@ -182,7 +248,9 @@ sanger_accessions_selection %>%
 	autofit()
 ```
 
-**`r s_table("join_by")`**. Methods used to join accessions across loci for Sanger dataset. Count is number of species.
+**`r s_table("join_by")`**.
+Methods used to join accessions across loci for Sanger dataset.
+Count is number of species.
 
 \newpage
 

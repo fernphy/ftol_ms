@@ -856,6 +856,35 @@ references:
   title: Dynamism in plastome structure observed across the phylogenetic tree of ferns
   type: article-journal
   volume: '190'
+- id: Liu2020a
+  accessed:
+  - year: 2022
+    month: 2
+    day: 17
+  author:
+  - family: Liu
+    given: Hong‐Mei
+  - family: Schuettpelz
+    given: Eric
+  - family: Schneider
+    given: Harald
+  citation-key: Liu2020a
+  container-title: Journal of Systematics and Evolution
+  container-title-short: J. Syst. Evol.
+  DOI: 10/ghcrgh
+  ISSN: 1674-4918, 1759-6831
+  issue: '6'
+  issued:
+  - year: 2020
+    month: 11
+  language: en
+  page: 988-1002
+  source: DOI.org (Crossref)
+  title: Evaluating the status of fern and lycophyte nothotaxa in the context of the
+    Pteridophyte Phylogeny Group classification (PPG I)
+  type: article-journal
+  URL: https://onlinelibrary.wiley.com/doi/10.1111/jse.12641
+  volume: '58'
 - id: Lu2015a
   author:
   - family: Lu
