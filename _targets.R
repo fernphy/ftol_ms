@@ -117,13 +117,32 @@ tar_plan(
 	# track files used for rendering MS
 	tar_file(ref_files, list.files("ms", "references", full.names = TRUE)),
 	tar_render(
-		ms,
+		ms_doc,
 		"ms/manuscript.Rmd",
-		output_dir = "results"
+		output_dir = "results",
+		output_format = "bookdown::word_document2",
+		params = list(doc_type = "doc")
 	),
 	tar_render(
-		si,
+		ms_pdf,
+		"ms/manuscript.Rmd",
+		output_dir = "results",
+		output_format = "bookdown::pdf_document2",
+		params = list(doc_type = "pdf")
+	),
+	tar_render(
+		si_doc,
 		"ms/si.Rmd",
-		output_dir = "results"
+		knit_root_dir = "ms",
+		output_dir = "results",
+		output_format = "bookdown::word_document2",
+		params = list(doc_type = "doc")
+	),
+	tar_render(
+		si_pdf,
+		"ms/si.Rmd",
+		output_dir = "results",
+		output_format = "bookdown::pdf_document2",
+		params = list(doc_type = "pdf")
 	)
 )

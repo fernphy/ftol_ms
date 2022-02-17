@@ -893,13 +893,23 @@ s_table_num <- function(name) {s_table(name) %>% str_remove("Table ")}
 
 # Pagebreaks ----
 
+#' Pagebreak for MS Word (doc) only
+#' 
+#' Meant for use within Rmd when rendering.
+#' Breaks a page depending if the output format is MS Word
+#' 
+#' @param rmd_params Parameters set in YAML header or rmarkdown::render(). 
+#' Must include `doc_type` (either 'doc' for MS Word or 'pdf' for PDF output)
+#' 
+pagebreak_doc <- function(rmd_params = params) {ifelse(rmd_params$doc_type == "doc", return("\\newpage"), return(""))}
+
 #' Pagebreak for PDF only
 #' 
 #' Meant for use within Rmd when rendering. Requires parameter variable
 #' `doc_type` to be defined (either 'doc' for MS Word or 'pdf' for PDF output)
 #'
 #' Breaks a page depending if the output format is PDF
-pagebreak_pdf <- function(rmd_params = params) {ifelse(rmd_params$doc_type == "pdf", return("\\clearpage"), return(""))}
+pagebreak_pdf <- function(rmd_params = params) {ifelse(rmd_params$doc_type == "pdf", return("\\newpage"), return(""))}
 
 # Phylogeny ----
 

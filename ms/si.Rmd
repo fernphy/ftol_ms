@@ -1,5 +1,5 @@
 ---
-title: "Supplemental Information"
+title: "*Supplementary Material*"
 mainfont: Roboto-Regular.ttf
 fontsize: 11pt
 mainfontoptions: 
@@ -15,6 +15,11 @@ output:
     keep_tex: no
     latex_engine: xelatex
     pandoc_args: [ "--csl", "frontiers.csl"]
+  bookdown::word_document2:
+    pandoc_args: [ "--csl", "frontiers.csl"]
+    toc: no
+    number_sections: no
+    reference_docx: Frontiers_Template_SI.docx
 header-includes: 
   - \usepackage{float} # keep figures from floating away
   - \usepackage{booktabs} # need for kable tables
@@ -24,7 +29,7 @@ header-includes:
   - \pagestyle{fancy}  # enable header
   - \fancypagestyle{plain}{\pagestyle{fancy}} # show header on first page
   - \renewcommand{\headrulewidth}{0pt} # delete line beneath header
-  - \fancyhead[RE,RO]{Nitta \textit{et al}. Fern Tree of Life SI} # add header on right side
+  - \fancyhead[RE,RO]{Supplementary Material} # add header on right side
   - \fancyhead[LO,LE]{} # suppress automatic section header on left side
   - \cfoot{\thepage} # footer
 editor_options: 
@@ -45,7 +50,7 @@ knitr::opts_chunk$set(
 	echo = FALSE, warning = FALSE, message = FALSE, results = 'hide')
 # Load packages
 library(ggupset)
-library(kableExtra)
+library(flextable)
 source(here::here("R/ms_packages.R"))
 ```
 
@@ -67,7 +72,8 @@ tar_load(
 		sanger_sampling,
 		sanger_accessions_selection,
 		plastome_tree,
-		plastid_tree_dated),
+		plastid_tree_dated,
+		fossil_calibration_tips),
 	store = ftol_cache
 )
 
@@ -78,7 +84,8 @@ tar_load(
 		ref_files,
 		other_dates,
 		du_dates_all,
-		family_stem_ages
+		family_stem_ages,
+		fossil_ferns_raw
 	),
 	store = here::here("_targets")
 )
@@ -113,7 +120,39 @@ source(temp_file, local = TRUE)
 fs::file_delete(temp_file)
 ```
 
-```{r join_by, results = "as-is"}
+```{r fossils}
+# Filter raw fossil data to just fossils used, write out as CSV
+fossils_table <-
+fossil_ferns_raw %>%
+	inner_join(
+		select(fossil_calibration_tips, fossil_taxon), by = "fossil_taxon") %>%
+	verify(nrow(.) == nrow(fossil_calibration_tips)) %>%
+	rowwise() %>%
+	mutate(
+		note = jntools::paste3(notes_21, notes_22sep = ". ") %>%
+			str_replace_all("\\.\\.", "\\.") %>%
+			na_if(".") %>%
+			str_replace_all(" \\.$", "\\.")
+	) %>%
+	ungroup() %>%
+	select(
+		n_fos, minimum_age, node_calibrated, fossil_taxon, 
+		lower = lower_limit_of_oldest_stratigraphic_age,
+		upper = upper_limit_of_oldest_stratigraphic_age,
+		stratigraphic_age, 
+		country, type_locality, formation,
+		organs, specimen_holotype, collection,
+		reference, note
+	)
+
+write_csv(fossils_table, result_file(s_table("fossils"), "csv"))
+```
+
+**`r s_table("fossils")`**. Fossils used as calibration points for molecular dating (`r result_file(s_table("fossils"), "csv")`). "n_fos" is the fossil ID number used in our fossil database (https://github.com/pteridophy/fossils). "minimum_age" (Ma) is the age used for calibration; "lower" is the lower limit of the oldest stratigraphic age for the fossil; "upper" is the upper limit of the oldest stratigraphic age for the fossil.
+
+\newpage
+
+```{r join-by, results = "markup"}
 # Make table showing method of joining accessions across loci
 sanger_accessions_selection %>% 
 	left_join(select(sanger_sampling, species, outgroup), by = "species") %>%
@@ -131,23 +170,21 @@ sanger_accessions_selection %>%
 			str_replace_all("Monophy", "Monophyletic"),
 		n = number(n),
 		percent = case_when(
-			join_by != "Total" ~ percent(percent) %>% 
-				str_replace_all("%", "\\\\%"),
+			join_by != "Total" ~ percent(percent),
 			TRUE ~ ""
 		)
 	) %>%
 	rename(
 		"Method" = join_by,
-		`\\textit{n}` = n,
-		`\\%` = percent
-	) %>%
-  kbl(booktabs = TRUE, escape = FALSE, format = "latex") %>%
-  kable_styling(latex_options = c("striped", "HOLD_position"))
+		`%` = percent) %>%
+	flextable() %>%
+	italic(1,2, part = "header") %>%
+	autofit()
 ```
 
 **`r s_table("join_by")`**. Methods used to join accessions across loci for Sanger dataset. Count is number of species.
 
-\clearpage
+\newpage
 
 ```{r plot-prep-load}
 # Load the plot prep code from the main MS
@@ -186,7 +223,7 @@ sanger_alignment_tbl %>%
 Frequency of locus combinations by species, Sanger dataset.
 Only top 20 combinations shown.
 
-\clearpage
+\newpage
 
 ```{r du-ages, fig.width = 7, fig.height = 5}
 # Helper function for subsetting dates to get into
@@ -344,3 +381,5 @@ For other studies, point indicates best (most likely) estimate [@Schuettpelz2007
 @Du2021 used six different dating schemes; for details, see that paper.
 Codes in parentheses after family names indicate major clade as in `r figure("ftol")`.
 Period name abbreviations as follows: FIXME.
+
+\newpage
