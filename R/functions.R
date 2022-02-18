@@ -1106,3 +1106,47 @@ base_freq_missing <- function(
 # Generate custom error message for assertr
 # https://github.com/ropensci/assertr/issues/70
 err_msg <- function(msg) stop(msg, call. = FALSE)
+
+#' Check order of cited figures and tables in an Rmd file
+#'
+#' @param type Type of citation to check:
+#' - "all": everything
+#' - "fig": all figures
+#' - "s_fig": SI figures
+#' - "tab": all tables
+#' - "s_tab": SI tables
+#' @param rmd_file Path to the Rmd file
+#' @return Character vector: the functions citing the tables and references,
+#' in the order they appear in the Rmd file.
+check_ft_order <- function(type = "all", rmd_file = "ms/manuscript.Rmd") {
+	
+	# Run inline code when purling
+	options(knitr.purl.inline = TRUE)
+	
+	# Make a temporary file to write out just inline R code from the SI Rmd
+	temp_file <- tempfile()
+	
+	# Generate R script including inline R code from the ms Rmd
+	suppressMessages(knitr::purl(rmd_file, output = temp_file))
+	
+	# Trim this R script down to only functions that define figure and table captions
+	refs <- read_lines(temp_file) %>%
+		magrittr::extract(
+			str_detect(., "^figure\\(|^table\\(|^s_figure\\(|^s_table\\(|^figure_num\\(|^table_num\\(|^s_figure_num\\(|^s_table_num\\(")
+		) %>%
+		unique
+	
+	# Delete the temporary file
+	fs::file_delete(temp_file)
+	
+	switch(
+		type,
+		"all" = refs,
+		"fig" = refs[str_detect(refs, "fig")],
+		"s_fig" = refs[str_detect(refs, "s_fig")],
+		"tab" = refs[str_detect(refs, "tab")],
+		"s_tab" = refs[str_detect(refs, "s_tab")],
+		stop("Must choose 'all', 'fig', 's_fig', 'tab', or 's_tab' for type")
+	)
+	
+}
