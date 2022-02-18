@@ -20,6 +20,14 @@ tar_plan(
 		"_targets/user/data_raw/1-s2.0-S1055790316302287-mmc2.xlsx"
 	),
 	other_dates = parse_ts_dates(testo_sundue_2016_si_path),
+	# - Notes on differences between Pteridocat and PPGI
+	tar_files_input(
+		pteridocat_ppgi_diff_notes_path,
+		"_targets/user/data_raw/pteridocat_ppgi_diff_notes.csv"
+	),
+	pteridocat_ppgi_diff_notes = read_csv(
+		pteridocat_ppgi_diff_notes_path
+	),
 	# - Targets from FTOL workflow
 	plastome_metadata_renamed = tar_read(
 		plastome_metadata_renamed,

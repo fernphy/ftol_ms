@@ -1,0 +1,632 @@
+references:
+- id: Du2021
+  accessed:
+  - year: 2022
+    month: 2
+    day: 2
+  author:
+  - family: Du
+    given: Xin‐Yu
+  - family: Lu
+    given: Jin‐Mei
+  - family: Zhang
+    given: Li‐Bing
+  - family: Wen
+    given: Jun
+  - family: Kuo
+    given: Li‐Yaung
+  - family: Mynssen
+    given: Claudine M.
+  - family: Schneider
+    given: Harald
+  - family: Li
+    given: De‐Zhu
+  citation-key: Du2021
+  container-title: Cladistics
+  container-title-short: Cladistics
+  DOI: 10/gpb22j
+  ISSN: 0748-3007, 1096-0031
+  issue: '5'
+  issued:
+  - year: 2021
+    month: 10
+  language: en
+  page: 518-539
+  source: DOI.org (Crossref)
+  title: Simultaneous diversification of Polypodiales and angiosperms in the Mesozoic
+  type: article-journal
+  URL: https://onlinelibrary.wiley.com/doi/10.1111/cla.12457
+  volume: '37'
+- id: PteridophytePhylogenyGroupI2016
+  author:
+  - literal: Pteridophyte Phylogeny Group I
+  citation-key: PteridophytePhylogenyGroupI2016
+  container-title: Journal of Systematics and Evolution
+  DOI: 10.1111/jse.12229
+  issue: '6'
+  issued:
+  - year: 2016
+  page: 563-603
+  title: A community-derived classification for extant lycophytes and ferns
+  type: article-journal
+  volume: '54'
+- id: Rothfels2015a
+  author:
+  - family: Rothfels
+    given: Carl J.
+  - family: Li
+    given: Fay-Wei
+  - family: Sigel
+    given: Erin M
+  - family: Huiet
+    given: Layne
+  - family: Larsson
+    given: Anders
+  - family: Burge
+    given: Dylan O.
+  - family: Ruhsam
+    given: Markus
+  - family: Deyholos
+    given: Michael
+  - family: Soltis
+    given: Douglas E.
+  - family: Stewart
+    given: C. N.
+  - family: Shaw
+    given: Shane W.
+  - family: Pokorny
+    given: Lisa
+  - family: Chen
+    given: Tao
+  - family: DePamphilis
+    given: Claude
+  - family: DeGironimo
+    given: Lisa
+  - family: Chen
+    given: Li
+  - family: Wei
+    given: Xiaofeng
+  - family: Sun
+    given: Xiao
+  - family: Korall
+    given: Petra
+  - family: Stevenson
+    given: Dennis W.
+  - family: Graham
+    given: Sean W.
+  - family: Wong
+    given: G. K.-S.
+  - family: Pryer
+    given: Kathleen M
+  citation-key: Rothfels2015a
+  container-title: American Journal of Botany
+  DOI: 10.3732/ajb.1500089
+  ISSN: 0002-9122
+  issue: '7'
+  issued:
+  - year: 2015
+  page: 1-19
+  title: The evolutionary history of ferns inferred from 25 low-copy nuclear genes
+  type: article-journal
+  URL: http://www.amjbot.org/content/early/2015/07/15/ajb.1500089
+  volume: '102'
+- id: Schuettpelz2007b
+  author:
+  - family: Schuettpelz
+    given: Eric
+  citation-key: Schuettpelz2007b
+  issued:
+  - year: 2007
+  title: The evolution and diversification of epiphytic ferns
+  type: article-journal
+  URL: papers://ebd7d3df-d8f1-4be8-bcf7-4fb07ababf30/Paper/p598
+- id: Testo2016a
+  author:
+  - family: Testo
+    given: Weston L.
+  - family: Sundue
+    given: Michael A
+  citation-key: Testo2016a
+  container-title: Molecular Phylogenetics and Evolution
+  DOI: 10.1016/j.ympev.2016.09.003
+  ISSN: '10959513'
+  issued:
+  - year: 2016
+  page: 200-211
+  PMID: '27621129'
+  title: A 4000-species dataset provides new insight into the evolution of ferns
+  type: article-journal
+  URL: http://dx.doi.org/10.1016/j.ympev.2016.09.003
+  volume: '105'
+- id: Almeida2017
+  author:
+  - family: Almeida
+    given: Thaís Elias
+  - family: Salino
+    given: Alexandre
+  - family: Dubuisson
+    given: Jean-Yves
+  - family: Hennerquin
+    given: Sabine
+  citation-key: Almeida2017
+  container-title: PhytoKeys
+  DOI: 10.3897/phytokeys.78.12189
+  ISSN: 1314-2003
+  issued:
+  - year: 2017
+  page: 109-131
+  title: Adetogramma (Polypodiaceae), a new monotypic fern genus segregated from Polypodium
+  type: article-journal
+  volume: '78'
+- id: Dong2018b
+  accessed:
+  - year: 2021
+    month: 8
+    day: 11
+  author:
+  - family: Dong
+    given: Shi-Yong
+  - family: Zuo
+    given: Zheng-Yu
+  citation-key: Dong2018b
+  container-title: Annals of the Missouri Botanical Garden
+  container-title-short: Annals of the Missouri Botanical Garden
+  DOI: 10/gmgfp8
+  ISSN: 0026-6493, 2162-4372
+  issue: '1'
+  issued:
+  - year: 2018
+    month: 5
+  language: en
+  page: 1-23
+  source: DOI.org (Crossref)
+  title: On the Recognition of *Gymnosphaera* As a Distinct Genus in Cyatheaceae <sup/>
+  type: article-journal
+  URL: http://www.bioone.org/doi/10.3417/2017049
+  volume: '103'
+- id: Dong2018c
+  accessed:
+  - year: 2022
+    month: 2
+    day: 18
+  author:
+  - family: Dong
+    given: Shi-Yong
+  - family: Chen
+    given: Cheng-Wei
+  - family: Tan
+    given: Shi-Shi
+  - family: Zhao
+    given: Hui-Guo
+  - family: Zuo
+    given: Zheng-Yu
+  - family: Chao
+    given: Yi-Shan
+  - family: Chang
+    given: Yi-Han
+  citation-key: Dong2018c
+  container-title: Journal of Systematics and Evolution
+  container-title-short: Jnl of Sytematics Evolution
+  DOI: 10/gdbgs5
+  ISSN: '16744918'
+  issue: '2'
+  issued:
+  - year: 2018
+    month: 3
+  language: en
+  page: 139-147
+  source: DOI.org (Crossref)
+  title: 'New insights on the phylogeny of *Tectaria* (Tectariaceae), with special
+    reference to *Polydictyum* as a distinct lineage: New insights on the phylogeny
+    of *Tectaria*'
+  title-short: New insights on the phylogeny of *Tectaria* (Tectariaceae), with special
+    reference to *Polydictyum* as a distinct lineage
+  type: article-journal
+  URL: https://onlinelibrary.wiley.com/doi/10.1111/jse.12292
+  volume: '56'
+- id: Dong2020
+  accessed:
+  - year: 2022
+    month: 1
+    day: 26
+  author:
+  - family: Dong
+    given: Shi‐Yong
+  - family: Zuo
+    given: Zheng‐Yu
+  - family: Xiao
+    given: Yong
+  - family: Huang
+    given: Ling
+  - family: Pham
+    given: Van The
+  - family: Phan
+    given: Ke Loc
+  - family: Kang
+    given: Ming
+  citation-key: Dong2020
+  container-title: Journal of Systematics and Evolution
+  container-title-short: J. Syst. Evol.
+  DOI: 10/gn9h7f
+  ISSN: 1674-4918, 1759-6831
+  issued:
+  - year: 2020
+    month: 10
+    day: 13
+  language: en
+  page: jse.12679
+  source: DOI.org (Crossref)
+  title: 'A contribution to *Gymnosphaera* (Cyatheaceae) in mainland Asia: Two new
+    species, reinstatement of *Cyathea bonii* , and their phylogenetic positions'
+  title-short: A contribution to *Gymnosphaera* (Cyatheaceae) in mainland Asia
+  type: article-journal
+  URL: https://onlinelibrary.wiley.com/doi/10.1111/jse.12679
+- id: Fawcett2021
+  author:
+  - family: Fawcett
+    given: Susan
+  - family: Smith
+    given: Alan
+  citation-key: Fawcett2021
+  issued:
+  - year: 2021
+  publisher: Botanical Research Institute of Texas Press
+  title: A Generic Classification of the Thelypteridaceae
+  type: book
+- id: George2019
+  accessed:
+  - year: 2022
+    month: 2
+    day: 18
+  author:
+  - family: George
+    given: Lisa O.
+  - family: Pryer
+    given: Kathleen M.
+  - family: Kao
+    given: Tzu-Tong
+  - family: Huiet
+    given: Layne
+  - family: Windham
+    given: Michael D.
+  citation-key: George2019
+  container-title: Systematic Botany
+  container-title-short: Systematic Botany
+  DOI: 10/gphjp4
+  ISSN: 0363-6445
+  issue: '3'
+  issued:
+  - year: 2019
+    month: 8
+    day: 6
+  language: en
+  page: 471-482
+  source: DOI.org (Crossref)
+  title: '*Baja* : A New Monospecific Genus Segregated from *Cheilanthes* s. l. (Pteridaceae)'
+  title-short: '*Baja*'
+  type: article-journal
+  URL: https://www.ingentaconnect.com/content/10.1600/036364419X15620113920536
+  volume: '44'
+- id: Liu2020a
+  accessed:
+  - year: 2022
+    month: 2
+    day: 17
+  author:
+  - family: Liu
+    given: Hong‐Mei
+  - family: Schuettpelz
+    given: Eric
+  - family: Schneider
+    given: Harald
+  citation-key: Liu2020a
+  container-title: Journal of Systematics and Evolution
+  container-title-short: J. Syst. Evol.
+  DOI: 10/ghcrgh
+  ISSN: 1674-4918, 1759-6831
+  issue: '6'
+  issued:
+  - year: 2020
+    month: 11
+  language: en
+  page: 988-1002
+  source: DOI.org (Crossref)
+  title: Evaluating the status of fern and lycophyte nothotaxa in the context of the
+    Pteridophyte Phylogeny Group classification (PPG I)
+  type: article-journal
+  URL: https://onlinelibrary.wiley.com/doi/10.1111/jse.12641
+  volume: '58'
+- id: Liu2020c
+  accessed:
+  - year: 2021
+    month: 9
+    day: 21
+  author:
+  - family: Liu
+    given: Hongmei
+  - family: Rakotondrainibe
+    given: France
+  - family: Hennequin
+    given: Sabine
+  - family: Schneider
+    given: Harald
+  citation-key: Liu2020c
+  container-title: Plant Systematics and Evolution
+  container-title-short: Plant Syst Evol
+  DOI: 10/gg5mz9
+  ISSN: 0378-2697, 2199-6881
+  issue: '2'
+  issued:
+  - year: 2020
+    month: 4
+  language: en
+  page: '30'
+  source: DOI.org (Crossref)
+  title: 'The significance of Rouxopteris (Gleicheniaceae, Polypodiopsida): a new
+    genus endemic to the Madagascan region'
+  title-short: The significance of Rouxopteris (Gleicheniaceae, Polypodiopsida)
+  type: article-journal
+  URL: http://link.springer.com/10.1007/s00606-020-01657-9
+  volume: '306'
+- id: Lu2019
+  accessed:
+  - year: 2021
+    month: 9
+    day: 29
+  author:
+  - family: Lu
+    given: Ngan Thi
+  - family: Zhou
+    given: Xin‐Mao
+  - family: Zhang
+    given: Liang
+  - family: Knapp
+    given: Ralf
+  - family: Li
+    given: Chun‐Xiang
+  - family: Fan
+    given: Xue‐Ping
+  - family: Zhou
+    given: Lin
+  - family: Wei
+    given: Hong‐Jin
+  - family: Lu
+    given: Jin‐Mei
+  - family: Xu
+    given: Bo
+  - family: Peng
+    given: Yu‐Lan
+  - family: Gao
+    given: Xin‐Fen
+  - family: Zhang
+    given: Li‐Bing
+  citation-key: Lu2019
+  container-title: TAXON
+  container-title-short: TAXON
+  DOI: 10/gmxqm6
+  ISSN: 0040-0262, 1996-8175
+  issue: '6'
+  issued:
+  - year: 2019
+    month: 12
+  language: en
+  page: 1149-1172
+  source: DOI.org (Crossref)
+  title: A global plastid phylogeny of the cliff fern family Woodsiaceae and a two‐genus
+    classification of Woodsiaceae with the description of × *Woodsimatium* nothogen.
+    nov.
+  type: article-journal
+  URL: https://onlinelibrary.wiley.com/doi/10.1002/tax.12180
+  volume: '68'
+- id: Moran2019
+  accessed:
+  - year: 2022
+    month: 2
+    day: 18
+  author:
+  - family: Moran
+    given: Robbin C.
+  - family: Garrison Hanks
+    given: Judith
+  - family: Sundue
+    given: Michael
+  citation-key: Moran2019
+  container-title: TAXON
+  container-title-short: TAXON
+  DOI: 10/gphjp8
+  ISSN: 0040-0262, 1996-8175
+  issue: '3'
+  issued:
+  - year: 2019
+    month: 6
+  language: en
+  page: 425-441
+  source: DOI.org (Crossref)
+  title: Phylogenetic relationships of Neotropical lady ferns (Athyriaceae), with
+    a description of *Ephemeropteris* , gen. nov.
+  type: article-journal
+  URL: https://onlinelibrary.wiley.com/doi/10.1002/tax.12063
+  volume: '68'
+- id: PteridophytePhylogenyGroupI2016
+  author:
+  - literal: Pteridophyte Phylogeny Group I
+  citation-key: PteridophytePhylogenyGroupI2016
+  container-title: Journal of Systematics and Evolution
+  DOI: 10.1111/jse.12229
+  issue: '6'
+  issued:
+  - year: 2016
+  page: 563-603
+  title: A community-derived classification for extant lycophytes and ferns
+  type: article-journal
+  volume: '54'
+- id: SHALISKO2019
+  author:
+  - family: SHALISKO
+    given: VIACHESLAV
+  - family: SUNDUE
+    given: MICHAEL A.
+  - family: VILLALOBOS-ARÁMBULA
+    given: ALMA ROSA
+  - family: MUÑIZ-CASTRO
+    given: MIGUEL ÁNGEL
+  - family: VÁZQUEZ-GARCÍA
+    given: J. ANTONIO
+  citation-key: SHALISKO2019
+  container-title: Phytotaxa
+  DOI: 10.11646/phytotaxa.394.3.1
+  ISSN: 1179-3155
+  issue: '3'
+  issued:
+  - year: 2019
+  page: '176'
+  title: Taxonomic novelties in grammitid ferns (Polypodiaceae) from the Neotropics
+    and Madagascar supported by molecular data
+  type: article-journal
+  volume: '394'
+- id: Shang2018
+  author:
+  - family: Shang
+    given: Hui
+  - family: Sundue
+    given: Michael A
+  - family: Wei
+    given: Ran
+  - family: Wei
+    given: Xue Ping
+  - family: Luo
+    given: Jun Jie
+  - family: Liu
+    given: Li
+  - family: Schwartsburd
+    given: Pedro B.
+  - family: Yan
+    given: Yue Hong
+  - family: Zhang
+    given: Xian Chun
+  citation-key: Shang2018
+  container-title: Molecular Phylogenetics and Evolution
+  DOI: 10.1016/j.ympev.2018.04.038
+  ISSN: '10959513'
+  issued:
+  - year: 2018
+  title: 'Hiya: A new genus segregated from Hypolepis in the fern family Dennstaedtiaceae,
+    based on phylogenetic evidence and character evolution'
+  type: article-journal
+- id: Testo2019
+  author:
+  - family: Testo
+    given: Weston L.
+  - family: Field
+    given: Ashley R
+  - family: Sessa
+    given: Emily B
+  - family: Sundue
+    given: Michael A
+  - family: Hall
+    given: Bartram
+  citation-key: Testo2019
+  DOI: 10.1600/036364419X15650157948607
+  issued:
+  - year: 2019
+  page: 1-16
+  title: Phylogenetic and morphological analyses support the resurrection of *Dendroconche*
+    and the recognition of two new genera in Polypodiaceae subfamily Microsoroideae
+  type: article-journal
+  volume: '44'
+- id: Wang2010a
+  author:
+  - family: Wang
+    given: Li
+  - family: Wu
+    given: Zhiqiang
+  - family: Xiang
+    given: Qiao-Ping
+  - family: Heinrichs
+    given: Jochen
+  - family: Schneider
+    given: Harald
+  - family: Zhang
+    given: Xian-Chun
+  citation-key: Wang2010a
+  container-title: Botanical Journal of the Linnean Society
+  issued:
+  - year: 2010
+  page: 28-38
+  title: A molecular phylogeny and a revised classification of tribe Lepisoreae (Polypodiaceae)
+    based on an analysis of four plastid DNA regions
+  type: article-journal
+  volume: '162'
+- id: Zhang2017
+  author:
+  - family: Zhang
+    given: Liang
+  - family: Zhou
+    given: Xin Mao
+  - family: Lu
+    given: Ngan Thi
+  - family: Zhang
+    given: Li Bing
+  citation-key: Zhang2017
+  container-title: Molecular Phylogenetics and Evolution
+  DOI: 10.1016/j.ympev.2016.12.037
+  ISSN: '10959513'
+  issued:
+  - year: 2017
+  page: 59-72
+  title: 'Phylogeny of the fern subfamily Pteridoideae (Pteridaceae; Pteridophyta),
+    with the description of a new genus: Gastoniella'
+  type: article-journal
+  URL: http://dx.doi.org/10.1016/j.ympev.2016.12.037
+  volume: '109'
+- id: Zhang2020b
+  accessed:
+  - year: 2021
+    month: 9
+    day: 29
+  author:
+  - family: Zhang
+    given: Liang
+  - family: Fan
+    given: Xue‐Ping
+  - family: Petchsri
+    given: Sahanat
+  - family: Zhou
+    given: Lin
+  - family: Pollawatn
+    given: Rossarin
+  - family: Zhang
+    given: Xin
+  - family: Zhou
+    given: Xin‐Mao
+  - family: Thi Lu
+    given: Ngan
+  - family: Knapp
+    given: Ralf
+  - family: Chantanaorrapint
+    given: Sahut
+  - family: Limpanasittichai
+    given: Ponpipat
+  - family: Sun
+    given: Hang
+  - family: Gao
+    given: Xin‐Fen
+  - family: Zhang
+    given: Li‐Bing
+  citation-key: Zhang2020b
+  container-title: Cladistics
+  container-title-short: Cladistics
+  DOI: 10/gmxqnt
+  ISSN: 0748-3007, 1096-0031
+  issue: '4'
+  issued:
+  - year: 2020
+    month: 8
+  language: en
+  page: 380-393
+  source: DOI.org (Crossref)
+  title: Evolutionary relationships of the ancient fern lineage the adder's tongues
+    (Ophioglossaceae) with description of *Sahashia* gen. nov
+  type: article-journal
+  URL: https://onlinelibrary.wiley.com/doi/10.1111/cla.12408
+  volume: '36'

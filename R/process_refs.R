@@ -10,6 +10,15 @@ filter_refs_yaml(
   "data_raw/main_library.yaml",
   "ms/references.yaml", silent = TRUE)
 
+# Same for SI
+filter_refs_yaml(
+  c(
+    "ms/si.rmd", # SI
+    "_targets/user/data_raw/pteridocat_ppgi_diff_notes.csv" # refs in SI tables
+  ),
+  "data_raw/main_library.yaml",
+  "ms/si_references.yaml", silent = TRUE)
+
 # Write out 'aux' file with citation keys to make collection in Zotero
 # so reference data are easier to work with.
 # The collection can be made with the betterbibtex for Zotero plugin:

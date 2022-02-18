@@ -32,6 +32,8 @@ header-includes:
   - \fancyhead[RE,RO]{Supplementary Material} # add header on right side
   - \fancyhead[LO,LE]{} # suppress automatic section header on left side
   - \cfoot{\thepage} # footer
+nocite: |
+  @*
 editor_options: 
   chunk_output_type: console
 params:
@@ -40,9 +42,8 @@ params:
 
 ---
 bibliography: 
-- `r here::here("ms/references.yaml")`
-- `r here::here("ms/references_other.yaml")`
-- `r here::here("ms/references_other.bib")`
+- `r here::here("ms/si_references.yaml")`
+- `r here::here("ms/si_references_other.yaml")`
 ---
 
 ```{r setup-si, include = FALSE}
@@ -87,7 +88,9 @@ tar_load(
 		other_dates,
 		du_dates_all,
 		family_stem_ages,
-		fossil_ferns_raw
+		fossil_ferns_raw,
+		pteridocat_ppgi_diff_refs_out,
+		pteridocat_ppgi_diff_notes
 	),
 	store = here::here("_targets")
 )
@@ -109,11 +112,11 @@ knitr::purl(here::here("ms/manuscript.Rmd"), output = temp_file)
 
 # Trim this R script down to only functions that define figure and table captions
 read_lines(temp_file) %>%
-  magrittr::extract(
-    str_detect(., "^figure\\(|^table\\(|^s_figure\\(|^s_table\\(|^figure_num\\(|^table_num\\(|^s_figure_num\\(|^s_table_num\\(")
-  ) %>%
-  unique %>%
-  write_lines(temp_file)
+	magrittr::extract(
+		str_detect(., "^figure\\(|^table\\(|^s_figure\\(|^s_table\\(|^figure_num\\(|^table_num\\(|^s_figure_num\\(|^s_table_num\\(")
+	) %>%
+	unique %>%
+	write_lines(temp_file)
 
 # Source the code. This will load the caption functions in the right order.
 source(temp_file, local = TRUE)
@@ -122,8 +125,7 @@ source(temp_file, local = TRUE)
 fs::file_delete(temp_file)
 ```
 
-```{r genera-diff}
-
+```{r genera-diff-make}
 # FIXME: need to update ppgi csv file
 # Add one missing nothogenus
 ppgi_taxonomy_mod <-
@@ -138,12 +140,12 @@ ppgi_taxonomy_mod <-
 # Verify that all accepted genera are accounted for
 accepted_species %>%
 	count(genus, name = "n_species") %>%
-	anti_join(select(ppgi_taxonomy_mod, genus, notes)) %>%
+	anti_join(select(ppgi_taxonomy_mod, genus, notes), by = "genus") %>%
 	verify(nrow(.) == 0, success_fun = success_logical)
 
 # Make table of Pteridocat genera not in PPGI
 pteridocat_not_in_ppgi <-
-accepted_species %>%
+	accepted_species %>%
 	count(genus, name = "n_species") %>%
 	left_join(select(ppgi_taxonomy_mod, genus, notes), by = "genus") %>%
 	assert(not_na, notes) %>%
@@ -152,41 +154,51 @@ accepted_species %>%
 	transmute(
 		diff = "Pteridocat not in PPGI",
 		genus,
-		n_species,
-		note = notes
-	)
+		n_species
+	) %>%
+	# Add notes
+	left_join(
+		select(pteridocat_ppgi_diff_notes, -ref, -n_species),
+		by = c("diff", "genus")
+	) %>%
+	assert(not_na, note)
 
 # Make table of PPGI genera not in Pteridocat
 ppgi_not_in_pteridocat <-
-ppgi_taxonomy_mod %>%
+	ppgi_taxonomy_mod %>%
 	filter(notes == "original PPGI 2016",
 				 class == "Polypodiopsida") %>%
 	anti_join(accepted_species, by = "genus") %>%
 	count(genus) %>%
 	transmute(
 		diff = "PPGI not in Pteridocat",
-		genus,
-		# FIXME: need to add n species from PPGI and note
-		n_species = NA,
-		note = NA
-	)
+		genus
+	) %>%
+	# Add notes
+	left_join(
+		select(pteridocat_ppgi_diff_notes, -ref), by = c("diff", "genus")
+	) %>%
+	assert(not_na, note)
 
 genera_diff_table <- 
 	bind_rows(pteridocat_not_in_ppgi, ppgi_not_in_pteridocat)
+```
 
+```{r genera-diff-save, eval = params$doc_type == "doc"}
+# Save if rendering to doc
 write_csv(genera_diff_table, result_file(s_table("genera_diff"), "csv"))
 ```
 
 **`r s_table("genera_diff")`**.
-Differences in genera included as accepted in Pteridocat taxonomic database (https://github.com/pteridophy/pteridocat) vs. @PteridophytePhylogenyGroupI2016 (`r result_file(s_table("genera_diff"), "csv") %>% fs::path_file()`).
+Differences in genera included as accepted in Pteridocat taxonomic database (https://github.com/pteridophy/pteridocat) vs. PPGI [@PteridophytePhylogenyGroupI2016] (`r result_file(s_table("genera_diff"), "csv") %>% fs::path_file()`).
 "diff" is type of difference (Pteridocat genus not in PPGI or PPGI genus not in Pteridocat).
-"n_species" is the number of accepted species in each genus in the system that includes the genus.
+"n_species" is the number of accepted species in each genus (Pteridocat) or estimated number of species (PPGI).
 References in "notes" column provided at end of Supplementary Materials.
 
-```{r fossils}
+```{r fossils-make}
 # Filter raw fossil data to just fossils used, write out as CSV
 fossils_table <-
-fossil_ferns_raw %>%
+	fossil_ferns_raw %>%
 	inner_join(
 		select(fossil_calibration_tips, fossil_taxon), by = "fossil_taxon") %>%
 	verify(nrow(.) == nrow(fossil_calibration_tips)) %>%
@@ -207,7 +219,10 @@ fossil_ferns_raw %>%
 		organs, specimen_holotype, collection,
 		reference, note
 	)
+```
 
+```{r fossils-save, eval = params$doc_type == "doc"}
+# Save if rendering to doc
 write_csv(fossils_table, result_file(s_table("fossils"), "csv"))
 ```
 
@@ -261,7 +276,7 @@ knitr::read_chunk(
 	labels = "plot-prep-main",
 	from = "og_taxa <-",
 	to = "left_join\\(clade_cols_tib"
-	)
+)
 ```
 
 <!-- Run the plot prep code -->
@@ -311,7 +326,7 @@ du_dates_stem_fam <-
 		affinities_group == "stem",
 		str_detect(author, "^r")) %>%
 	select(family = affinities, author, median, low, high)
-	
+
 # Make tibble of Du
 du_schemes <- du_dates_stem_fam %>%
 	select(scheme = author) %>%
