@@ -49,6 +49,10 @@ tar_plan(
 		pteridocat,
 		store = ftol_cache
 	),
+	monophy_by_clade = tar_read(
+		monophy_by_clade,
+		store = ftol_cache
+	),
 	tar_files_input(
 		fossil_ferns_path,
 		fs::path(ftol_cache, "user/data_raw/Fossils_Ferns.csv")
@@ -120,6 +124,9 @@ tar_plan(
 		du_2021_si_path,
 		"_targets/user/data_raw/cla12457-sup-0003-tables1-s5.docx"),
 	du_dates_all = parse_du_dates(du_2021_si_path),
+	# - Summarize fern monophyly
+	fern_monophy_summ_tbl = summarize_fern_monophyly(
+		monophy_by_clade, ppgi_taxonomy, sanger_sampling),
 	
 	# Render manuscript ----
 	# track files used for rendering MS

@@ -55,6 +55,19 @@ library(flextable)
 source(here::here("R/ms_packages.R"))
 ```
 
+```{r formatters-load-si}
+# Load formatting functions defined in functions.R
+knitr::read_chunk(
+	here::here("R/functions.R"),
+	labels = "formatters-si",
+	from = "formatters start",
+	to = "formatters end"
+)
+```
+
+```{r, formatters-si}
+```
+
 ```{r load-functions-si, eval = params$doc_type == "manual"}
 # Load functions (only if running interactively)
 source(here::here("R/functions.R"))
@@ -75,7 +88,8 @@ tar_load(
 		plastome_tree,
 		plastid_tree_dated,
 		fossil_calibration_tips,
-		ppgi_taxonomy),
+		ppgi_taxonomy,
+		monophy_by_clade),
 	store = ftol_cache
 )
 
@@ -90,7 +104,8 @@ tar_load(
 		family_stem_ages,
 		fossil_ferns_raw,
 		pteridocat_ppgi_diff_refs_out,
-		pteridocat_ppgi_diff_notes
+		pteridocat_ppgi_diff_notes,
+		fern_monophy_summ_tbl
 	),
 	store = here::here("_targets")
 )
@@ -269,13 +284,32 @@ Count is number of species.
 
 \newpage
 
+```{r monophy, results = "markup"}
+fern_monophy_summ_tbl %>%
+	mutate(
+		tax_level = str_to_sentence(tax_level),
+		percent = percent(percent, accuracy = 0.1) %>%
+			str_replace_all("100\\.0", "100")) %>%
+	select(
+		`Taxonomic level` = tax_level, Monophyly = monophyly,
+		n, `%` = percent) %>%
+	flextable() %>%
+	italic(1,3, part = "header") %>%
+	autofit()
+```
+
+**`r s_table("monophy")`**.
+Monophyly by taxonomic level for ferns in FTOL.
+
+\newpage
+
 ```{r plot-prep-load}
 # Load the plot prep code from the main MS
 knitr::read_chunk(
 	here::here("ms/manuscript.Rmd"),
 	labels = "plot-prep-main",
-	from = "og_taxa <-",
-	to = "left_join\\(clade_cols_tib"
+	from = "plot-prep start",
+	to = "plot-prep end"
 )
 ```
 

@@ -26,7 +26,7 @@ fetch_metadata <- function(
 	
 	# If no results, return empty tibble
 	if (initial_genbank_results$count < 1) return(tibble(taxid = NA))
-
+	
 	# Download IDs with maximum set to 1 more than the total number of hits.
 	genbank_results <- rentrez::entrez_search(
 		db = "nucleotide",
@@ -39,7 +39,7 @@ fetch_metadata <- function(
 	# - make "safe" version of rentrez::entrez_summary to catch errors
 	safe_entrez_summary <- purrr::safely(rentrez::entrez_summary)
 	entrez_summary_gb <- function(id, col_select) {
-
+		
 		# Download data
 		res <- safe_entrez_summary(db = "nucleotide", id = id)
 		
@@ -324,9 +324,9 @@ get_accepted_species <- function(pteridocat, ppgi_taxonomy) {
 			genus = case_when(
 				str_detect(scientificName, "^x |^× ") ~ 
 					str_split(scientificName, " ") %>% map_chr(2),
-			TRUE ~ str_split(scientificName, " ") %>% map_chr(1)
+				TRUE ~ str_split(scientificName, " ") %>% map_chr(1)
 			)
-    ) %>%
+		) %>%
 		left_join(
 			select(ppgi_taxonomy, genus, family, 
 						 suborder, order, class), by = "genus"
@@ -754,6 +754,88 @@ get_stem_family_age <- function(
 		select(family, age)
 }
 
+#' Summarize (non-)monophyletic status of ferns in FTOL
+#'
+#' @param monophy_by_clade Tibble with monophyly status by clade
+#' @param ppgi_taxonomy Pteridophyte phylogeny group I taxonomy (genus level
+#' and above)
+#' @param sanger_sampling Tibble including sampling statistics in Sanger 
+#' dataset (one row per species, with columns for higher-level taxonomy
+#' and outgroup status)
+#' @param check Logical; check that Polypodioideae is the only taxonomic
+#' level above genus that is non-monophyletic
+#'
+#' @return Tibble
+#' 
+summarize_fern_monophyly <- function(
+	monophy_by_clade, ppgi_taxonomy,
+	sanger_sampling, check = TRUE) {
+	
+	ppgi_tax_levels <-
+		ppgi_taxonomy %>%
+		select(class:genus) %>%
+		pivot_longer(
+			names_to = "tax_level",
+			values_to = "taxon",
+			-class
+		) %>%
+		filter(!is.na(taxon)) %>%
+		unique()
+	
+	# Add taxonomic level to monophy by clade table
+	monophy_by_clade_tax_level <-
+		monophy_by_clade %>%
+		assert(not_na, monophyly) %>%
+		assert(in_set("Monotypic", "Yes", "No"), monophyly) %>%
+		left_join(ppgi_tax_levels, by = "taxon") %>%
+		# Drop lycophytes
+		filter(class != "Lycopodiopsida") %>%
+		# Exclude Equisetum subgenera, outgroups
+		filter(!str_detect(taxon, "subgen")) %>%
+		assert(not_na, class) %>%
+		verify(all(class == "Polypodiopsida")) %>%
+		select(-class) %>%
+		left_join(
+			unique(select(sanger_sampling, taxon = genus, outgroup)),
+			by = "taxon") %>%
+		mutate(outgroup = replace_na(outgroup, FALSE)) %>%
+		filter(outgroup != TRUE) %>%
+		assert(not_na, tax_level)
+	
+	if (isTRUE(check)) {
+	monophy_by_clade_tax_level %>%
+		filter(tax_level != "genus", monophyly == "No") %>%
+		verify(
+			taxon == "Polypodioideae",
+			success_fun = success_logical,
+			error_fun = err_msg(
+				"Polypodioideae is not the only non-monophyletic taxon above genus")
+			)
+	}
+		
+	# Get order of taxonomic levels
+	tax_levels_order <-
+		ppgi_taxonomy %>%
+		select(order:genus) %>%
+		colnames()
+	
+	# Make summary table
+	monophy_by_clade_tax_level %>%
+		group_by(tax_level) %>%
+		count(monophyly) %>%
+		mutate(total = sum(n)) %>%
+		ungroup() %>%
+		rowwise() %>%
+		mutate(percent = n/total) %>%
+		ungroup() %>%
+		mutate(
+			tax_level = factor(tax_level, levels = tax_levels_order),
+			monophyly = factor(monophyly, levels = c("Monotypic", "Yes", "No"))
+		) %>%
+		arrange(tax_level, monophyly)
+}
+
+
 # Formatting ----
 
 # Abbreviations
@@ -761,11 +843,13 @@ ie <- "*i.e.*"
 eg <- "*e.g.*"
 ca <- "*ca.*"
 
+### formatters start
 # Specify custom percentage format
 percent <- function(...) {scales::percent(...)}
 
 # Specify custom number format
 number <- function(...) {scales::number(big.mark = ",", ...)}
+### formatters end
 
 #' Convert a data.frame of counts to percentages, with automatic formatting
 #'
@@ -1018,3 +1102,7 @@ base_freq_missing <- function(
 	base_freq <- ape::base.freq(seqs[, start:end], all = TRUE, freq = freq)
 	sum(base_freq[missing_base_codes])
 }
+
+# Generate custom error message for assertr
+# https://github.com/ropensci/assertr/issues/70
+err_msg <- function(msg) stop(msg, call. = FALSE)
