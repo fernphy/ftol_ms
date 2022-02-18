@@ -105,7 +105,8 @@ tar_load(
 		fossil_ferns_raw,
 		pteridocat_ppgi_diff_refs_out,
 		pteridocat_ppgi_diff_notes,
-		fern_monophy_summ_tbl
+		fern_monophy_summ_tbl,
+		fern_nonmono_gen
 	),
 	store = here::here("_targets")
 )
@@ -237,7 +238,6 @@ fossils_table <-
 ```
 
 ```{r fossils-save, eval = params$doc_type == "doc"}
-# Save if rendering to doc
 write_csv(fossils_table, result_file(s_table("fossils"), "csv"))
 ```
 
@@ -303,6 +303,22 @@ Monophyly by taxonomic level for ferns in FTOL.
 
 \newpage
 
+```{r nonmono-gen, eval = params$doc_type == "doc"}
+fern_nonmono_gen %>%
+	arrange(family, subfamily, genus) %>%
+	write_csv(result_file(s_table("nonmono_gen"), "csv"))
+```
+
+**`r s_table("nonmono_gen")`**.
+Non-monophyletic fern genera in FTOL (`r result_file(s_table("nonmono_gen"), "csv") %>% fs::path_file()`).
+"number_tips" is the number of tips (species) in the genus.
+"delta_tips" is the number of tips that do not belong to the genus but are included in the clade descending from the most common recent ancestor of the genus.
+"number_intruders" is the number of intruding taxa into the genus.
+"number_outliers" is the number of tips (species) belonging to the genus that appear in other clades.
+Status of intruders and outliers was determined using the default cutoff level (0.5) in the R package "MonoPhy" [@Schwery2016].
+
+\newpage
+
 ```{r plot-prep-load}
 # Load the plot prep code from the main MS
 knitr::read_chunk(
@@ -314,7 +330,7 @@ knitr::read_chunk(
 ```
 
 <!-- Run the plot prep code -->
-```{r, plot-prep-main}
+```{r plot-prep-main}
 ```
 
 ```{r locus-upset, fig.width = 7, fig.height = 5}

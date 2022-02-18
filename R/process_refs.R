@@ -1,6 +1,6 @@
 # Filter a list of references in YAML format to those cited in an RMD file
 library(tidyverse)
-source("R/ms_functions.R")
+source(here::here("R/functions.R"))
 
 # Filter YAML references from Zotero library.
 # data_raw/main_library.yaml has been exported from Zotero

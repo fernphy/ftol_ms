@@ -754,22 +754,20 @@ get_stem_family_age <- function(
 		select(family, age)
 }
 
-#' Summarize (non-)monophyletic status of ferns in FTOL
+#' Filter monophyly table to ferns, add taxonomic level
 #'
-#' @param monophy_by_clade Tibble with monophyly status by clade
+#' @param monophy_by_clade Monophyly status for various taxonomic levels,
+#' including ferns and outgroups
 #' @param ppgi_taxonomy Pteridophyte phylogeny group I taxonomy (genus level
 #' and above)
-#' @param sanger_sampling Tibble including sampling statistics in Sanger 
-#' dataset (one row per species, with columns for higher-level taxonomy
-#' and outgroup status)
-#' @param check Logical; check that Polypodioideae is the only taxonomic
-#' level above genus that is non-monophyletic
+#' @param sanger_sampling Tibble with one row per species in the tree, including
+#' columns "genus", "family", etc. 
 #'
 #' @return Tibble
 #' 
-summarize_fern_monophyly <- function(
+add_tax_levels_to_monophyly <- function(
 	monophy_by_clade, ppgi_taxonomy,
-	sanger_sampling, check = TRUE) {
+	sanger_sampling) {
 	
 	ppgi_tax_levels <-
 		ppgi_taxonomy %>%
@@ -801,6 +799,22 @@ summarize_fern_monophyly <- function(
 		mutate(outgroup = replace_na(outgroup, FALSE)) %>%
 		filter(outgroup != TRUE) %>%
 		assert(not_na, tax_level)
+}
+
+#' Summarize (non-)monophyletic status of ferns in FTOL
+#'
+#' @param monophy_by_clade_tax_level Tibble with monophyly status by clade,
+#' including taxonomic level
+#' @param ppgi_taxonomy Pteridophyte phylogeny group I taxonomy (genus level
+#' and above)
+#' @param check Logical; check that Polypodioideae is the only taxonomic
+#' level above genus that is non-monophyletic
+#'
+#' @return Tibble
+#' 
+summarize_fern_monophyly <- function(
+	monophy_by_clade_tax_level, ppgi_taxonomy,
+	check = TRUE) {
 	
 	if (isTRUE(check)) {
 	monophy_by_clade_tax_level %>%
@@ -835,6 +849,26 @@ summarize_fern_monophyly <- function(
 		arrange(tax_level, monophyly)
 }
 
+#' Make table of non-monophyletic fern genera in FTOL
+#'
+#' @param fern_monophy_by_clade_tax_level Tibble with monophyletic status
+#' of taxa in FTOL including taxonomic level
+#' @param ppgi_taxonomy Pteridophyte phylogeny group I taxonomy (genus level
+#' and above)
+#'
+#' @return Tibble: nonmonophyletic genera in FTOL
+#' 
+make_nonmonophy_gen_tab <- function(
+	fern_monophy_by_clade_tax_level, ppgi_taxonomy) {
+	
+	fern_monophy_by_clade_tax_level %>%
+		assert(not_na, tax_level, outgroup) %>%
+		filter(tax_level == "genus", monophyly == "No", outgroup == FALSE) %>%
+		rename(genus = taxon) %>%
+		select(-c(monophyly, mrca, tax_level, outgroup)) %>%
+		left_join(select(ppgi_taxonomy, genus, family, subfamily), by = "genus") %>%
+		select(family, subfamily, everything())
+}
 
 # Formatting ----
 

@@ -113,7 +113,8 @@ tar_load(
 		crown_ages,
 		fossil_ferns_raw,
 		family_stem_ages,
-		fern_monophy_summ_tbl
+		fern_monophy_summ_tbl,
+		fern_nonmono_gen
 	),
 	store = here::here("_targets")
 )
@@ -713,6 +714,7 @@ hym_gle_bs <- get_bs(plastome_tree, c("Dipteris_conjugata", "Hymenophyllum_polya
 cyath_salv_bs <- get_bs(plastome_tree, c("Plagiogyria_adnata", "Azolla_filiculoides"))
 denn_poly_bs <- get_bs(plastome_tree, c("Dennstaedtia_hirsuta", "Pseudophegopteris_aurita"))
 
+# Format monophyly status as list for MS
 fern_monophy_summ <-
 fern_monophy_summ_tbl %>%
 	mutate(
@@ -721,6 +723,30 @@ fern_monophy_summ_tbl %>%
 	) %>%
 	split(.$tax_level) %>%
 	map(~split(., .$monophyly))
+
+top_nonmono_subfam <-
+fern_nonmono_gen %>%
+	group_by(family, subfamily) %>%
+	summarize(n = n(), .groups = "drop") %>%
+	slice_max(n = 3, order_by = n) %>%
+	assert(not_na, family, subfamily) %>%
+	mutate(subfamily = fct_reorder(subfamily, n)) %>%
+	mutate(n = jntools::english2(n)) %>%
+	arrange(desc(subfamily))
+
+# Double check that non-monophyletic genera outside of
+# top three non-monophyletic subfamilies all have less
+# than four genera each
+fern_nonmono_gen %>%
+	anti_join(
+		top_nonmono_subfam,
+		by = c("family", "subfamily")) %>%
+	count(family, subfamily) %>%
+	verify(
+		all(n < 4), 
+		error_fun = error_msg(
+			"Other subfamilies besides top three don't have less than four genera each"),
+		success_fun = success_logical)
 ```
 
 Ferns are strongly supported as monophyletic (BS `r ferns_bs`; all subsequent relationships mentioned received BS >=`r percent(.98)` in the backbone phylogeny unless otherwise indicated).
@@ -741,6 +767,7 @@ The other clade includes Thelypteridaceae, Woodsiaceae, a clade comprised of Ono
 
 All sampled orders, suborders, families, and subfamilies were recovered as monophyletic (or monotypic) with the exception of Polypodioideae, which is known to be paraphyletic relative to Grammitidoideae [@PteridophytePhylogenyGroupI2016].
 `r fern_monophy_summ$genus$No$n` genera (`r fern_monophy_summ$genus$No$p`) were non-monophyletic (`r s_table("monophy")`).
+The subfamilies with the most non-monophyletic genera were `r top_nonmono_subfam$subfamily[[1]]` (`r top_nonmono_subfam$n[[1]]`), `r top_nonmono_subfam$subfamily[[2]]` (`r top_nonmono_subfam$n[[2]]`), and `r top_nonmono_subfam$subfamily[[3]]` (`r top_nonmono_subfam$n[[3]]`); other (sub)families each had four or fewer non-monophyletic genera (`r s_table("nonmono_gen")`).
 
 ## Divergence times
 

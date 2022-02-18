@@ -124,9 +124,19 @@ tar_plan(
 		du_2021_si_path,
 		"_targets/user/data_raw/cla12457-sup-0003-tables1-s5.docx"),
 	du_dates_all = parse_du_dates(du_2021_si_path),
-	# - Summarize fern monophyly
+	# Summarize fern monophyly
+	# - filter to ferns, add taxonomic levels
+	fern_monophy_by_clade_tax_level = add_tax_levels_to_monophyly(
+		monophy_by_clade, ppgi_taxonomy, sanger_sampling
+	),
+	# - calculate summary table
 	fern_monophy_summ_tbl = summarize_fern_monophyly(
-		monophy_by_clade, ppgi_taxonomy, sanger_sampling),
+		fern_monophy_by_clade_tax_level, ppgi_taxonomy
+	),
+	# - make table of non-monophyletic genera
+	fern_nonmono_gen = make_nonmonophy_gen_tab(
+		fern_monophy_by_clade_tax_level, ppgi_taxonomy
+	),
 	
 	# Render manuscript ----
 	# track files used for rendering MS
