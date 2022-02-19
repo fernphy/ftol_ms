@@ -50,7 +50,7 @@ bibliography:
 
 ```{r setup-si, include = FALSE}
 knitr::opts_chunk$set(
-	echo = FALSE, warning = FALSE, message = FALSE, results = 'hide')
+  echo = FALSE, warning = FALSE, message = FALSE, results = 'hide')
 # Load packages
 library(ggupset)
 library(flextable)
@@ -60,10 +60,10 @@ source(here::here("R/ms_packages.R"))
 ```{r formatters-load-si}
 # Load formatting functions defined in functions.R
 knitr::read_chunk(
-	here::here("R/functions.R"),
-	labels = "formatters-si",
-	from = "formatters start",
-	to = "formatters end"
+  here::here("R/functions.R"),
+  labels = "formatters-si",
+  from = "formatters start",
+  to = "formatters end"
 )
 ```
 
@@ -83,34 +83,34 @@ source(here::here("R/functions.R"))
 ftol_cache <- here::here("working/_targets")
 
 tar_load(
-	c(
-		sanger_alignment_tbl,
-		sanger_sampling,
-		sanger_accessions_selection,
-		plastome_tree,
-		plastid_tree_dated,
-		fossil_calibration_tips,
-		ppgi_taxonomy,
-		monophy_by_clade),
-	store = ftol_cache
+  c(
+    sanger_alignment_tbl,
+    sanger_sampling,
+    sanger_accessions_selection,
+    plastome_tree,
+    plastid_tree_dated,
+    fossil_calibration_tips,
+    ppgi_taxonomy,
+    monophy_by_clade),
+  store = ftol_cache
 )
 
 # Targets from MS workflow
 tar_load(
-	c(
-		accepted_species,
-		gb_species_by_year,
-		ref_files,
-		other_dates,
-		du_dates_all,
-		family_stem_ages,
-		fossil_ferns_raw,
-		pteridocat_ppgi_diff_refs_out,
-		pteridocat_ppgi_diff_notes,
-		fern_monophy_summ_tbl,
-		fern_nonmono_gen
-	),
-	store = here::here("_targets")
+  c(
+    accepted_species,
+    gb_species_by_year,
+    ref_files,
+    other_dates,
+    du_dates_all,
+    family_stem_ages,
+    fossil_ferns_raw,
+    pteridocat_ppgi_diff_refs_out,
+    pteridocat_ppgi_diff_notes,
+    fern_monophy_summ_tbl,
+    fern_nonmono_gen
+  ),
+  store = here::here("_targets")
 )
 ```
 
@@ -130,11 +130,11 @@ knitr::purl(here::here("ms/manuscript.Rmd"), output = temp_file)
 
 # Trim this R script down to only functions that define figure and table captions
 read_lines(temp_file) %>%
-	magrittr::extract(
-		str_detect(., "^figure\\(|^table\\(|^s_figure\\(|^s_table\\(|^figure_num\\(|^table_num\\(|^s_figure_num\\(|^s_table_num\\(")
-	) %>%
-	unique %>%
-	write_lines(temp_file)
+  magrittr::extract(
+    str_detect(., "^figure\\(|^table\\(|^s_figure\\(|^s_table\\(|^figure_num\\(|^table_num\\(|^s_figure_num\\(|^s_table_num\\(")
+  ) %>%
+  unique %>%
+  write_lines(temp_file)
 
 # Source the code. This will load the caption functions in the right order.
 source(temp_file, local = TRUE)
@@ -147,59 +147,59 @@ fs::file_delete(temp_file)
 # FIXME: need to update ppgi csv file
 # Add one missing nothogenus
 ppgi_taxonomy_mod <-
-	bind_rows(
-		ppgi_taxonomy,
-		tibble(
-			genus = "Phlebosia",
-			notes = "Nothogenus"
-		)
-	)
+  bind_rows(
+    ppgi_taxonomy,
+    tibble(
+      genus = "Phlebosia",
+      notes = "Nothogenus"
+    )
+  )
 
 # Verify that all accepted genera are accounted for
 accepted_species %>%
-	count(genus, name = "n_species") %>%
-	anti_join(select(ppgi_taxonomy_mod, genus, notes), by = "genus") %>%
-	verify(nrow(.) == 0, success_fun = success_logical)
+  count(genus, name = "n_species") %>%
+  anti_join(select(ppgi_taxonomy_mod, genus, notes), by = "genus") %>%
+  verify(nrow(.) == 0, success_fun = success_logical)
 
 # Make table of Pteridocat genera not in PPGI
 pteridocat_not_in_ppgi <-
-	accepted_species %>%
-	count(genus, name = "n_species") %>%
-	left_join(select(ppgi_taxonomy_mod, genus, notes), by = "genus") %>%
-	assert(not_na, notes) %>%
-	assert(is_uniq, genus) %>%
-	filter(notes != "original PPGI 2016") %>%
-	transmute(
-		diff = "Pteridocat not in PPGI",
-		genus,
-		n_species
-	) %>%
-	# Add notes
-	left_join(
-		select(pteridocat_ppgi_diff_notes, -ref, -n_species),
-		by = c("diff", "genus")
-	) %>%
-	assert(not_na, note)
+  accepted_species %>%
+  count(genus, name = "n_species") %>%
+  left_join(select(ppgi_taxonomy_mod, genus, notes), by = "genus") %>%
+  assert(not_na, notes) %>%
+  assert(is_uniq, genus) %>%
+  filter(notes != "original PPGI 2016") %>%
+  transmute(
+    diff = "Pteridocat not in PPGI",
+    genus,
+    n_species
+  ) %>%
+  # Add notes
+  left_join(
+    select(pteridocat_ppgi_diff_notes, -ref, -n_species),
+    by = c("diff", "genus")
+  ) %>%
+  assert(not_na, note)
 
 # Make table of PPGI genera not in Pteridocat
 ppgi_not_in_pteridocat <-
-	ppgi_taxonomy_mod %>%
-	filter(notes == "original PPGI 2016",
-				 class == "Polypodiopsida") %>%
-	anti_join(accepted_species, by = "genus") %>%
-	count(genus) %>%
-	transmute(
-		diff = "PPGI not in Pteridocat",
-		genus
-	) %>%
-	# Add notes
-	left_join(
-		select(pteridocat_ppgi_diff_notes, -ref), by = c("diff", "genus")
-	) %>%
-	assert(not_na, note)
+  ppgi_taxonomy_mod %>%
+  filter(notes == "original PPGI 2016",
+         class == "Polypodiopsida") %>%
+  anti_join(accepted_species, by = "genus") %>%
+  count(genus) %>%
+  transmute(
+    diff = "PPGI not in Pteridocat",
+    genus
+  ) %>%
+  # Add notes
+  left_join(
+    select(pteridocat_ppgi_diff_notes, -ref), by = c("diff", "genus")
+  ) %>%
+  assert(not_na, note)
 
 genera_diff_table <- 
-	bind_rows(pteridocat_not_in_ppgi, ppgi_not_in_pteridocat)
+  bind_rows(pteridocat_not_in_ppgi, ppgi_not_in_pteridocat)
 ```
 
 ```{r genera-diff-save, eval = params$doc_type == "doc"}
@@ -216,27 +216,27 @@ References in "notes" column provided at end of Supplementary Materials.
 ```{r fossils-make}
 # Filter raw fossil data to just fossils used, write out as CSV
 fossils_table <-
-	fossil_ferns_raw %>%
-	inner_join(
-		select(fossil_calibration_tips, fossil_taxon), by = "fossil_taxon") %>%
-	verify(nrow(.) == nrow(fossil_calibration_tips)) %>%
-	rowwise() %>%
-	mutate(
-		note = jntools::paste3(notes_21, notes_22sep = ". ") %>%
-			str_replace_all("\\.\\.", "\\.") %>%
-			na_if(".") %>%
-			str_replace_all(" \\.$", "\\.")
-	) %>%
-	ungroup() %>%
-	select(
-		n_fos, minimum_age, node_calibrated, fossil_taxon, 
-		lower = lower_limit_of_oldest_stratigraphic_age,
-		upper = upper_limit_of_oldest_stratigraphic_age,
-		stratigraphic_age, 
-		country, type_locality, formation,
-		organs, specimen_holotype, collection,
-		reference, note
-	)
+  fossil_ferns_raw %>%
+  inner_join(
+    select(fossil_calibration_tips, fossil_taxon), by = "fossil_taxon") %>%
+  verify(nrow(.) == nrow(fossil_calibration_tips)) %>%
+  rowwise() %>%
+  mutate(
+    note = jntools::paste3(notes_21, notes_22sep = ". ") %>%
+      str_replace_all("\\.\\.", "\\.") %>%
+      na_if(".") %>%
+      str_replace_all(" \\.$", "\\.")
+  ) %>%
+  ungroup() %>%
+  select(
+    n_fos, minimum_age, node_calibrated, fossil_taxon, 
+    lower = lower_limit_of_oldest_stratigraphic_age,
+    upper = upper_limit_of_oldest_stratigraphic_age,
+    stratigraphic_age, 
+    country, type_locality, formation,
+    organs, specimen_holotype, collection,
+    reference, note
+  )
 ```
 
 ```{r fossils-save, eval = params$doc_type == "doc"}
@@ -253,31 +253,31 @@ Fossils used as calibration points for molecular dating (`r result_file(s_table(
 ```{r join-by, results = "markup"}
 # Make table showing method of joining accessions across loci
 sanger_accessions_selection %>% 
-	left_join(select(sanger_sampling, species, outgroup), by = "species") %>%
-	# FIXME why is this NA?
-	# filter(is.na(outgroup)) %>%
-	filter(outgroup == FALSE) %>%
-	select(-outgroup) %>%
-	assert(not_na, join_by, species) %>%
-	assert(is_uniq, species) %>%
-	tabyl(join_by) %>%
-	arrange(n) %>%
-	adorn_totals() %>%
-	mutate(
-		join_by = str_to_sentence(join_by) %>%
-			str_replace_all("Monophy", "Monophyletic"),
-		n = number(n),
-		percent = case_when(
-			join_by != "Total" ~ percent(percent),
-			TRUE ~ ""
-		)
-	) %>%
-	rename(
-		"Method" = join_by,
-		`%` = percent) %>%
-	flextable() %>%
-	italic(1,2, part = "header") %>%
-	autofit()
+  left_join(select(sanger_sampling, species, outgroup), by = "species") %>%
+  # FIXME why is this NA?
+  # filter(is.na(outgroup)) %>%
+  filter(outgroup == FALSE) %>%
+  select(-outgroup) %>%
+  assert(not_na, join_by, species) %>%
+  assert(is_uniq, species) %>%
+  tabyl(join_by) %>%
+  arrange(n) %>%
+  adorn_totals() %>%
+  mutate(
+    join_by = str_to_sentence(join_by) %>%
+      str_replace_all("Monophy", "Monophyletic"),
+    n = number(n),
+    percent = case_when(
+      join_by != "Total" ~ percent(percent),
+      TRUE ~ ""
+    )
+  ) %>%
+  rename(
+    "Method" = join_by,
+    `%` = percent) %>%
+  flextable() %>%
+  italic(1,2, part = "header") %>%
+  autofit()
 ```
 
 **`r s_table("join_by")`**.
@@ -288,16 +288,16 @@ Count is number of species.
 
 ```{r monophy, results = "markup"}
 fern_monophy_summ_tbl %>%
-	mutate(
-		tax_level = str_to_sentence(tax_level),
-		percent = percent(percent, accuracy = 0.1) %>%
-			str_replace_all("100\\.0", "100")) %>%
-	select(
-		`Taxonomic level` = tax_level, Monophyly = monophyly,
-		n, `%` = percent) %>%
-	flextable() %>%
-	italic(1,3, part = "header") %>%
-	autofit()
+  mutate(
+    tax_level = str_to_sentence(tax_level),
+    percent = percent(percent, accuracy = 0.1) %>%
+      str_replace_all("100\\.0", "100")) %>%
+  select(
+    `Taxonomic level` = tax_level, Monophyly = monophyly,
+    n, `%` = percent) %>%
+  flextable() %>%
+  italic(1,3, part = "header") %>%
+  autofit()
 ```
 
 **`r s_table("monophy")`**.
@@ -307,8 +307,8 @@ Monophyly by taxonomic level for ferns in FTOL.
 
 ```{r nonmono-gen, eval = params$doc_type == "doc"}
 fern_nonmono_gen %>%
-	arrange(family, subfamily, genus) %>%
-	write_csv(result_file(s_table("nonmono_gen"), "csv"))
+  arrange(family, subfamily, genus) %>%
+  write_csv(result_file(s_table("nonmono_gen"), "csv"))
 ```
 
 **`r s_table("nonmono_gen")`**.
@@ -324,10 +324,10 @@ Status of intruders and outliers was determined using the default cutoff level (
 ```{r plot-prep-load}
 # Load the plot prep code from the main MS
 knitr::read_chunk(
-	here::here("ms/manuscript.Rmd"),
-	labels = "plot-prep-main",
-	from = "plot-prep start",
-	to = "plot-prep end"
+  here::here("ms/manuscript.Rmd"),
+  labels = "plot-prep-main",
+  from = "plot-prep start",
+  to = "plot-prep end"
 )
 ```
 
@@ -338,20 +338,20 @@ knitr::read_chunk(
 ```{r locus-upset, fig.width = 7, fig.height = 5}
 # Make tibble with one row per locus per species
 sanger_alignment_tbl %>%
-	mutate(taxon = map(align_trimmed, rownames)) %>%
-	select(locus = target, species = taxon) %>%
-	unnest(cols = species) %>%
-	# Exclude outgroups
-	left_join(
-		unique(select(sanger_sampling, species, outgroup)), by = "species") %>%
-	filter(outgroup == FALSE) %>%
-	select(-outgroup) %>%
-	group_by(species) %>%
-	summarize(locus = list(locus)) %>%
-	ggplot(aes(x = locus)) +
-	geom_bar() +
-	labs(x = "Locus combination", y = "Count (num. species)") +
-	scale_x_upset(n_intersections = 20)
+  mutate(taxon = map(align_trimmed, rownames)) %>%
+  select(locus = target, species = taxon) %>%
+  unnest(cols = species) %>%
+  # Exclude outgroups
+  left_join(
+    unique(select(sanger_sampling, species, outgroup)), by = "species") %>%
+  filter(outgroup == FALSE) %>%
+  select(-outgroup) %>%
+  group_by(species) %>%
+  summarize(locus = list(locus)) %>%
+  ggplot(aes(x = locus)) +
+  geom_bar() +
+  labs(x = "Locus combination", y = "Count (num. species)") +
+  scale_x_upset(n_intersections = 20)
 ```
 
 **`r s_figure("locus-upset")`**.
@@ -364,79 +364,79 @@ Only top 20 combinations shown.
 # Helper function for subsetting dates to get into
 # almost-long format
 subset_ages <- function(other_dates, author_sel) {
-	other_dates %>%
-		select(family, contains(glue("{author_sel}_"))) %>%
-		rename_with(~str_remove_all(., glue("{author_sel}_"))) %>%
-		mutate(author = author_sel)
+  other_dates %>%
+    select(family, contains(glue("{author_sel}_"))) %>%
+    rename_with(~str_remove_all(., glue("{author_sel}_"))) %>%
+    mutate(author = author_sel)
 }
 
 # Filter Du ages to just stem families
 du_dates_stem_fam <-
-	du_dates_all %>%
-	filter(
-		str_detect(affinities, "eae$"),
-		affinities_group == "stem",
-		str_detect(author, "^r")) %>%
-	select(family = affinities, author, median, low, high)
+  du_dates_all %>%
+  filter(
+    str_detect(affinities, "eae$"),
+    affinities_group == "stem",
+    str_detect(author, "^r")) %>%
+  select(family = affinities, author, median, low, high)
 
 # Make tibble of Du
 du_schemes <- du_dates_stem_fam %>%
-	select(scheme = author) %>%
-	unique() %>%
-	mutate(
-		code = str_split(scheme, "_") %>%
-			map_chr(last) %>%
-			str_to_upper()) %>%
-	arrange(code)
+  select(scheme = author) %>%
+  unique() %>%
+  mutate(
+    code = str_split(scheme, "_") %>%
+      map_chr(last) %>%
+      str_to_upper()) %>%
+  arrange(code)
 
 # Combine dates in almost-long format:
 # one row per family/author combination,
 # cols for median, high, and low date
 all_ages_with_du <-
-	bind_rows(
-		du_dates_stem_fam,
-		subset_ages(other_dates, "ts"),
-		subset_ages(other_dates, "rothfels"),
-		select(other_dates, family, median = schuettpelz_best) %>%
-			mutate(author = "schuettpelz"),
-		transmute(
-			family_stem_ages,
-			family,
-			author = "current",
-			median = age
-		)
-	) %>%
-	filter(family %in% du_dates_stem_fam$family) %>%
-	left_join(
-		unique(select(sanger_sampling, family, major_clade)), by = "family") %>%
-	left_join(clade_tibble, by = "major_clade") %>%
-	# (some median dates are NA if that family wasn't included in a author)
-	assert(not_na, family, major_clade, code, author) %>%
-	# Set family as a factor ordered by current age estimate
-	left_join(family_stem_ages, by = "family") %>%
-	mutate(family = fct_reorder(family, age)) %>%
-	select(-age)
+  bind_rows(
+    du_dates_stem_fam,
+    subset_ages(other_dates, "ts"),
+    subset_ages(other_dates, "rothfels"),
+    select(other_dates, family, median = schuettpelz_best) %>%
+      mutate(author = "schuettpelz"),
+    transmute(
+      family_stem_ages,
+      family,
+      author = "current",
+      median = age
+    )
+  ) %>%
+  filter(family %in% du_dates_stem_fam$family) %>%
+  left_join(
+    unique(select(sanger_sampling, family, major_clade)), by = "family") %>%
+  left_join(clade_tibble, by = "major_clade") %>%
+  # (some median dates are NA if that family wasn't included in a author)
+  assert(not_na, family, major_clade, code, author) %>%
+  # Set family as a factor ordered by current age estimate
+  left_join(family_stem_ages, by = "family") %>%
+  mutate(family = fct_reorder(family, age)) %>%
+  select(-age)
 
 # Define shapes and colors for points
 du_ages_colors <- c(
-	current = palette_okabe_ito(order = "vermillion"),
-	rothfels = palette_okabe_ito(order = "bluishgreen"),
-	schuettpelz = palette_okabe_ito(order = "blue"),
-	ts = palette_okabe_ito(order = "orange"),
-	rep(
-		palette_okabe_ito(order = "gray"),
-		length(du_schemes$scheme)) %>%
-		set_names(du_schemes$scheme)
+  current = palette_okabe_ito(order = "vermillion"),
+  rothfels = palette_okabe_ito(order = "bluishgreen"),
+  schuettpelz = palette_okabe_ito(order = "blue"),
+  ts = palette_okabe_ito(order = "orange"),
+  rep(
+    palette_okabe_ito(order = "gray"),
+    length(du_schemes$scheme)) %>%
+    set_names(du_schemes$scheme)
 )
 
 du_ages_shapes <- c(
-	current = 16, # circle
-	rothfels = 16,
-	schuettpelz = 16,
-	ts = 16,
-	seq_along(du_schemes$scheme) %>%
-		subtract(1) %>%
-		set_names(du_schemes$scheme)
+  current = 16, # circle
+  rothfels = 16,
+  schuettpelz = 16,
+  ts = 16,
+  seq_along(du_schemes$scheme) %>%
+    subtract(1) %>%
+    set_names(du_schemes$scheme)
 )
 
 # Cross doesn't work because we can't distinguish error bars
@@ -444,69 +444,69 @@ du_ages_shapes[du_ages_shapes == 3] <- 6
 
 # Format names of papers for printing
 du_ages_sampling <-
-	tribble(
-		~source, ~year, ~label,
-		"schuettpelz", 2009, "Schuettpelz & Pryer 2009",
-		"rothfels", 2015, "Rothfels et al. 2015",
-		"ts", 2016, "Testo and Sundue 2016",
-		"current", 2021, "This study",
-	) %>%
-	bind_rows(
-		du_schemes %>%
-			mutate(
-				year = 2020 + 0.1*seq_along(du_schemes$scheme),
-				label = paste("Du et al. 2021 scheme", code)
-			) %>%
-			transmute(source = scheme, year, label)
-	) %>%
-	mutate(source = fct_reorder(source, year))
+  tribble(
+    ~source, ~year, ~label,
+    "schuettpelz", 2009, "Schuettpelz & Pryer 2009",
+    "rothfels", 2015, "Rothfels et al. 2015",
+    "ts", 2016, "Testo and Sundue 2016",
+    "current", 2021, "This study",
+  ) %>%
+  bind_rows(
+    du_schemes %>%
+      mutate(
+        year = 2020 + 0.1*seq_along(du_schemes$scheme),
+        label = paste("Du et al. 2021 scheme", code)
+      ) %>%
+      transmute(source = scheme, year, label)
+  ) %>%
+  mutate(source = fct_reorder(source, year))
 
 
 # Format y-axis text: show major clade in parentheses
 family_labs_tbl <-
-	all_ages_with_du %>%
-	select(family, code) %>%
-	unique() %>%
-	mutate(label = glue("{family} ({code})"))
+  all_ages_with_du %>%
+  select(family, code) %>%
+  unique() %>%
+  mutate(label = glue("{family} ({code})"))
 
 family_labs <- family_labs_tbl$label %>%
-	set_names(., family_labs_tbl$family)
+  set_names(., family_labs_tbl$family)
 
 ggplot(all_ages_with_du) +
-	geom_pointrange(
-		aes(
-			x = median, xmin = low, xmax = high,
-			y = family,
-			color = author, shape = author),
-		position = position_dodge(width = 0.5)) +
-	scale_shape_manual(
-		values = du_ages_shapes,
-		limits = du_ages_sampling$source, 
-		labels = du_ages_sampling$label) +
-	scale_color_manual(
-		values = du_ages_colors,
-		limits = du_ages_sampling$source, 
-		labels = du_ages_sampling$label) +
-	scale_y_discrete(labels = family_labs, expand = expansion(add = 0.7)) +
-	scale_x_reverse("Age (millions of years)") +
-	coord_geo(
-		dat = list("periods", "eras"),
-		pos = list("b", "b"),
-		abbrv = list(TRUE, FALSE),
-		xlim = c(250, 0),
-		fill = "transparent",
-		color = "grey20",
-		lab_color = "grey30",
-		height = unit(1, "lines"),
-		# FIXME: change this to true when issue gets resolved
-		# https://github.com/willgearty/deeptime/issues/41
-		expand = FALSE,
-		size = 3) +
-	theme_bw() +
-	theme(
-		axis.title.y = element_blank(),
-		legend.title = element_blank()
-	)
+  geom_pointrange(
+    aes(
+      x = median, xmin = low, xmax = high,
+      y = family,
+      color = author, shape = author),
+    position = position_dodge(width = 0.5)) +
+  scale_shape_manual(
+    values = du_ages_shapes,
+    limits = du_ages_sampling$source, 
+    labels = du_ages_sampling$label) +
+  scale_color_manual(
+    values = du_ages_colors,
+    limits = du_ages_sampling$source, 
+    labels = du_ages_sampling$label) +
+  scale_y_discrete(labels = family_labs, expand = expansion(add = 0.7)) +
+  scale_x_reverse("Age (millions of years)") +
+  coord_geo(
+    dat = list("periods", "eras"),
+    pos = list("b", "b"),
+    abbrv = list(TRUE, FALSE),
+    xlim = c(250, 0),
+    fill = "transparent",
+    color = "grey20",
+    lab_color = "grey30",
+    height = unit(1, "lines"),
+    # FIXME: change this to true when issue gets resolved
+    # https://github.com/willgearty/deeptime/issues/41
+    expand = FALSE,
+    size = 3) +
+  theme_bw() +
+  theme(
+    axis.title.y = element_blank(),
+    legend.title = element_blank()
+  )
 ```
 
 **`r s_figure("du-ages")`**.

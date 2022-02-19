@@ -62,14 +62,14 @@ library(assertr)
 #' @return Character vector
 
 print_fossil_cat <- function(fossil_data, cat_select) {
-	data <-
+  data <-
     fossil_data %>% filter(category == cat_select)
-	
-	c(
-		md_heading(cat_select, 3),
-		md_bullet(data$text),
-		md_blank()
-	)
+  
+  c(
+    md_heading(cat_select, 3),
+    md_bullet(data$text),
+    md_blank()
+  )
 }
 
 #' Print data for a single fossil
@@ -83,28 +83,28 @@ print_fossil_cat <- function(fossil_data, cat_select) {
 #' print_fossil(fossils_long, "Acrostichum_intertrappeum") %>%
 #' 	glue::as_glue()
 print_fossil <- function(fossil_data, fossil_select) {
-	# Filter data to only selected fossil
-	data <-
+  # Filter data to only selected fossil
+  data <-
     fossils_long %>% filter(fossil_taxon == fossil_select)
-	
-	# Print name of fossil as header in italics
-	header <-
-	data %>% 
-		filter(var == "fossil_taxon_header") %>%
-		pull(value) %>%
-		str_replace_all("_", " ") %>%
-		md_italic() %>%
-		md_heading(1)
-	
-	categories <- data %>%
-		filter(!is.na(category)) %>%
-		pull(category) %>%
-		unique()
-	
-	body <- map(categories, ~print_fossil_cat(data, .)) %>%
-		unlist()
-	
-	c(header, body, md_rule())
+  
+  # Print name of fossil as header in italics
+  header <-
+    data %>% 
+    filter(var == "fossil_taxon_header") %>%
+    pull(value) %>%
+    str_replace_all("_", " ") %>%
+    md_italic() %>%
+    md_heading(1)
+  
+  categories <- data %>%
+    filter(!is.na(category)) %>%
+    pull(category) %>%
+    unique()
+  
+  body <- map(categories, ~print_fossil_cat(data, .)) %>%
+    unlist()
+  
+  c(header, body, md_rule())
 }
 ```
 
@@ -115,13 +115,13 @@ fossils_data_path <- here::here("_targets/user/data_raw/Fossils_Ferns.csv")
 # Extract fossil categories (first row of fossil data)
 fossils_categories <-
   read_csv(fossils_data_path, n_max = 1) %>%
-	pivot_longer(names_to = "category", values_to = "raw_names", everything()) %>%
-	mutate(
-		category = str_replace_all(category, "\\.\\.\\.[0-9]+", "skip") %>%
-			na_if("skip")) %>%
-	fill(category) %>%
-	mutate(category = str_to_title(category)) %>%
-	filter(category != "Pteridophy")
+  pivot_longer(names_to = "category", values_to = "raw_names", everything()) %>%
+  mutate(
+    category = str_replace_all(category, "\\.\\.\\.[0-9]+", "skip") %>%
+      na_if("skip")) %>%
+  fill(category) %>%
+  mutate(category = str_to_title(category)) %>%
+  filter(category != "Pteridophy")
 
 # Get raw column names
 fossils_raw_names <-
@@ -132,34 +132,34 @@ fossils_clean_names <- fossils_raw_names %>% janitor::clean_names()
 
 # Tidy fossils in wide format
 fossils <-
-fossils_clean_names %>%
-	# Filter to only those actually used in the study
-	filter(used == "X") %>%
-	select(-used) %>%
-	select(fossil_taxon, everything())
+  fossils_clean_names %>%
+  # Filter to only those actually used in the study
+  filter(used == "X") %>%
+  select(-used) %>%
+  select(fossil_taxon, everything())
 
 # Make a tibble of column namees for formatting
 name_tbl <- tibble(
-	raw_names = colnames(fossils_raw_names),
-	var = colnames(fossils_clean_names)
+  raw_names = colnames(fossils_raw_names),
+  var = colnames(fossils_clean_names)
 ) %>%
-	right_join(
-		tibble(var = colnames(fossils)), by = "var"
-	) %>%
-	mutate(var_order = 1:nrow(.))
+  right_join(
+    tibble(var = colnames(fossils)), by = "var"
+  ) %>%
+  mutate(var_order = 1:nrow(.))
 
 # Convert to long format
 fossils_long <- fossils %>%
-	mutate(
-		across(everything(), as.character),
-		fossil_taxon_header = glue("†{fossil_taxon}")) %>%
-	pivot_longer(names_to = "var", values_to = "value", -fossil_taxon) %>%
-	left_join(name_tbl, by = "var") %>%
-	mutate(
-		text = as.character(glue::glue("{raw_names}: {value}"))
-	) %>%
-	left_join(fossils_categories, by = "raw_names") %>%
-	arrange(fossil_taxon, category, var_order)
+  mutate(
+    across(everything(), as.character),
+    fossil_taxon_header = glue("†{fossil_taxon}")) %>%
+  pivot_longer(names_to = "var", values_to = "value", -fossil_taxon) %>%
+  left_join(name_tbl, by = "var") %>%
+  mutate(
+    text = as.character(glue::glue("{raw_names}: {value}"))
+  ) %>%
+  left_join(fossils_categories, by = "raw_names") %>%
+  arrange(fossil_taxon, category, var_order)
 ```
 
 These data are exported from the FernCal v1.0 database (https://github.com/pteridophy/FossilFerns), which includes `r nrow(fossils_clean_names)` records of fossils to use as calibration points for molecular dating of ferns.
@@ -175,8 +175,8 @@ For a summary of these data in CSV format, see Table FIXME <add table number>.
 ```{r print-fossils, include = TRUE, results = "asis", eval = TRUE}
 unique(fossils_long$fossil_taxon) %>%
   map(~print_fossil(fossils_long, .)) %>%
-	unlist() %>%
-	glue::as_glue()
+  unlist() %>%
+  glue::as_glue()
 ```
 
 # References

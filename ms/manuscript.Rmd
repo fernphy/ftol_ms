@@ -40,7 +40,7 @@ bibliography:
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
-	echo = FALSE, warning = FALSE, message = FALSE, results = 'hide')
+  echo = FALSE, warning = FALSE, message = FALSE, results = 'hide')
 # Load packages
 source(here::here("R/ms_packages.R"))
 ```
@@ -48,10 +48,10 @@ source(here::here("R/ms_packages.R"))
 ```{r formatters-load}
 # Load formatting functions defined in functions.R
 knitr::read_chunk(
-	here::here("R/functions.R"),
-	labels = "formatters",
-	from = "formatters start",
-	to = "formatters end"
+  here::here("R/functions.R"),
+  labels = "formatters",
+  from = "formatters start",
+  to = "formatters end"
 )
 ```
 
@@ -71,83 +71,83 @@ source(here::here("R/functions.R"))
 ftol_cache <- here::here("working/_targets")
 
 tar_load(
-	c(
-		accs_exclude,
-		fern_sanger_seqs_raw,
-		raw_fasta_all,
-		sanger_seqs_combined_filtered,
-		sanger_seqs_rogues_removed,
-		sanger_accessions_selection,
-		plastome_seqs_combined_filtered,
-		plastome_metadata_raw_all,
-		plastome_metadata_renamed,
-		sanger_alignment,
-		plastome_alignment,
-		plastome_metadata_renamed,
-		ppgi_taxonomy,
-		plastid_calibration_dates,
-		pteridocat,
-		sanger_alignment_tbl,
-		plastome_alignment_tbl,
-		monophy_by_clade,
-		plastome_tree,
-		plastid_tree_dated,
-		fossil_calibration_tips,
-		ts_fossil_calibration_tips,
-		treepl_cv_results),
-	store = ftol_cache
+  c(
+    accs_exclude,
+    fern_sanger_seqs_raw,
+    raw_fasta_all,
+    sanger_seqs_combined_filtered,
+    sanger_seqs_rogues_removed,
+    sanger_accessions_selection,
+    plastome_seqs_combined_filtered,
+    plastome_metadata_raw_all,
+    plastome_metadata_renamed,
+    sanger_alignment,
+    plastome_alignment,
+    plastome_metadata_renamed,
+    ppgi_taxonomy,
+    plastid_calibration_dates,
+    pteridocat,
+    sanger_alignment_tbl,
+    plastome_alignment_tbl,
+    monophy_by_clade,
+    plastome_tree,
+    plastid_tree_dated,
+    fossil_calibration_tips,
+    ts_fossil_calibration_tips,
+    treepl_cv_results),
+  store = ftol_cache
 )
 
 # Targets from MS workflow
 tar_load(
-	c(
-		accepted_species,
-		sanger_sampling,
-		coverage_by_rank,
-		total_coverage,
-		bb_coverage_by_rank,
-		bb_total_coverage,
-		gb_species_by_year,
-		ref_files,
-		other_dates,
-		crown_ages,
-		fossil_ferns_raw,
-		family_stem_ages,
-		fern_monophy_summ_tbl,
-		fern_nonmono_gen
-	),
-	store = here::here("_targets")
+  c(
+    accepted_species,
+    sanger_sampling,
+    coverage_by_rank,
+    total_coverage,
+    bb_coverage_by_rank,
+    bb_total_coverage,
+    gb_species_by_year,
+    ref_files,
+    other_dates,
+    crown_ages,
+    fossil_ferns_raw,
+    family_stem_ages,
+    fern_monophy_summ_tbl,
+    fern_nonmono_gen
+  ),
+  store = here::here("_targets")
 )
 ```
 
 ```{r abstract-stats}
 # Make tibble of outgroup species
 og_species <- 
-	plastome_metadata_renamed %>%
-	select(species, outgroup) %>%
-	filter(outgroup == TRUE)
+  plastome_metadata_renamed %>%
+  select(species, outgroup) %>%
+  filter(outgroup == TRUE)
 
 # Count number of fern species in Sanger data
 n_sanger_ferns <-
-	sanger_sampling %>% 
-	filter(outgroup == FALSE) %>%
-	n_distinct(.$species)
+  sanger_sampling %>% 
+  filter(outgroup == FALSE) %>%
+  n_distinct(.$species)
 
 # Count number of calibration points
 n_calibrations_ferns <-
-	fossil_calibration_tips %>%
-	assert(is_uniq, node_calibrated) %>%
-	filter(!affinities %in% c("Tracheophytes", "Euphyllophytes")) %>%
-	pull(node_calibrated) %>%
-	n_distinct() %>%
-	number()
+  fossil_calibration_tips %>%
+  assert(is_uniq, node_calibrated) %>%
+  filter(!affinities %in% c("Tracheophytes", "Euphyllophytes")) %>%
+  pull(node_calibrated) %>%
+  n_distinct() %>%
+  number()
 
 n_calibrations_total <-
-	fossil_calibration_tips %>%
-	assert(is_uniq, node_calibrated) %>%
-	pull(node_calibrated) %>%
-	n_distinct() %>%
-	number()
+  fossil_calibration_tips %>%
+  assert(is_uniq, node_calibrated) %>%
+  pull(node_calibrated) %>%
+  n_distinct() %>%
+  number()
 ```
 
 <!-- Set left justification -->
@@ -355,46 +355,46 @@ We generated the final Sanger phylogeny by using the backbone phylogeny as a con
 ```{r dating-methods-stats}
 # Count total number of fern fossils in database
 n_fern_fossils_total <- 
-	fossil_ferns_raw %>%
-	# Exclude non-fern fossils
-	filter(!affinities %in% c("Euphyllophytes", "Tracheophytes")) %>%
-	pull(fossil_taxon) %>%
-	n_distinct() %>%
-	number()
+  fossil_ferns_raw %>%
+  # Exclude non-fern fossils
+  filter(!affinities %in% c("Euphyllophytes", "Tracheophytes")) %>%
+  pull(fossil_taxon) %>%
+  n_distinct() %>%
+  number()
 
 # Format fossils for printing in MS
 fossils <-
-	fossil_ferns_raw %>%
-	mutate(age = number(minimum_age, accuracy = 0.1)) %>%
+  fossil_ferns_raw %>%
+  mutate(age = number(minimum_age, accuracy = 0.1)) %>%
   split(.$affinities)
 
 # Format values used for treePL smoothing as tibble
 cv_smooth_test <-	
-	tibble(cv_result = treepl_cv_results) %>%
-	mutate(smooth = str_match(cv_result, "\\((.*)\\)") %>% 
-				 	magrittr::extract(, 2) %>%
-				 	parse_number()) %>%
-	mutate(chisq = str_match(cv_result, "\\) (.*)$") %>% 
-				 	magrittr::extract(, 2) %>%
-				 	parse_number()) %>%
-	arrange(smooth)
+  tibble(cv_result = treepl_cv_results) %>%
+  mutate(smooth = str_match(cv_result, "\\((.*)\\)") %>% 
+           magrittr::extract(, 2) %>%
+           parse_number()) %>%
+  mutate(chisq = str_match(cv_result, "\\) (.*)$") %>% 
+           magrittr::extract(, 2) %>%
+           parse_number()) %>%
+  arrange(smooth)
 
 # Extract start, end, and best smooth values
 smooth_start <- cv_smooth_test %>%
-	slice_min(n = 1, order_by = smooth) %>%
-	pull(smooth) %>%
-	number(., accuracy = .)
+  slice_min(n = 1, order_by = smooth) %>%
+  pull(smooth) %>%
+  number(., accuracy = .)
 
 smooth_end <- cv_smooth_test %>%
-	slice_max(n = 1, order_by = smooth) %>%
-	pull(smooth) %>%
-	number(., accuracy = .)
+  slice_max(n = 1, order_by = smooth) %>%
+  pull(smooth) %>%
+  number(., accuracy = .)
 
 smooth_best <-
-	cv_smooth_test %>%
-	slice_min(n = 1, order_by = chisq) %>%
-	pull(smooth) %>%
-	number(., accuracy = .)
+  cv_smooth_test %>%
+  slice_min(n = 1, order_by = chisq) %>%
+  pull(smooth) %>%
+  number(., accuracy = .)
 ```
 
 We rooted the ML tree on bryophytes and estimated divergence dates using penalized likelihood with treePL [@Smith2012].
@@ -421,18 +421,18 @@ A docker image to run the code is available at https://hub.docker.com/r/joelnitt
 ```{r genbank-stats}
 # Helper function to count number of GenBank accessions in a dataset
 count_accs <- function(data) {
-	data %>%
-	pull(accession) %>%
-	n_distinct() %>%
-	number()
+  data %>%
+    pull(accession) %>%
+    n_distinct() %>%
+    number()
 }
 
 # Manual list of accessions to exclude
 n_accs_exclude <-
-accs_exclude %>%
-	pull(accession) %>%
-	n_distinct() %>%
-	number()
+  accs_exclude %>%
+  pull(accession) %>%
+  n_distinct() %>%
+  number()
 
 # Sanger ----
 
@@ -453,60 +453,60 @@ n_accs_second_filter <- count_accs(sanger_seqs_rogues_removed)
 # Number of GenBank accessions in final selection
 # first convert to long form
 sanger_accessions_selection_long <-
- sanger_accessions_selection %>%
-	select(contains("accession")) %>%
-	pivot_longer(values_to = "accession", everything()) %>%
-	filter(!is.na(accession))
+  sanger_accessions_selection %>%
+  select(contains("accession")) %>%
+  pivot_longer(values_to = "accession", everything()) %>%
+  filter(!is.na(accession))
 
 # Count number of raw accessions in final selection
 n_accs_raw_final <- count_accs(sanger_accessions_selection_long)
 
 # Count number of accessions in final selection, split by locus
 n_accs_final <- 
-	sanger_accessions_selection_long %>%
-	# Count accessions containing different loci as distinct
-	mutate(
-		name = str_remove_all(name, "accession_"),
-		accession = paste(name, accession, sep = "_")) %>%
-	count_accs()
+  sanger_accessions_selection_long %>%
+  # Count accessions containing different loci as distinct
+  mutate(
+    name = str_remove_all(name, "accession_"),
+    accession = paste(name, accession, sep = "_")) %>%
+  count_accs()
 
 # Analyze join by method
 join_by_count <-
-sanger_accessions_selection %>% 
-	assert(not_na, join_by, species) %>%
-	assert(is_uniq, species) %>%
-	tabyl(join_by) %>%
-	mutate(join_by = fct_reorder(join_by, n)) %>%
-	mutate(
-			percent = percent(percent, accuracy = 0.1),
-			n = number(n, accuracy = 1)) %>%
-	split(.$join_by)
-	
+  sanger_accessions_selection %>% 
+  assert(not_na, join_by, species) %>%
+  assert(is_uniq, species) %>%
+  tabyl(join_by) %>%
+  mutate(join_by = fct_reorder(join_by, n)) %>%
+  mutate(
+    percent = percent(percent, accuracy = 0.1),
+    n = number(n, accuracy = 1)) %>%
+  split(.$join_by)
+
 # Plastome ----
 # Don't include OG in calculations
 n_plast_accs_query <-
-	plastome_metadata_raw_all %>%
-	left_join(
-		select(plastome_metadata_renamed, accession, outgroup),
-		by = "accession") %>%
-	# excluded accessions lack outgroup info, but are all ferns
-	mutate(outgroup = replace_na(FALSE)) %>%
-	assert(not_na, outgroup) %>%
-	filter(outgroup == FALSE) %>%
-	count_accs()
-n_plast_first_filter <-
-	plastome_metadata_renamed %>%
+  plastome_metadata_raw_all %>%
+  left_join(
+    select(plastome_metadata_renamed, accession, outgroup),
+    by = "accession") %>%
+  # excluded accessions lack outgroup info, but are all ferns
+  mutate(outgroup = replace_na(FALSE)) %>%
   assert(not_na, outgroup) %>%
-	filter(outgroup == FALSE) %>%
-	count_accs()
+  filter(outgroup == FALSE) %>%
+  count_accs()
+n_plast_first_filter <-
+  plastome_metadata_renamed %>%
+  assert(not_na, outgroup) %>%
+  filter(outgroup == FALSE) %>%
+  count_accs()
 n_accs_plast_final <- 
-	plastome_seqs_combined_filtered %>%
-	left_join(
-		select(plastome_metadata_renamed, accession, outgroup),
-		by = "accession") %>%
-	assert(not_na, outgroup) %>%
-	filter(outgroup == FALSE) %>%
-	count_accs()
+  plastome_seqs_combined_filtered %>%
+  left_join(
+    select(plastome_metadata_renamed, accession, outgroup),
+    by = "accession") %>%
+  assert(not_na, outgroup) %>%
+  filter(outgroup == FALSE) %>%
+  count_accs()
 ```
 
 The initial GenBank query for the seven Sanger loci resulted in `r n_accs_query` accessions ("accessions" in this case includes some cases where a single accession contains multiple loci).
@@ -528,14 +528,14 @@ Selection of the longest set of concatenated sequences per species resulted in `
 # Taxon sampling ----
 # Format FTOL sampling as list
 tax_coverage <-
-	coverage_by_rank %>%
-	filter(rank == "major_clade") %>%
-	transmute(
-		# Be sure to change to factor so list is correct order
-		# when splitting
-		clade = fct_reorder(name, coverage),
-		coverage = percent(coverage, accuracy = 0.1)) %>%
-	split(.$clade)
+  coverage_by_rank %>%
+  filter(rank == "major_clade") %>%
+  transmute(
+    # Be sure to change to factor so list is correct order
+    # when splitting
+    clade = fct_reorder(name, coverage),
+    coverage = percent(coverage, accuracy = 0.1)) %>%
+  split(.$clade)
 
 # Format overall FTOL sampling as list
 total_sampling <- split(total_coverage, total_coverage$rank)
@@ -546,107 +546,107 @@ bb_total_sampling <- split(bb_total_coverage, bb_total_coverage$rank)
 # Locus sampling ----
 # Make tibble with one row per locus per species
 sanger_locus_sampling <-
-sanger_alignment_tbl %>%
-	mutate(taxon = map(align_trimmed, rownames)) %>%
-	select(locus = target, species = taxon) %>%
-	unnest(cols = species) %>%
-	# Exclude outgroups
-	left_join(
-		unique(select(sanger_sampling, species, outgroup)), by = "species") %>%
-	filter(outgroup == FALSE) %>%
-	select(-outgroup)
+  sanger_alignment_tbl %>%
+  mutate(taxon = map(align_trimmed, rownames)) %>%
+  select(locus = target, species = taxon) %>%
+  unnest(cols = species) %>%
+  # Exclude outgroups
+  left_join(
+    unique(select(sanger_sampling, species, outgroup)), by = "species") %>%
+  filter(outgroup == FALSE) %>%
+  select(-outgroup)
 
 # Summarize mean number of loci per species
 locus_summ <-
-sanger_locus_sampling %>%
-	group_by(species) %>%
-	summarize(
-		n_loci = n_distinct(locus)
-	) %>%
-	summarize(
-		max = max(n_loci) %>% number(accuracy = 1),
-		min = min(n_loci) %>% number(accuracy = 1),
-		mean = mean(n_loci) %>% number(accuracy = 0.1),
-		sd = sd(n_loci) %>% number(accuracy = 0.1)
-	)
-	
+  sanger_locus_sampling %>%
+  group_by(species) %>%
+  summarize(
+    n_loci = n_distinct(locus)
+  ) %>%
+  summarize(
+    max = max(n_loci) %>% number(accuracy = 1),
+    min = min(n_loci) %>% number(accuracy = 1),
+    mean = mean(n_loci) %>% number(accuracy = 0.1),
+    sd = sd(n_loci) %>% number(accuracy = 0.1)
+  )
+
 # Format total number of samples per locus as list for MS
 locus_total <-
-sanger_locus_sampling %>%
-	count(locus) %>%
-	mutate(
-		locus = fct_reorder(locus, n),
-		n = number(n)) %>%
-	split(.$locus)
+  sanger_locus_sampling %>%
+  count(locus) %>%
+  mutate(
+    locus = fct_reorder(locus, n),
+    n = number(n)) %>%
+  split(.$locus)
 
 # Make tibble with number of species per locus combination
 locus_comb_tib <-
-sanger_locus_sampling %>%
-	group_by(species) %>%
-	summarize(comb = paste(sort(locus), collapse = "_")) %>%
-	count(comb) %>%
-	arrange(desc(n)) %>%
-	mutate(
-		rbcl_present = str_detect(comb, "rbcL"),
-		n_loci = str_count(comb, "_") + 1)
+  sanger_locus_sampling %>%
+  group_by(species) %>%
+  summarize(comb = paste(sort(locus), collapse = "_")) %>%
+  count(comb) %>%
+  arrange(desc(n)) %>%
+  mutate(
+    rbcl_present = str_detect(comb, "rbcL"),
+    n_loci = str_count(comb, "_") + 1)
 
 # Format as list for MS
 locus_comb <-
-	locus_comb_tib %>%
-	mutate(
-		comb = fct_reorder(comb, n),
-		n = number(n, accuracy = 1)) %>%
-	split(.$comb)
+  locus_comb_tib %>%
+  mutate(
+    comb = fct_reorder(comb, n),
+    n = number(n, accuracy = 1)) %>%
+  split(.$comb)
 
 # Verify the most frequent locus combination is rbcL alone
 assertthat::assert_that(
-	locus_comb_tib %>%
-		filter(n == max(n)) %>%
-		pull(comb) == "rbcL")
+  locus_comb_tib %>%
+    filter(n == max(n)) %>%
+    pull(comb) == "rbcL")
 
 # Verify that the second most frequent locus combination is all seven species
 assertthat::assert_that(
-	locus_comb_tib %>%
-		arrange(desc(n)) %>%
-		slice(2) %>%
-		pull(n_loci) == 7)
+  locus_comb_tib %>%
+    arrange(desc(n)) %>%
+    slice(2) %>%
+    pull(n_loci) == 7)
 
 # Calculate number of species with > 1 locus
 sp_mult_loci <-
-sanger_locus_sampling %>%
-	group_by(species) %>%
-	summarize(mult_loci = if_else(n_distinct(locus) > 1, "true", "false")) %>%
-	tabyl_fmt(mult_loci) %>%
-	split(.$mult_loci)
+  sanger_locus_sampling %>%
+  group_by(species) %>%
+  summarize(mult_loci = if_else(n_distinct(locus) > 1, "true", "false")) %>%
+  tabyl_fmt(mult_loci) %>%
+  split(.$mult_loci)
 
 # Backbone locus sampling ----
 bb_locus_tbl <-
-plastome_alignment_tbl %>%
-	mutate(taxon = map(align_trimmed, rownames)) %>%
-	select(locus = target, species = taxon) %>%
-	unnest(cols = species) %>%
-	group_by(species) %>%
-	summarize(n_loci = n_distinct(locus)) %>%
-	arrange(desc(n_loci)) %>%
-	left_join(
-		unique(select(sanger_sampling, species, outgroup)), by = "species") %>%
-	filter(outgroup == FALSE) %>%
-	select(-outgroup)
+  plastome_alignment_tbl %>%
+  mutate(taxon = map(align_trimmed, rownames)) %>%
+  select(locus = target, species = taxon) %>%
+  unnest(cols = species) %>%
+  group_by(species) %>%
+  summarize(n_loci = n_distinct(locus)) %>%
+  arrange(desc(n_loci)) %>%
+  left_join(
+    unique(select(sanger_sampling, species, outgroup)), by = "species") %>%
+  filter(outgroup == FALSE) %>%
+  select(-outgroup)
 
 bb_locus_summ <-
-bb_locus_tbl %>%
-	summarize(
-		max = max(n_loci) %>% number(accuracy = 1),
-		min = min(n_loci) %>% number(accuracy = 1),
-		mean = mean(n_loci) %>% number(accuracy = 0.1),
-		sd = sd(n_loci) %>% number(accuracy = 0.1)
-	)
+  bb_locus_tbl %>%
+  summarize(
+    max = max(n_loci) %>% number(accuracy = 1),
+    min = min(n_loci) %>% number(accuracy = 1),
+    mean = mean(n_loci) %>% number(accuracy = 0.1),
+    sd = sd(n_loci) %>% number(accuracy = 0.1)
+  )
 
 bb_with_all_loci <-
-	bb_locus_tbl %>%
-	mutate(all_loci_sampled = if_else(n_loci == 79, "true", "false")) %>%
-	tabyl_fmt(all_loci_sampled) %>%
-	split(.$all_loci_sampled)
+  bb_locus_tbl %>%
+  mutate(all_loci_sampled = if_else(n_loci == 79, "true", "false")) %>%
+  tabyl_fmt(all_loci_sampled) %>%
+  split(.$all_loci_sampled)
 ``` 
 
 Taxon sampling for the current version of FTOL includes `r total_sampling$species$coverage` species (`r total_sampling$species$coverage_p`), `r total_sampling$genus$coverage` genera (`r total_sampling$genus$coverage_p`), `r total_sampling$family$coverage` families, and `r total_sampling$order$coverage` orders of ferns (all coverage values are relative to the number of accepted species in Pteridocat).
@@ -665,42 +665,42 @@ Locus sampling per species in the plastome dataset ranged from `r bb_locus_summ$
 ```{r dna-stats}
 # Calculate frequency of missing bases in each dataset overall
 plastome_missing_freq <- base_freq_missing(plastome_alignment) %>%
-	percent(accuracy = 0.1)
+  percent(accuracy = 0.1)
 sanger_missing_freq <- base_freq_missing(sanger_alignment) %>%
-	percent(accuracy = 0.1)
+  percent(accuracy = 0.1)
 
 # Calculate frequency of missing bases by locus for Sanger loci
 # Concatenate Sanger loci again here to be sure order is the same
 sanger_genes_cat <- do.call(
-	ape::cbind.DNAbin,
-	c(sanger_alignment_tbl$align_trimmed, fill.with.gaps = TRUE))
+  ape::cbind.DNAbin,
+  c(sanger_alignment_tbl$align_trimmed, fill.with.gaps = TRUE))
 
 sanger_missing_by_gene <-
-	# Get start and end position of each gene in concatenated alignment
+  # Get start and end position of each gene in concatenated alignment
   sanger_alignment_tbl %>%
-	mutate(
-		nbp = map_dbl(align_trimmed, ncol),
-		end = cumsum(nbp),
-		start = end - nbp + 1) %>%
-	# Calculate frequency of missing data
-	select(gene = target, start, end) %>%
-	mutate(
-		missing = map2_dbl(
-			start, end,
-			~base_freq_missing(
-				seqs = sanger_genes_cat,
-				start = .x,
-				end = .y))
-	) %>%
-	select(-start, -end) %>%
-	# Reorder and split for printing
-	mutate(
-		# Format gene names for printing
-		gene = str_replace_all(gene, "-", "--"),
-		gene = str_replace_all(gene, "([^-]+)", "*\\1*"),
-		gene = fct_reorder(gene, missing),
-		missing = percent(missing)) %>%
-	split(.$gene)
+  mutate(
+    nbp = map_dbl(align_trimmed, ncol),
+    end = cumsum(nbp),
+    start = end - nbp + 1) %>%
+  # Calculate frequency of missing data
+  select(gene = target, start, end) %>%
+  mutate(
+    missing = map2_dbl(
+      start, end,
+      ~base_freq_missing(
+        seqs = sanger_genes_cat,
+        start = .x,
+        end = .y))
+  ) %>%
+  select(-start, -end) %>%
+  # Reorder and split for printing
+  mutate(
+    # Format gene names for printing
+    gene = str_replace_all(gene, "-", "--"),
+    gene = str_replace_all(gene, "([^-]+)", "*\\1*"),
+    gene = fct_reorder(gene, missing),
+    missing = percent(missing)) %>%
+  split(.$gene)
 ```
 
 The Sanger DNA alignment was `r number(ncol(sanger_alignment))` bp with `r sanger_missing_freq` missing data (missing bases or gaps) overall; rates of missing data by locus ranged from `r sanger_missing_by_gene %>% first() %>% extract2("missing")` (`r sanger_missing_by_gene %>% first() %>% extract2("gene")`) to `r sanger_missing_by_gene %>% last() %>% extract2("missing")` (`r sanger_missing_by_gene %>% last() %>% extract2("gene")`).
@@ -716,37 +716,37 @@ denn_poly_bs <- get_bs(plastome_tree, c("Dennstaedtia_hirsuta", "Pseudophegopter
 
 # Format monophyly status as list for MS
 fern_monophy_summ <-
-fern_monophy_summ_tbl %>%
-	mutate(
-		n = as.integer(n),
-		p = percent(percent)
-	) %>%
-	split(.$tax_level) %>%
-	map(~split(., .$monophyly))
+  fern_monophy_summ_tbl %>%
+  mutate(
+    n = as.integer(n),
+    p = percent(percent)
+  ) %>%
+  split(.$tax_level) %>%
+  map(~split(., .$monophyly))
 
 top_nonmono_subfam <-
-fern_nonmono_gen %>%
-	group_by(family, subfamily) %>%
-	summarize(n = n(), .groups = "drop") %>%
-	slice_max(n = 3, order_by = n) %>%
-	assert(not_na, family, subfamily) %>%
-	mutate(subfamily = fct_reorder(subfamily, n)) %>%
-	mutate(n = jntools::english2(n)) %>%
-	arrange(desc(subfamily))
+  fern_nonmono_gen %>%
+  group_by(family, subfamily) %>%
+  summarize(n = n(), .groups = "drop") %>%
+  slice_max(n = 3, order_by = n) %>%
+  assert(not_na, family, subfamily) %>%
+  mutate(subfamily = fct_reorder(subfamily, n)) %>%
+  mutate(n = jntools::english2(n)) %>%
+  arrange(desc(subfamily))
 
 # Double check that non-monophyletic genera outside of
 # top three non-monophyletic subfamilies all have less
 # than four genera each
 fern_nonmono_gen %>%
-	anti_join(
-		top_nonmono_subfam,
-		by = c("family", "subfamily")) %>%
-	count(family, subfamily) %>%
-	verify(
-		all(n < 4), 
-		error_fun = error_msg(
-			"Other subfamilies besides top three don't have less than four genera each"),
-		success_fun = success_logical)
+  anti_join(
+    top_nonmono_subfam,
+    by = c("family", "subfamily")) %>%
+  count(family, subfamily) %>%
+  verify(
+    all(n < 4), 
+    error_fun = error_msg(
+      "Other subfamilies besides top three don't have less than four genera each"),
+    success_fun = success_logical)
 ```
 
 Ferns are strongly supported as monophyletic (BS `r ferns_bs`; all subsequent relationships mentioned received BS >=`r percent(.98)` in the backbone phylogeny unless otherwise indicated).
@@ -784,17 +784,17 @@ We did not compare crown ages of families across studies because differences in 
 ```{r phy-discussion-stats}
 # Calculate number of genera sampled for Gleicheniales
 ppgi_gleich_genera_n <-
-	ppgi_taxonomy %>%
-	filter(order == "Gleicheniales") %>%
-	pull(genus) %>%
-	n_distinct()
+  ppgi_taxonomy %>%
+  filter(order == "Gleicheniales") %>%
+  pull(genus) %>%
+  n_distinct()
 
 plastome_gleich_genera_n <-
-	bb_coverage_by_rank %>%
-	left_join(select(ppgi_taxonomy, name = genus, order), by = "name") %>%
-	filter(order == "Gleicheniales") %>%
-	pull(name) %>%
-	n_distinct()
+  bb_coverage_by_rank %>%
+  left_join(select(ppgi_taxonomy, name = genus, order), by = "name") %>%
+  filter(order == "Gleicheniales") %>%
+  pull(name) %>%
+  n_distinct()
 ```
 
 The phylogenetic position of Equisetidae relative to other ferns has long been a point of contention in molecular systematics of ferns.
@@ -895,223 +895,223 @@ The authors thank Michael Hassler for maintaining the World Ferns taxonomic data
 
 # Make vector of outgroup taxa
 og_taxa <-
-	sanger_sampling %>%
-	filter(outgroup == TRUE) %>%
-	pull(species)
+  sanger_sampling %>%
+  filter(outgroup == TRUE) %>%
+  pull(species)
 
 plastome_tree_rooted <- phytools::reroot(
-	plastome_tree,
-	getMRCA(
-		plastome_tree,
-		c("Physcomitrium_patens", "Marchantia_polymorpha", "Anthoceros_angustus")
-	)) %>%
-	ladderize()
+  plastome_tree,
+  getMRCA(
+    plastome_tree,
+    c("Physcomitrium_patens", "Marchantia_polymorpha", "Anthoceros_angustus")
+  )) %>%
+  ladderize()
 
 # Make tibble of backbone tips with higher-level taxonomy
 backbone_taxonomy <-
-	tibble(species = get_tips_in_ape_plot_order(plastome_tree_rooted)) %>%
-	# Add higher taxonomy
-	left_join(sanger_sampling, by = "species") %>%
-	# Add column for phylogenetic order
-	mutate(phy_order = seq_len(nrow(.))) %>%
-	# Outgroup lacks family data, so call "og"
-	mutate(
-		family = case_when(
-			outgroup == TRUE ~ "og",
-			TRUE ~ family),
-		major_clade = case_when(
-			outgroup == TRUE ~ "og",
-			TRUE ~ major_clade)
-	)
+  tibble(species = get_tips_in_ape_plot_order(plastome_tree_rooted)) %>%
+  # Add higher taxonomy
+  left_join(sanger_sampling, by = "species") %>%
+  # Add column for phylogenetic order
+  mutate(phy_order = seq_len(nrow(.))) %>%
+  # Outgroup lacks family data, so call "og"
+  mutate(
+    family = case_when(
+      outgroup == TRUE ~ "og",
+      TRUE ~ family),
+    major_clade = case_when(
+      outgroup == TRUE ~ "og",
+      TRUE ~ major_clade)
+  )
 
 # Make exemplar set of species in backbone representing plot groups
 major_clade_exemp_taxa <-
-	backbone_taxonomy %>%
-	# Slice to one exemplar species per major clade
-	group_by(major_clade) %>%
-	slice(1) %>%
-	ungroup() %>%
-	# Slicing arranges alphabetically, so put back in (unladderized) phylo order
-	arrange(phy_order) %>%
-	# Drop outgroup
-	filter(family != "og")
+  backbone_taxonomy %>%
+  # Slice to one exemplar species per major clade
+  group_by(major_clade) %>%
+  slice(1) %>%
+  ungroup() %>%
+  # Slicing arranges alphabetically, so put back in (unladderized) phylo order
+  arrange(phy_order) %>%
+  # Drop outgroup
+  filter(family != "og")
 
 # Make a color palette for major clades
 # Start with list of green.armytage.colors names,
 # exclude those that are too close or stand out too much
 # https://www.jstatsoft.org/article/view/v090c01
 green_army_use_cols <-
-	c(
-		"amethyst",
-		"blue",
-		"caramel",
-		"damson",
-		# "ebony",
-		# "forest",
-		"green",
-		"honeydew",
-		# "iron",
-		# "jade",
-		# "khaki",
-		# "lime",
-		"mallow",
-		"navy",
-		# "orpiment",
-		"pink",
-		# "quagmire",
-		"red",
-		"sky",
-		"turquoise",
-		"uranium",
-		"violet",
-		"wine",
-		# "xanthin",
-		# "yellow",
-		"zinnia"
-	)
+  c(
+    "amethyst",
+    "blue",
+    "caramel",
+    "damson",
+    # "ebony",
+    # "forest",
+    "green",
+    "honeydew",
+    # "iron",
+    # "jade",
+    # "khaki",
+    # "lime",
+    "mallow",
+    "navy",
+    # "orpiment",
+    "pink",
+    # "quagmire",
+    "red",
+    "sky",
+    "turquoise",
+    "uranium",
+    "violet",
+    "wine",
+    # "xanthin",
+    # "yellow",
+    "zinnia"
+  )
 
 clade_cols <-
-	Polychrome::green.armytage.colors() %>%
-	extract(green_army_use_cols) %>%
-	extract(seq_len(nrow(major_clade_exemp_taxa))) %>%
-	set_names(major_clade_exemp_taxa$major_clade)
+  Polychrome::green.armytage.colors() %>%
+  extract(green_army_use_cols) %>%
+  extract(seq_len(nrow(major_clade_exemp_taxa))) %>%
+  set_names(major_clade_exemp_taxa$major_clade)
 
 clade_cols_tib <-
-	tibble(
-		color = clade_cols,
-		major_clade = names(clade_cols)
-	) %>%
-	mutate(
-		code = substr(major_clade, 1, 2),
-		code = case_when(
-			major_clade == "Saccolomatineae" ~ "Sac",
-			major_clade == "Salviniales" ~ "Sal",
-			TRUE ~ code
-		)) %>%
-	assert(is_uniq, code)
+  tibble(
+    color = clade_cols,
+    major_clade = names(clade_cols)
+  ) %>%
+  mutate(
+    code = substr(major_clade, 1, 2),
+    code = case_when(
+      major_clade == "Saccolomatineae" ~ "Sac",
+      major_clade == "Salviniales" ~ "Sal",
+      TRUE ~ code
+    )) %>%
+  assert(is_uniq, code)
 
 # Make tibble for annotating major clades
 clade_tibble <- 
-	# Use assess_monophy to get MRCA of each major clade
-	# They should all by monophyletic anyways
-	select(sanger_sampling, species, major_clade) %>%
-	assess_monophy(
-		taxon_sampling = .,
-		tree = plastid_tree_dated,
-		tax_levels = "major_clade"
-	) %>%
-	get_result_monophy(1) %>%
-	# Exclude lycophytes
-	filter(!taxon %in% c(
-		"Selaginellales", "Lycopodiales", "Isoëtales", "Isoetales")) %>%
-	verify(all(monophyly == "Yes")) %>%
-	transmute(major_clade = taxon, mrca = parse_number(mrca)) %>%
-	left_join(clade_cols_tib, by = "major_clade")
+  # Use assess_monophy to get MRCA of each major clade
+  # They should all by monophyletic anyways
+  select(sanger_sampling, species, major_clade) %>%
+  assess_monophy(
+    taxon_sampling = .,
+    tree = plastid_tree_dated,
+    tax_levels = "major_clade"
+  ) %>%
+  get_result_monophy(1) %>%
+  # Exclude lycophytes
+  filter(!taxon %in% c(
+    "Selaginellales", "Lycopodiales", "Isoëtales", "Isoetales")) %>%
+  verify(all(monophyly == "Yes")) %>%
+  transmute(major_clade = taxon, mrca = parse_number(mrca)) %>%
+  left_join(clade_cols_tib, by = "major_clade")
 ### plot-prep end
 ```
 
 ```{r genbank-make}
 fern_tree_sampling <-
-	tribble(
-		~source, ~year, ~n_species, ~label,
-		"Hasebe1995", 1995, 107, "Hasebe et al. 1995",
-		"Schuettpelz2007", 2007, 400, "Schuettpelz et al. 2007",
-		"Lehtonen2011", 2011, 2957, "Lehtonen 2011",
-		"Testo2016a", 2016, 3973, "Testo and Sundue 2016",
-		"this_study", 2021, n_sanger_ferns, "This study",
-	) %>%
-	mutate(source = fct_reorder(source, year))
+  tribble(
+    ~source, ~year, ~n_species, ~label,
+    "Hasebe1995", 1995, 107, "Hasebe et al. 1995",
+    "Schuettpelz2007", 2007, 400, "Schuettpelz et al. 2007",
+    "Lehtonen2011", 2011, 2957, "Lehtonen 2011",
+    "Testo2016a", 2016, 3973, "Testo and Sundue 2016",
+    "this_study", 2021, n_sanger_ferns, "This study",
+  ) %>%
+  mutate(source = fct_reorder(source, year))
 
 compartment_labs <- 
-	gb_species_by_year %>%
-	filter(year == max(year)) %>%
-	transmute(
-		type,
-		label = str_to_sentence(type),
-		year,
-		n_species
-	)
+  gb_species_by_year %>%
+  filter(year == max(year)) %>%
+  transmute(
+    type,
+    label = str_to_sentence(type),
+    year,
+    n_species
+  )
 
 okabe_ito_cols <-
-	palette_okabe_ito(1:9) %>%
-	set_names(
-		c("orange", "light_blue", "green", 
-			"yellow", "blue", "red",
-			"magenta", "grey", "black"))
+  palette_okabe_ito(1:9) %>%
+  set_names(
+    c("orange", "light_blue", "green", 
+      "yellow", "blue", "red",
+      "magenta", "grey", "black"))
 
 compartment_cols <- c(
-	mitochondrial = okabe_ito_cols["red"] %>% set_names(NULL),
-	nuclear = okabe_ito_cols["blue"] %>% set_names(NULL),
-	plastid = okabe_ito_cols["green"] %>% set_names(NULL),
-	total = "grey40"
+  mitochondrial = okabe_ito_cols["red"] %>% set_names(NULL),
+  nuclear = okabe_ito_cols["blue"] %>% set_names(NULL),
+  plastid = okabe_ito_cols["green"] %>% set_names(NULL),
+  total = "grey40"
 )
 
 # Manually specify axis buffers since we will annotate the panel border manually
 year_buffer <- 
-	max(gb_species_by_year$year) %>%
-	subtract(min(gb_species_by_year$year)) %>%
-	multiply_by(0.05)
+  max(gb_species_by_year$year) %>%
+  subtract(min(gb_species_by_year$year)) %>%
+  multiply_by(0.05)
 sp_buffer <- max(gb_species_by_year$n_species) %>%
-	subtract(min(gb_species_by_year$n_species)) %>%
-	multiply_by(0.05)
+  subtract(min(gb_species_by_year$n_species)) %>%
+  multiply_by(0.05)
 
 genbank_plot <-
-	ggplot(gb_species_by_year, aes(x = year, y = n_species)) +
-	geom_line(aes(color = type)) +
-	scale_color_manual(values = compartment_cols, guide = "none") +
-	# Annotate panel border manually, since the automatic border gets
-	# printed on top of label annotations with theme_bw()
-	annotate(
-		"rect", 
-		xmin = min(gb_species_by_year$year) - year_buffer,
-		xmax = max(gb_species_by_year$year) + year_buffer,
-		ymin = min(gb_species_by_year$n_species) - sp_buffer,
-		ymax = max(gb_species_by_year$n_species) + sp_buffer,
-		fill = "transparent",
-		color = "grey20") +
-	geom_label_repel(
-		data = compartment_labs %>% filter(type %in% c("nuclear", "mitochondrial")),
-		aes(color = type, label = label),
-		segment.linetype = 2, 
-		xlim = c(2020, Inf),
-		# Do not repel from top or bottom edges.
-		ylim = c(-Inf, Inf)
-	) +
-	geom_label_repel(
-		data = compartment_labs %>% filter(type %in% c("total", "plastid")),
-		aes(color = type, label = label),
-		segment.linetype = 2, 
-		xlim = c(2020, Inf),
-		ylim = c(-Inf, Inf),
-		min.segment.length = 0
-	) +
-	geom_point(
-		data = fern_tree_sampling,
-		aes(shape = source)
-	) +
-	scale_shape(
-		limits = fern_tree_sampling$source, 
-		labels = fern_tree_sampling$label
-	) +
-	scale_x_continuous(expand = expansion(0, 0)) + 
-	scale_y_continuous(expand = expansion(0, 0)) + 
-	labs(shape = "Study", y = "No. species", x = "Year") +
-	coord_cartesian(clip = "off") +
-	guides(shape = guide_legend(nrow = 2)) +
-	theme_bw() +
-	theme(
-		panel.border = element_blank(),
-		legend.position = "bottom",
-		legend.title = element_blank(),
-		plot.margin = margin(r = 1, t = 0.5, l = 0.5, unit = "in")
-	)
+  ggplot(gb_species_by_year, aes(x = year, y = n_species)) +
+  geom_line(aes(color = type)) +
+  scale_color_manual(values = compartment_cols, guide = "none") +
+  # Annotate panel border manually, since the automatic border gets
+  # printed on top of label annotations with theme_bw()
+  annotate(
+    "rect", 
+    xmin = min(gb_species_by_year$year) - year_buffer,
+    xmax = max(gb_species_by_year$year) + year_buffer,
+    ymin = min(gb_species_by_year$n_species) - sp_buffer,
+    ymax = max(gb_species_by_year$n_species) + sp_buffer,
+    fill = "transparent",
+    color = "grey20") +
+  geom_label_repel(
+    data = compartment_labs %>% filter(type %in% c("nuclear", "mitochondrial")),
+    aes(color = type, label = label),
+    segment.linetype = 2, 
+    xlim = c(2020, Inf),
+    # Do not repel from top or bottom edges.
+    ylim = c(-Inf, Inf)
+  ) +
+  geom_label_repel(
+    data = compartment_labs %>% filter(type %in% c("total", "plastid")),
+    aes(color = type, label = label),
+    segment.linetype = 2, 
+    xlim = c(2020, Inf),
+    ylim = c(-Inf, Inf),
+    min.segment.length = 0
+  ) +
+  geom_point(
+    data = fern_tree_sampling,
+    aes(shape = source)
+  ) +
+  scale_shape(
+    limits = fern_tree_sampling$source, 
+    labels = fern_tree_sampling$label
+  ) +
+  scale_x_continuous(expand = expansion(0, 0)) + 
+  scale_y_continuous(expand = expansion(0, 0)) + 
+  labs(shape = "Study", y = "No. species", x = "Year") +
+  coord_cartesian(clip = "off") +
+  guides(shape = guide_legend(nrow = 2)) +
+  theme_bw() +
+  theme(
+    panel.border = element_blank(),
+    legend.position = "bottom",
+    legend.title = element_blank(),
+    plot.margin = margin(r = 1, t = 0.5, l = 0.5, unit = "in")
+  )
 ```
 
 ```{r genbank-save, eval = params$doc_type == "doc" }
 # Save plot if rendering to doc
 ggsave(
-	result_file(figure("genbank"), "pdf"),
-	genbank_plot, width = 7, height = 5, units = "in")
+  result_file(figure("genbank"), "pdf"),
+  genbank_plot, width = 7, height = 5, units = "in")
 ```
 
 ```{r genbank-print, fig.width = 7, fig.height = 5, eval = params$doc_type == "pdf"}
@@ -1134,52 +1134,52 @@ Only accessions identified to species included; environmental samples, hybrid fo
 
 # Format y-axis text: show major clade abbreviations in bold
 clade_labs_tib <-
-	clade_cols_tib %>%
-	select(major_clade, code) %>%
-	mutate(
-		clade_short = map2_chr(major_clade, code, ~str_remove(.x, .y)),
-		label = glue("<b>{code}</b>{clade_short}"))
+  clade_cols_tib %>%
+  select(major_clade, code) %>%
+  mutate(
+    clade_short = map2_chr(major_clade, code, ~str_remove(.x, .y)),
+    label = glue("<b>{code}</b>{clade_short}"))
 
 clade_labs <- clade_labs_tib$label %>%
-	set_names(., clade_labs_tib$major_clade)
-	
+  set_names(., clade_labs_tib$major_clade)
+
 # Format coverage at order-ish level for plotting
 b <-
-	coverage_by_rank %>%
-	filter(rank == "major_clade") %>%
-	left_join(major_clade_exemp_taxa, by = c(name = "major_clade")) %>%
-	arrange(phy_order) %>%
-	rename(clade = name) %>%
-	mutate(
-		clade = fct_reorder(clade, phy_order) %>%
-			fct_rev(),
-		coverage_text = glue("{number(n, accuracy = 1)}/{number(n_accepted, accuracy = 1)}")
-	) %>%
-	ggplot(aes(x = coverage, y = clade, fill = clade)) +
-	geom_col(color = "grey10", size = 0.2) +
-	geom_text(
-		aes(label = coverage_text),
-		hjust = 0,
-		nudge_x = 0.01,
-		size = 6*.36 # 6 pt font
-	) +
-	scale_x_continuous(
-		labels = percent,
-		limits = c(0,1),
-		expand = expansion(mult = c(0, 0))
-	) +
-	scale_fill_manual(values = clade_cols) +
-	scale_y_discrete(labels = clade_labs) +
-	labs(x = "Coverage") +
-	theme_bw() +
-	theme(
-		axis.text.y = element_markdown(size = 6),
-		axis.title.y = element_blank(),
-		legend.position = "none",
-		plot.background = element_rect(fill = "transparent", colour = NA),
-		panel.grid.major.y = element_blank(),
-		panel.grid.minor.x = element_blank()
-	)
+  coverage_by_rank %>%
+  filter(rank == "major_clade") %>%
+  left_join(major_clade_exemp_taxa, by = c(name = "major_clade")) %>%
+  arrange(phy_order) %>%
+  rename(clade = name) %>%
+  mutate(
+    clade = fct_reorder(clade, phy_order) %>%
+      fct_rev(),
+    coverage_text = glue("{number(n, accuracy = 1)}/{number(n_accepted, accuracy = 1)}")
+  ) %>%
+  ggplot(aes(x = coverage, y = clade, fill = clade)) +
+  geom_col(color = "grey10", size = 0.2) +
+  geom_text(
+    aes(label = coverage_text),
+    hjust = 0,
+    nudge_x = 0.01,
+    size = 6*.36 # 6 pt font
+  ) +
+  scale_x_continuous(
+    labels = percent,
+    limits = c(0,1),
+    expand = expansion(mult = c(0, 0))
+  ) +
+  scale_fill_manual(values = clade_cols) +
+  scale_y_discrete(labels = clade_labs) +
+  labs(x = "Coverage") +
+  theme_bw() +
+  theme(
+    axis.text.y = element_markdown(size = 6),
+    axis.title.y = element_blank(),
+    legend.position = "none",
+    plot.background = element_rect(fill = "transparent", colour = NA),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.x = element_blank()
+  )
 
 # Tree plot ----
 
@@ -1188,48 +1188,48 @@ b <-
 # results in different positions of text relative to bars. 
 # Account for this by manual adjusting offset.text
 ftol_geom_cladelab <- function(code_select, offset_text) {
-	geom_cladelab(
-		data = filter(clade_tibble, code %in% code_select),
-		mapping = aes(
-			node = mrca,
-			color = major_clade,
-			label = code
-		),
-		offset = 0.1,
-		offset.text = offset_text,
-		fontsize = 2.5,
-		textcolour = "black",
-		barsize = 2)
+  geom_cladelab(
+    data = filter(clade_tibble, code %in% code_select),
+    mapping = aes(
+      node = mrca,
+      color = major_clade,
+      label = code
+    ),
+    offset = 0.1,
+    offset.text = offset_text,
+    fontsize = 2.5,
+    textcolour = "black",
+    barsize = 2)
 }
 
 a <- ggtree(
-	plastid_tree_dated, layout = "circular", right = FALSE, size = 0.1) + 
-	ftol_geom_cladelab(
-		clade_tibble$code[clade_tibble$code %in% c("Eq", "Op", "Ma", "Os", "Gl")], 10) +
-	ftol_geom_cladelab(
-		clade_tibble$code[clade_tibble$code %in% c("Hy", "Sc", "Sal")], 14) +
-	ftol_geom_cladelab(
-		clade_tibble$code[clade_tibble$code %in% c("Cy", "Sac", "Li", "De")], 17) +
-	ftol_geom_cladelab("Pt", 26) +
-	ftol_geom_cladelab("As", 34) +
-	ftol_geom_cladelab("Po", 17) +
-	scale_color_manual(values = clade_cols) +
-	theme(legend.position = "none")
-	
+  plastid_tree_dated, layout = "circular", right = FALSE, size = 0.1) + 
+  ftol_geom_cladelab(
+    clade_tibble$code[clade_tibble$code %in% c("Eq", "Op", "Ma", "Os", "Gl")], 10) +
+  ftol_geom_cladelab(
+    clade_tibble$code[clade_tibble$code %in% c("Hy", "Sc", "Sal")], 14) +
+  ftol_geom_cladelab(
+    clade_tibble$code[clade_tibble$code %in% c("Cy", "Sac", "Li", "De")], 17) +
+  ftol_geom_cladelab("Pt", 26) +
+  ftol_geom_cladelab("As", 34) +
+  ftol_geom_cladelab("Po", 17) +
+  scale_color_manual(values = clade_cols) +
+  theme(legend.position = "none")
+
 # Assemble plots ----
 ftol_plot <-
-	a + inset_element(b, left = 0.85, bottom = 0.14, right = 1.3, top = .8) +
-	plot_annotation(
-		theme = theme(
-			plot.margin = unit(c(-2,5,-2,-1.4), "cm"))
-	)
+  a + inset_element(b, left = 0.85, bottom = 0.14, right = 1.3, top = .8) +
+  plot_annotation(
+    theme = theme(
+      plot.margin = unit(c(-2,5,-2,-1.4), "cm"))
+  )
 ```
 
 ```{r ftol-save, eval = params$doc_type == "doc"}
 # Save plot if rendering to doc
 ggsave(
-	result_file(figure("ftol"), "pdf"),
-	ftol_plot, width = 7, height = 7, units = "in")
+  result_file(figure("ftol"), "pdf"),
+  ftol_plot, width = 7, height = 7, units = "in")
 ```
 
 ```{r ftol-print, fig.width = 7, fig.height = 7, eval = params$doc_type == "pdf"}
@@ -1250,22 +1250,22 @@ Taxonomy follows @PteridophytePhylogenyGroupI2016.
 ```{r backbone-make}
 # Make exemplar set of species in backbone representing families
 family_exemp <-
-	backbone_taxonomy %>%
-	# Drop outgroups %>%
-	filter(family != "og") %>%
-	# Slice to one exemplar species per family
-	group_by(family) %>%
-	slice(1) %>%
-	ungroup() %>%
-	# Slicing arranges alphabetically, so put back in (unladderized) phylo order
-	arrange(phy_order)
+  backbone_taxonomy %>%
+  # Drop outgroups %>%
+  filter(family != "og") %>%
+  # Slice to one exemplar species per family
+  group_by(family) %>%
+  slice(1) %>%
+  ungroup() %>%
+  # Slicing arranges alphabetically, so put back in (unladderized) phylo order
+  arrange(phy_order)
 
 # Trim tree to exemplar species, rename by family
 phy <- keep.tip(plastome_tree_rooted, family_exemp$species)
 new_tip_label <-
-	tibble(species = phy$tip.label) %>%
-	left_join(family_exemp, by = "species") %>%
-	pull(family)
+  tibble(species = phy$tip.label) %>%
+  left_join(family_exemp, by = "species") %>%
+  pull(family)
 phy$tip.label <- new_tip_label
 # Convert BS support values to numeric
 phy$node.label <- parse_number(phy$node.label)
@@ -1274,153 +1274,153 @@ phy <- rescale_tree(phy, 100)
 
 # Make tibble for printing BS values
 bs_tibble <- tibble(
-	# hard-code node ID: internal nodes start after tip nodes,
-	# and phy$node.label is in the same order as internal nodes
-	node = 1:Nnode(phy) + Ntip(phy), 
-	# Don't print BS = 100%
-	bootstrap = ifelse(phy$node.label == 100, "", phy$node.label))
+  # hard-code node ID: internal nodes start after tip nodes,
+  # and phy$node.label is in the same order as internal nodes
+  node = 1:Nnode(phy) + Ntip(phy), 
+  # Don't print BS = 100%
+  bootstrap = ifelse(phy$node.label == 100, "", phy$node.label))
 
 # Make tibble for labeling clades
 phy_tip <- as_tibble(phy)
 
 suborder_labels_singletons <-
-	family_exemp %>% 
-	filter(outgroup == FALSE) %>%
-	group_by(major_clade) %>%
-	select(major_clade, family) %>% 
-	filter(n_distinct(family) == 1) %>%
-	ungroup() %>%
-	left_join(phy_tip, by = c(family = "label")) %>%
-	select(major_clade, mrca = node)
+  family_exemp %>% 
+  filter(outgroup == FALSE) %>%
+  group_by(major_clade) %>%
+  select(major_clade, family) %>% 
+  filter(n_distinct(family) == 1) %>%
+  ungroup() %>%
+  left_join(phy_tip, by = c(family = "label")) %>%
+  select(major_clade, mrca = node)
 
 suborder_labels <-
-	family_exemp %>% 
-	filter(outgroup == FALSE) %>%
-	group_by(major_clade) %>%
-	select(major_clade, family) %>% 
-	filter(n_distinct(family) > 1) %>%
-	summarize(taxa = list(family)) %>%
-	mutate(
-		mrca = map_chr(taxa, ~getMRCA(phy, .))
-	) %>%
-	transmute(
-		major_clade,
-		mrca
-	) %>%
-	mutate(mrca = parse_number(mrca)) %>%
-	bind_rows(suborder_labels_singletons) %>%
-	mutate(
-		clade_label = case_when(
-			major_clade == "Aspleniineae" ~ "Aspleniineae\n(eupolypods II)",
-			major_clade == "Polypodiineae" ~ "Polypodiineae\n(eupolypods I)",
-			TRUE ~ major_clade
-		)
-	)
+  family_exemp %>% 
+  filter(outgroup == FALSE) %>%
+  group_by(major_clade) %>%
+  select(major_clade, family) %>% 
+  filter(n_distinct(family) > 1) %>%
+  summarize(taxa = list(family)) %>%
+  mutate(
+    mrca = map_chr(taxa, ~getMRCA(phy, .))
+  ) %>%
+  transmute(
+    major_clade,
+    mrca
+  ) %>%
+  mutate(mrca = parse_number(mrca)) %>%
+  bind_rows(suborder_labels_singletons) %>%
+  mutate(
+    clade_label = case_when(
+      major_clade == "Aspleniineae" ~ "Aspleniineae\n(eupolypods II)",
+      major_clade == "Polypodiineae" ~ "Polypodiineae\n(eupolypods I)",
+      TRUE ~ major_clade
+    )
+  )
 
 # Get data of x and y co-ordinates for ggtree plot
 phy_plot_data <- ggplot_build(ggtree(phy)) %>%
-	magrittr::extract2("data") %>%
-	magrittr::extract2(1) %>%
-	as_tibble()
+  magrittr::extract2("data") %>%
+  magrittr::extract2(1) %>%
+  as_tibble()
 
 # Make a dataframe for plotting various clade labels
 other_clade_labels <-
-	list(
-		"eupolypods" = c("Polypodiaceae", "Aspleniaceae"),
-		"Polypodiales" = c("Polypodiaceae", "Saccolomataceae"),
-		"Polypodiidae\n(leptosporangiates)" = c("Polypodiaceae", "Osmundaceae")
-	) %>%
-	tibble(
-		clade_label = names(.),
-		x = map_dbl(., ~node_height_from_tips(phy, .)),
-		node = map_dbl(., ~ape::getMRCA(phy, .))
-	) %>%
-	left_join(
-		select(phy_plot_data, node, y), by = "node"
-	) %>%
-	select(-`.`, -node)
+  list(
+    "eupolypods" = c("Polypodiaceae", "Aspleniaceae"),
+    "Polypodiales" = c("Polypodiaceae", "Saccolomataceae"),
+    "Polypodiidae\n(leptosporangiates)" = c("Polypodiaceae", "Osmundaceae")
+  ) %>%
+  tibble(
+    clade_label = names(.),
+    x = map_dbl(., ~node_height_from_tips(phy, .)),
+    node = map_dbl(., ~ape::getMRCA(phy, .))
+  ) %>%
+  left_join(
+    select(phy_plot_data, node, y), by = "node"
+  ) %>%
+  select(-`.`, -node)
 
 segment_cols <-
-	rep("grey20", length(other_clade_labels$clade_label)) %>%
-	set_names(other_clade_labels$clade_label)
+  rep("grey20", length(other_clade_labels$clade_label)) %>%
+  set_names(other_clade_labels$clade_label)
 
 set.seed(123)
 # Use the ggtree::`%<+%` operator to map the 
 # bootstrap values onto the ggtree object
 backbone_plot <- 
-	ggtree(phy) %<+% bs_tibble +
-	# now we can show BS values using geom_text()
-	geom_text(aes(label = bootstrap), hjust = -.25, size = 2.5) +
-	# add tip labels
-	geom_tiplab(aes(label = label)) +
-	# highlight major clades
-	geom_hilight(
-		data = suborder_labels,
-		mapping = aes(
-			node = mrca,
-			fill = major_clade
-		),
-		alpha = 0.2,
-		align = "right",
-		extend = 30,
-		gradient.direction = "rt",
-		roundrect = TRUE,
-		gradient.length.out = 2) +
-	scale_fill_manual(values = clade_cols) +
-	# label major clades
-	geom_cladelab(
-		data = suborder_labels,
-		mapping = aes(
-			node = mrca,
-			label = clade_label
-		),
-		offset = 28,
-		align = TRUE,
-		extend = 0.3,
-		hjust = 0,
-		barcolour = "grey20",
-		barsize = 2) +
-	# Label other groups
-	geom_text_repel(
-		data = other_clade_labels %>%
-			filter(clade_label == "Polypodiidae\n(leptosporangiates)"),
-		aes(x = x, y = y, label = clade_label),
-		hjust = 0,
-		xlim = c(NA, 10),
-		ylim = c(15, NA),
-		color = "grey20",
-		segment.color = "grey20"
-	) +
-	geom_text_repel(
-		data = other_clade_labels %>%
-			filter(clade_label == "eupolypods"),
-		aes(x = x, y = y, label = clade_label),
-		hjust = 0,
-		xlim = c(NA, 64),
-		ylim = c(32, NA),
-		color = "grey20",
-		segment.color = "grey20"
-	) +
-	geom_text_repel(
-		data = other_clade_labels %>%
-			filter(clade_label == "Polypodiales"),
-		aes(x = x, y = y, label = clade_label),
-		hjust = 0,
-		xlim = c(NA, 48),
-		ylim = c(24, NA),
-		color = "grey20",
-		segment.color = "grey20"
-	) +
-	xlim(0, 180) +
-	coord_cartesian(clip = "off") +
-	theme(legend.position = "none")
+  ggtree(phy) %<+% bs_tibble +
+  # now we can show BS values using geom_text()
+  geom_text(aes(label = bootstrap), hjust = -.25, size = 2.5) +
+  # add tip labels
+  geom_tiplab(aes(label = label)) +
+  # highlight major clades
+  geom_hilight(
+    data = suborder_labels,
+    mapping = aes(
+      node = mrca,
+      fill = major_clade
+    ),
+    alpha = 0.2,
+    align = "right",
+    extend = 30,
+    gradient.direction = "rt",
+    roundrect = TRUE,
+    gradient.length.out = 2) +
+  scale_fill_manual(values = clade_cols) +
+  # label major clades
+  geom_cladelab(
+    data = suborder_labels,
+    mapping = aes(
+      node = mrca,
+      label = clade_label
+    ),
+    offset = 28,
+    align = TRUE,
+    extend = 0.3,
+    hjust = 0,
+    barcolour = "grey20",
+    barsize = 2) +
+  # Label other groups
+  geom_text_repel(
+    data = other_clade_labels %>%
+      filter(clade_label == "Polypodiidae\n(leptosporangiates)"),
+    aes(x = x, y = y, label = clade_label),
+    hjust = 0,
+    xlim = c(NA, 10),
+    ylim = c(15, NA),
+    color = "grey20",
+    segment.color = "grey20"
+  ) +
+  geom_text_repel(
+    data = other_clade_labels %>%
+      filter(clade_label == "eupolypods"),
+    aes(x = x, y = y, label = clade_label),
+    hjust = 0,
+    xlim = c(NA, 64),
+    ylim = c(32, NA),
+    color = "grey20",
+    segment.color = "grey20"
+  ) +
+  geom_text_repel(
+    data = other_clade_labels %>%
+      filter(clade_label == "Polypodiales"),
+    aes(x = x, y = y, label = clade_label),
+    hjust = 0,
+    xlim = c(NA, 48),
+    ylim = c(24, NA),
+    color = "grey20",
+    segment.color = "grey20"
+  ) +
+  xlim(0, 180) +
+  coord_cartesian(clip = "off") +
+  theme(legend.position = "none")
 ```
 
 ```{r backbone-tree-save, eval = params$doc_type == "doc"}
 # Save plot if rendering to doc
 ggsave(
-	result_file(figure("backbone"), "pdf"),
-	backbone_plot, width = 7, height = 9, units = "in")
+  result_file(figure("backbone"), "pdf"),
+  backbone_plot, width = 7, height = 9, units = "in")
 ```
 
 ```{r backbone-tree-print, fig.width = 7, fig.height = 9, eval = params$doc_type == "pdf"}
@@ -1443,131 +1443,131 @@ Colors of major clades (orders or suborders) correspond to those used in `r figu
 # Helper function for subsetting dates to get into
 # almost-long format
 subset_ages <- function(other_dates, author_sel) {
-	other_dates %>%
-		select(family, contains(glue("{author_sel}_"))) %>%
-		rename_with(~str_remove_all(., glue("{author_sel}_"))) %>%
-		mutate(author = author_sel)
+  other_dates %>%
+    select(family, contains(glue("{author_sel}_"))) %>%
+    rename_with(~str_remove_all(., glue("{author_sel}_"))) %>%
+    mutate(author = author_sel)
 }
 
 # Combine dates in almost-long format:
 # one row per family/study combination,
 # cols for median, high, and low date
 all_ages <-
-bind_rows(
-	subset_ages(other_dates, "ts"),
-	subset_ages(other_dates, "rothfels"),
-	select(other_dates, family, median = schuettpelz_best) %>%
-		mutate(author = "schuettpelz"),
-	transmute(
-		family_stem_ages,
-		family,
-		author = "current",
-		median = age
-	)
-) %>%
-	left_join(
-		unique(select(sanger_sampling, family, major_clade)), by = "family") %>%
-	left_join(clade_tibble, by = "major_clade") %>%
-	# (some median dates are NA if that family wasn't included in a study)
-	assert(not_na, family, major_clade, code, author) %>%
-	# Set family as a factor ordered by current age estimate
-	left_join(family_stem_ages, by = "family") %>%
-	mutate(family = fct_reorder(family, age)) %>%
-	select(-age)
- 
+  bind_rows(
+    subset_ages(other_dates, "ts"),
+    subset_ages(other_dates, "rothfels"),
+    select(other_dates, family, median = schuettpelz_best) %>%
+      mutate(author = "schuettpelz"),
+    transmute(
+      family_stem_ages,
+      family,
+      author = "current",
+      median = age
+    )
+  ) %>%
+  left_join(
+    unique(select(sanger_sampling, family, major_clade)), by = "family") %>%
+  left_join(clade_tibble, by = "major_clade") %>%
+  # (some median dates are NA if that family wasn't included in a study)
+  assert(not_na, family, major_clade, code, author) %>%
+  # Set family as a factor ordered by current age estimate
+  left_join(family_stem_ages, by = "family") %>%
+  mutate(family = fct_reorder(family, age)) %>%
+  select(-age)
+
 # Define shapes and colors for points
 ages_shapes <- c(
-	current = 16, # circle
-	rothfels = 17, # triangle
-	schuettpelz = 15, # square
-	ts = 18 # diamond
+  current = 16, # circle
+  rothfels = 17, # triangle
+  schuettpelz = 15, # square
+  ts = 18 # diamond
 )
 
 ages_colors <- c(
-	current = palette_okabe_ito(order = "vermillion"),
-	rothfels = palette_okabe_ito(order = "bluishgreen"),
-	schuettpelz = palette_okabe_ito(order = "blue"),
-	ts = palette_okabe_ito(order = "orange")
+  current = palette_okabe_ito(order = "vermillion"),
+  rothfels = palette_okabe_ito(order = "bluishgreen"),
+  schuettpelz = palette_okabe_ito(order = "blue"),
+  ts = palette_okabe_ito(order = "orange")
 )
 
 # Format names of papers for printing
 ages_sampling <-
-	tribble(
-		~source, ~year, ~label,
-		"schuettpelz", 2009, "Schuettpelz & Pryer 2009",
-		"rothfels", 2015, "Rothfels et al. 2015",
-		"ts", 2016, "Testo and Sundue 2016",
-		"current", 2021, "This study",
-	) %>%
-	mutate(source = fct_reorder(source, year))
-	
+  tribble(
+    ~source, ~year, ~label,
+    "schuettpelz", 2009, "Schuettpelz & Pryer 2009",
+    "rothfels", 2015, "Rothfels et al. 2015",
+    "ts", 2016, "Testo and Sundue 2016",
+    "current", 2021, "This study",
+  ) %>%
+  mutate(source = fct_reorder(source, year))
+
 # Format y-axis text: show major clade in parentheses
 family_labs_tbl <-
-all_ages %>%
-	select(family, code) %>%
-	unique() %>%
-	mutate(label = glue("{family} ({code})"))
+  all_ages %>%
+  select(family, code) %>%
+  unique() %>%
+  mutate(label = glue("{family} ({code})"))
 
 family_labs <- family_labs_tbl$label %>%
-	set_names(., family_labs_tbl$family)
-	
+  set_names(., family_labs_tbl$family)
+
 # Provide names of periods in caption
 # Make sure to read and check that they are all there!
 period_names <-
-	periods %>%
-	# Filter to range including Ordovician to Neogene
-	filter(min_age < 475) %>%
-	filter(min_age > 1) %>%
-	arrange(desc(min_age)) %>%
-	mutate(label = glue("{abbr} ({name})")) %>%
-	pull(label) %>%
-	paste(collapse = ", ")
+  periods %>%
+  # Filter to range including Ordovician to Neogene
+  filter(min_age < 475) %>%
+  filter(min_age > 1) %>%
+  arrange(desc(min_age)) %>%
+  mutate(label = glue("{abbr} ({name})")) %>%
+  pull(label) %>%
+  paste(collapse = ", ")
 
 div_times_plot <-
-ggplot(all_ages) +
-	geom_pointrange(
-		aes(
-			x = median, xmin = low, xmax = high,
-			y = family,
-			color = author, shape = author),
-		position = position_dodge(width = 0.5)) +
-	scale_shape_manual(
-		values = ages_shapes,
-		limits = ages_sampling$source, 
-		labels = ages_sampling$label) +
-	scale_color_manual(
-		values = ages_colors,
-		limits = ages_sampling$source, 
-		labels = ages_sampling$label) +
-	scale_y_discrete(labels = family_labs, expand = expansion(add = 0.7)) +
-	scale_x_reverse("Age (millions of years)") +
-	coord_geo(
-		dat = list("periods", "eras"),
-		pos = list("b", "b"),
-		abbrv = list(TRUE, FALSE),
-		xlim = c(500, 0),
-		fill = "transparent",
-		color = "grey20",
-		lab_color = "grey30",
-		height = unit(1, "lines"),
-		# FIXME: change this to true when issue gets resolved
-		# https://github.com/willgearty/deeptime/issues/41
-		expand = FALSE,
-		size = 3) +
-	guides(shape = guide_legend(nrow = 2)) +
-	theme_bw() +
-	theme(
-		axis.title.y = element_blank(),
-		legend.title = element_blank(),
-		legend.position = "bottom"
-	)
+  ggplot(all_ages) +
+  geom_pointrange(
+    aes(
+      x = median, xmin = low, xmax = high,
+      y = family,
+      color = author, shape = author),
+    position = position_dodge(width = 0.5)) +
+  scale_shape_manual(
+    values = ages_shapes,
+    limits = ages_sampling$source, 
+    labels = ages_sampling$label) +
+  scale_color_manual(
+    values = ages_colors,
+    limits = ages_sampling$source, 
+    labels = ages_sampling$label) +
+  scale_y_discrete(labels = family_labs, expand = expansion(add = 0.7)) +
+  scale_x_reverse("Age (millions of years)") +
+  coord_geo(
+    dat = list("periods", "eras"),
+    pos = list("b", "b"),
+    abbrv = list(TRUE, FALSE),
+    xlim = c(500, 0),
+    fill = "transparent",
+    color = "grey20",
+    lab_color = "grey30",
+    height = unit(1, "lines"),
+    # FIXME: change this to true when issue gets resolved
+    # https://github.com/willgearty/deeptime/issues/41
+    expand = FALSE,
+    size = 3) +
+  guides(shape = guide_legend(nrow = 2)) +
+  theme_bw() +
+  theme(
+    axis.title.y = element_blank(),
+    legend.title = element_blank(),
+    legend.position = "bottom"
+  )
 ```
 
 ```{r div-times-save, eval = params$doc_type == "doc"}
 # Save plot if rendering to doc
 ggsave(
-	result_file(figure("divtimes"), "pdf"),
-	div_times_plot, width = 7, height = 8, units = "in")
+  result_file(figure("divtimes"), "pdf"),
+  div_times_plot, width = 7, height = 8, units = "in")
 ```
 
 ```{r div-times-print, fig.width = 7, fig.height = 9, eval = params$doc_type == "pdf"}

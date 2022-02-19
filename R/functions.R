@@ -9,106 +9,106 @@
 #' @return Tibble
 #' 
 fetch_metadata <- function(
-	query = NULL,
-	col_select = c("gi", "caption", "taxid", "title", "slen", "subtype", "subname")) {
-	
-	assertthat::assert_that(assertthat::is.string(query))
-	
-	assertthat::assert_that(is.character(col_select))
-	
-	# Do an initial search without downloading any IDs to see how many hits
-	# we get.
-	initial_genbank_results <- rentrez::entrez_search(
-		db = "nucleotide",
-		term = query,
-		use_history = FALSE
-	)
-	
-	# If no results, return empty tibble
-	if (initial_genbank_results$count < 1) return(tibble(taxid = NA))
-	
-	# Download IDs with maximum set to 1 more than the total number of hits.
-	genbank_results <- rentrez::entrez_search(
-		db = "nucleotide",
-		term = query,
-		use_history = FALSE,
-		retmax = initial_genbank_results$count + 1
-	)
-	
-	# Define internal function to download genbank data into tibble
-	# - make "safe" version of rentrez::entrez_summary to catch errors
-	safe_entrez_summary <- purrr::safely(rentrez::entrez_summary)
-	entrez_summary_gb <- function(id, col_select) {
-		
-		# Download data
-		res <- safe_entrez_summary(db = "nucleotide", id = id)
-		
-		# Early exit if error with entrez
-		if (!is.null(res$error)) {
-			warning("No esummary records found in file, returning empty tibble")
-			return(tibble(taxid = NA))
-		}
-		
-		res$result %>%
-			# Extract selected columns from result
-			purrr::map_dfr(magrittr::extract, col_select) %>%
-			# Make sure taxid column is character
-			mutate(taxid = as.character(taxid)) %>%
-			assert(not_na, taxid)
-	}
-	
-	# Extract list of IDs from search results
-	genbank_ids <- genbank_results$ids
-	
-	# Fetch metadata for each ID and extract selected columns
-	if (length(genbank_ids) == 1) {
-		rentrez_results <- rentrez::entrez_summary(db = "nucleotide", id = genbank_ids) %>%
-			magrittr::extract(col_select) %>%
-			tibble::as_tibble() %>%
-			mutate(taxid = as.character(taxid)) %>%
-			assert(not_na, taxid)
-	} else {
-		# Split input vector into chunks
-		n <- length(genbank_ids)
-		chunk_size <- 200
-		r <- rep(1:ceiling(n/chunk_size), each = chunk_size)[1:n]
-		genbank_ids_list <- split(genbank_ids, r) %>% magrittr::set_names(NULL)
-		# Download results for each chunk
-		rentrez_results <- map_df(genbank_ids_list, ~entrez_summary_gb(., col_select = col_select))
-	}
-	
-	return(rentrez_results)
-	
+  query = NULL,
+  col_select = c("gi", "caption", "taxid", "title", "slen", "subtype", "subname")) {
+  
+  assertthat::assert_that(assertthat::is.string(query))
+  
+  assertthat::assert_that(is.character(col_select))
+  
+  # Do an initial search without downloading any IDs to see how many hits
+  # we get.
+  initial_genbank_results <- rentrez::entrez_search(
+    db = "nucleotide",
+    term = query,
+    use_history = FALSE
+  )
+  
+  # If no results, return empty tibble
+  if (initial_genbank_results$count < 1) return(tibble(taxid = NA))
+  
+  # Download IDs with maximum set to 1 more than the total number of hits.
+  genbank_results <- rentrez::entrez_search(
+    db = "nucleotide",
+    term = query,
+    use_history = FALSE,
+    retmax = initial_genbank_results$count + 1
+  )
+  
+  # Define internal function to download genbank data into tibble
+  # - make "safe" version of rentrez::entrez_summary to catch errors
+  safe_entrez_summary <- purrr::safely(rentrez::entrez_summary)
+  entrez_summary_gb <- function(id, col_select) {
+    
+    # Download data
+    res <- safe_entrez_summary(db = "nucleotide", id = id)
+    
+    # Early exit if error with entrez
+    if (!is.null(res$error)) {
+      warning("No esummary records found in file, returning empty tibble")
+      return(tibble(taxid = NA))
+    }
+    
+    res$result %>%
+      # Extract selected columns from result
+      purrr::map_dfr(magrittr::extract, col_select) %>%
+      # Make sure taxid column is character
+      mutate(taxid = as.character(taxid)) %>%
+      assert(not_na, taxid)
+  }
+  
+  # Extract list of IDs from search results
+  genbank_ids <- genbank_results$ids
+  
+  # Fetch metadata for each ID and extract selected columns
+  if (length(genbank_ids) == 1) {
+    rentrez_results <- rentrez::entrez_summary(db = "nucleotide", id = genbank_ids) %>%
+      magrittr::extract(col_select) %>%
+      tibble::as_tibble() %>%
+      mutate(taxid = as.character(taxid)) %>%
+      assert(not_na, taxid)
+  } else {
+    # Split input vector into chunks
+    n <- length(genbank_ids)
+    chunk_size <- 200
+    r <- rep(1:ceiling(n/chunk_size), each = chunk_size)[1:n]
+    genbank_ids_list <- split(genbank_ids, r) %>% magrittr::set_names(NULL)
+    # Download results for each chunk
+    rentrez_results <- map_df(genbank_ids_list, ~entrez_summary_gb(., col_select = col_select))
+  }
+  
+  return(rentrez_results)
+  
 }
 
 # Get a tibble of taxids for a single year from genbank
 fetch_taxa_by_year <- function(query, year, type) {
-	full_query <- glue::glue('{query} AND ("{year}"[Publication Date] : "{year+1}"[Publication Date]) ')
-	fetch_metadata(full_query, "taxid") %>%
-		count(taxid) %>%
-		mutate(type = type, year = year)
+  full_query <- glue::glue('{query} AND ("{year}"[Publication Date] : "{year+1}"[Publication Date]) ')
+  fetch_metadata(full_query, "taxid") %>%
+    count(taxid) %>%
+    mutate(type = type, year = year)
 }
 
 # Format a dataframe for searching GenBank for
 # three types of fern sequences: plastid, nuclear, michondria
 # from 1990 to 2021
 make_gb_query <- function() {
-	list(
-		year = 1990:2021,
-		query = c(
-			"(Polypodiopsida[Organism] AND gene_in_plastid[PROP])",
-			"(Polypodiopsida[Organism] gene_in_genomic[PROP])",
-			"(Polypodiopsida[Organism] gene_in_mitochondrion[PROP])"
-		)
-	) %>%
-		cross_df() %>%
-		mutate(
-			type = case_when(
-				str_detect(query, "plastid") ~ "plastid",
-				str_detect(query, "genomic") ~ "nuclear",
-				str_detect(query, "mito") ~ "mitochondrial",
-			)
-		)
+  list(
+    year = 1990:2021,
+    query = c(
+      "(Polypodiopsida[Organism] AND gene_in_plastid[PROP])",
+      "(Polypodiopsida[Organism] gene_in_genomic[PROP])",
+      "(Polypodiopsida[Organism] gene_in_mitochondrion[PROP])"
+    )
+  ) %>%
+    cross_df() %>%
+    mutate(
+      type = case_when(
+        str_detect(query, "plastid") ~ "plastid",
+        str_detect(query, "genomic") ~ "nuclear",
+        str_detect(query, "mito") ~ "mitochondrial",
+      )
+    )
 }
 
 #' Load a dataframe of NCBI species names corresponding to taxon IDs
@@ -124,57 +124,57 @@ make_gb_query <- function() {
 #' @return Tibble with two columns, "taxid" and "species"
 #' 
 load_ncbi_names <- function(taxdump_zip_file, taxid_keep) {
-	
-	# Unzip names.dmp to a temporary directory
-	temp_dir <- tempdir(check = TRUE)
-	
-	utils::unzip(
-		taxdump_zip_file, files = "names.dmp",
-		overwrite = TRUE, junkpaths = TRUE, exdir = temp_dir)
-	
-	# Load raw NCBI data
-	ncbi_raw <-
-		fs::path(temp_dir, "names.dmp") %>%
-		readr::read_delim(
-			delim = "\t|\t", col_names = FALSE,
-			col_types = cols(.default = col_character())
-		)
-	
-	# Delete temporary unzipped file
-	fs::file_delete(fs::path(temp_dir, "names.dmp"))
-	
-	# Prune raw NBCI names to names in metadata
-	ncbi_raw %>%
-		# Select only needed columns
-		transmute(
-			taxid = as.character(X1),
-			name = X2,
-			class = X4) %>%
-		# Filter to only taxid in genbank data
-		filter(taxid %in% unique(taxid_keep)) %>%
-		# Make sure there are no hidden fields in `class`
-		verify(all(str_count(class, "\\|") == 1)) %>%
-		# Drop field separators in `class`
-		mutate(class = str_remove_all(class, "\\\t\\|")) %>%
-		# Only keep accepted name
-		filter(class == "scientific name") %>%
-		# Exclude names from consideration that aren't fully identified to species, 
-		# environmental samples, or hybrid formulas.
-		# Hybrid names *can* be parsed:
-		# - "Equisetum x ferrissii" (x before specific epithet)
-		# - "x Cystocarpium roskamianum" (x before nothogenus)
-		# Hybrid formulas *can't* be parsed:
-		# - "Cystopteris alpina x Cystopteris fragilis" (x before another species)
-		mutate(
-			exclude = case_when(
-				str_detect(name, " sp\\.| aff\\.| cf\\.| × [A-Z]| x [A-Z]|environmental sample") ~ TRUE,
-				str_count(name, " ") < 1 ~ TRUE,
-				TRUE ~ FALSE
-			)
-		) %>%
-		filter(exclude == FALSE) %>%
-		select(-exclude) %>%
-		select(taxid, species = name)
+  
+  # Unzip names.dmp to a temporary directory
+  temp_dir <- tempdir(check = TRUE)
+  
+  utils::unzip(
+    taxdump_zip_file, files = "names.dmp",
+    overwrite = TRUE, junkpaths = TRUE, exdir = temp_dir)
+  
+  # Load raw NCBI data
+  ncbi_raw <-
+    fs::path(temp_dir, "names.dmp") %>%
+    readr::read_delim(
+      delim = "\t|\t", col_names = FALSE,
+      col_types = cols(.default = col_character())
+    )
+  
+  # Delete temporary unzipped file
+  fs::file_delete(fs::path(temp_dir, "names.dmp"))
+  
+  # Prune raw NBCI names to names in metadata
+  ncbi_raw %>%
+    # Select only needed columns
+    transmute(
+      taxid = as.character(X1),
+      name = X2,
+      class = X4) %>%
+    # Filter to only taxid in genbank data
+    filter(taxid %in% unique(taxid_keep)) %>%
+    # Make sure there are no hidden fields in `class`
+    verify(all(str_count(class, "\\|") == 1)) %>%
+    # Drop field separators in `class`
+    mutate(class = str_remove_all(class, "\\\t\\|")) %>%
+    # Only keep accepted name
+    filter(class == "scientific name") %>%
+    # Exclude names from consideration that aren't fully identified to species, 
+    # environmental samples, or hybrid formulas.
+    # Hybrid names *can* be parsed:
+    # - "Equisetum x ferrissii" (x before specific epithet)
+    # - "x Cystocarpium roskamianum" (x before nothogenus)
+    # Hybrid formulas *can't* be parsed:
+    # - "Cystopteris alpina x Cystopteris fragilis" (x before another species)
+    mutate(
+      exclude = case_when(
+        str_detect(name, " sp\\.| aff\\.| cf\\.| × [A-Z]| x [A-Z]|environmental sample") ~ TRUE,
+        str_count(name, " ") < 1 ~ TRUE,
+        TRUE ~ FALSE
+      )
+    ) %>%
+    filter(exclude == FALSE) %>%
+    select(-exclude) %>%
+    select(taxid, species = name)
 }
 
 #' Count the number of species accumulated in GenBank each year by
@@ -189,36 +189,36 @@ load_ncbi_names <- function(taxdump_zip_file, taxid_keep) {
 #' for each type of genomic compartment
 #' 
 count_ncbi_species_by_year <- function(gb_taxa, ncbi_names, year_range) {
-	
-	# Filter GenBank taxaids to only those identified to species,
-	# join to species names
-	gb_species <-
-		gb_taxa %>%
-		filter(!is.na(taxid)) %>%
-		inner_join(ncbi_names, by = "taxid")
-	
-	# Helper function to sum total species in each dataset
-	# by year
-	sum_species <- function(gb_species, year_select) {
-		bind_rows(
-			gb_species %>% filter(year <= year_select) %>%
-				group_by(type) %>%
-				summarize(
-					n_species = n_distinct(species),
-					n_acc = sum(n)
-				),
-			gb_species %>% filter(year <= year_select) %>%
-				summarize(
-					n_species = n_distinct(species),
-					n_acc = sum(n)
-				) %>%
-				mutate(type = "total")
-		) %>%
-			mutate(year = year_select)
-	}
-	
-	# Count total number of accumulated species per year
-	map_df(year_range, ~sum_species(gb_species, .))
+  
+  # Filter GenBank taxaids to only those identified to species,
+  # join to species names
+  gb_species <-
+    gb_taxa %>%
+    filter(!is.na(taxid)) %>%
+    inner_join(ncbi_names, by = "taxid")
+  
+  # Helper function to sum total species in each dataset
+  # by year
+  sum_species <- function(gb_species, year_select) {
+    bind_rows(
+      gb_species %>% filter(year <= year_select) %>%
+        group_by(type) %>%
+        summarize(
+          n_species = n_distinct(species),
+          n_acc = sum(n)
+        ),
+      gb_species %>% filter(year <= year_select) %>%
+        summarize(
+          n_species = n_distinct(species),
+          n_acc = sum(n)
+        ) %>%
+        mutate(type = "total")
+    ) %>%
+      mutate(year = year_select)
+  }
+  
+  # Count total number of accumulated species per year
+  map_df(year_range, ~sum_species(gb_species, .))
 }
 
 # Data loading ----
@@ -234,22 +234,22 @@ count_ncbi_species_by_year <- function(gb_taxa, ncbi_names, year_range) {
 #' @return Tibble
 #' 
 parse_ts_dates <- function(testo_sundue_2016_si_path) {
-	readxl::read_excel(
-		testo_sundue_2016_si_path,
-		# Divergence dates are in the 5th sheet
-		sheet = 5,
-		skip = 1
-	) %>%
-		janitor::clean_names() %>%
-		rename(
-			ts_median = median_age_2,
-			ts_low = x95_percent_hpd_low_3,
-			ts_high = x95_percent_hpd_high_4,
-			rothfels_median = median_age_5,
-			rothfels_low = x95_percent_hpd_low_6,
-			rothfels_high = x95_percent_hpd_high_7,
-			schuettpelz_best = best_age
-		)
+  readxl::read_excel(
+    testo_sundue_2016_si_path,
+    # Divergence dates are in the 5th sheet
+    sheet = 5,
+    skip = 1
+  ) %>%
+    janitor::clean_names() %>%
+    rename(
+      ts_median = median_age_2,
+      ts_low = x95_percent_hpd_low_3,
+      ts_high = x95_percent_hpd_high_4,
+      rothfels_median = median_age_5,
+      rothfels_low = x95_percent_hpd_low_6,
+      rothfels_high = x95_percent_hpd_high_7,
+      schuettpelz_best = best_age
+    )
 }
 
 #' Parse divergene dates in the Du et al. 2021 SI file
@@ -263,35 +263,35 @@ parse_ts_dates <- function(testo_sundue_2016_si_path) {
 #' @return Tibble
 #' 
 parse_du_dates <- function(du_2021_si_path) {
-	# Extract dates in original format
-	du_dates_raw <-
-		docxtractr::read_docx(du_2021_si_path) %>%
-		docxtractr::docx_extract_all_tbls(
-			guess_header = TRUE, preserve = FALSE, trim = TRUE) %>%
-		# Table of interest is the third one in the SI
-		magrittr::extract2(3)
-	
-	# Convert to longish format
-	du_dates_raw %>%
-		janitor::clean_names() %>%
-		pivot_longer(names_to = "author", values_to = "age", -lineage) %>%
-		mutate(age = str_remove_all(age, "\\(|,|\\)|ca\\.") %>%
-					 	str_squish()) %>%
-		separate(age,
-						 c("median", "low", "high"),
-						 sep = " ", fill = "right", convert = TRUE) %>%
-		mutate(
-			median = na_if(median, "\\") %>%
-				parse_number(),
-			affinities_group = str_match(
-				lineage,
-				"stem|crown") %>%
-				magrittr::extract(,1),
-			affinities = str_remove_all(lineage, "The|stem|crown|of") %>%
-				str_squish()
-		) %>%
-		assert(not_na, affinities_group) %>%
-		select(author, lineage, affinities, affinities_group, median, low, high)
+  # Extract dates in original format
+  du_dates_raw <-
+    docxtractr::read_docx(du_2021_si_path) %>%
+    docxtractr::docx_extract_all_tbls(
+      guess_header = TRUE, preserve = FALSE, trim = TRUE) %>%
+    # Table of interest is the third one in the SI
+    magrittr::extract2(3)
+  
+  # Convert to longish format
+  du_dates_raw %>%
+    janitor::clean_names() %>%
+    pivot_longer(names_to = "author", values_to = "age", -lineage) %>%
+    mutate(age = str_remove_all(age, "\\(|,|\\)|ca\\.") %>%
+             str_squish()) %>%
+    separate(age,
+             c("median", "low", "high"),
+             sep = " ", fill = "right", convert = TRUE) %>%
+    mutate(
+      median = na_if(median, "\\") %>%
+        parse_number(),
+      affinities_group = str_match(
+        lineage,
+        "stem|crown") %>%
+        magrittr::extract(,1),
+      affinities = str_remove_all(lineage, "The|stem|crown|of") %>%
+        str_squish()
+    ) %>%
+    assert(not_na, affinities_group) %>%
+    select(author, lineage, affinities, affinities_group, median, low, high)
 }
 
 # Coverage ----
@@ -305,46 +305,46 @@ parse_du_dates <- function(du_2021_si_path) {
 #' @return Tibble of accepted species with higher level taxonomy
 #' 
 get_accepted_species <- function(pteridocat, ppgi_taxonomy) {
-	pteridocat %>% 
-		# Only keep accepted names
-		filter(str_detect(taxonomicStatus, "accepted")) %>%
-		# Only keep species
-		# FIXME: need to add rank for newly added names in pteridocat_maker
-		# then don't need is.na()
-		filter(taxonRank == "species" | is.na(taxonRank)) %>%
-		select(scientificName) %>%
-		mutate(scientificName = str_squish(scientificName)) %>%
-		mutate(
-			rgnparser::gn_parse_tidy(scientificName) %>% 
-				select(species = canonicalsimple),
-			species = str_replace_all(species, " ", "_")
-		) %>%
-		# Map on higher level taxonomy
-		mutate(
-			genus = case_when(
-				str_detect(scientificName, "^x |^× ") ~ 
-					str_split(scientificName, " ") %>% map_chr(2),
-				TRUE ~ str_split(scientificName, " ") %>% map_chr(1)
-			)
-		) %>%
-		left_join(
-			select(ppgi_taxonomy, genus, family, 
-						 suborder, order, class), by = "genus"
-		) %>%
-		# FIXME: update class for nothogenera in PPG
-		mutate(class = case_when(
-			str_detect(
-				scientificName, "Schizoloma|Phlebosia|Cystocarpium") ~ "Polypodiopsida",
-			TRUE ~ class
-		)) %>%
-		# Drop lycophytes
-		assert(not_na, class) %>%
-		filter(class == "Polypodiopsida") %>%
-		select(-class) %>%
-		# Add major_clade
-		add_major_clade() %>%
-		# drop suborder
-		select(-suborder) 
+  pteridocat %>% 
+    # Only keep accepted names
+    filter(str_detect(taxonomicStatus, "accepted")) %>%
+    # Only keep species
+    # FIXME: need to add rank for newly added names in pteridocat_maker
+    # then don't need is.na()
+    filter(taxonRank == "species" | is.na(taxonRank)) %>%
+    select(scientificName) %>%
+    mutate(scientificName = str_squish(scientificName)) %>%
+    mutate(
+      rgnparser::gn_parse_tidy(scientificName) %>% 
+        select(species = canonicalsimple),
+      species = str_replace_all(species, " ", "_")
+    ) %>%
+    # Map on higher level taxonomy
+    mutate(
+      genus = case_when(
+        str_detect(scientificName, "^x |^× ") ~ 
+          str_split(scientificName, " ") %>% map_chr(2),
+        TRUE ~ str_split(scientificName, " ") %>% map_chr(1)
+      )
+    ) %>%
+    left_join(
+      select(ppgi_taxonomy, genus, family, 
+             suborder, order, class), by = "genus"
+    ) %>%
+    # FIXME: update class for nothogenera in PPG
+    mutate(class = case_when(
+      str_detect(
+        scientificName, "Schizoloma|Phlebosia|Cystocarpium") ~ "Polypodiopsida",
+      TRUE ~ class
+    )) %>%
+    # Drop lycophytes
+    assert(not_na, class) %>%
+    filter(class == "Polypodiopsida") %>%
+    select(-class) %>%
+    # Add major_clade
+    add_major_clade() %>%
+    # drop suborder
+    select(-suborder) 
 }
 
 #' Calculate coverage of species and other taxonomic ranks in FTOL
@@ -360,66 +360,66 @@ get_accepted_species <- function(pteridocat, ppgi_taxonomy) {
 #' @return Tibble
 #'
 calculate_ftol_coverage <- function(
-	sanger_sampling, 
-	accepted_species, ret_type = c("cov_by_rank", "total_sampling")) {
-	
-	# Tally accepted sampling by rank
-	accepted_sampling_by_rank <- tally_accepted_sampling_by_rank(
-		accepted_species)
-	
-	# Tally FTOL sampling by rank
-	ftol_sampling_by_rank <-
-		sanger_sampling %>%
-		# Exclude outgroup
-		filter(outgroup == FALSE) %>%
-		select(-outgroup) %>%
-		# drop suborder
-		select(-suborder) %>%
-		pivot_longer(names_to = "rank", values_to = "name", -species) %>%
-		group_by(rank) %>%
-		count(name) %>%
-		ungroup
-	
-	# Calculate coverage by rank
-	coverage_by_rank <- left_join(
-		ftol_sampling_by_rank,
-		rename(accepted_sampling_by_rank, n_accepted = n),
-		by = c("rank", "name")
-	) %>%
-		mutate(coverage = n/n_accepted)
-	
-	# Format overall sampling for printing in MS
-	total_sampling <-
-		# Start with FTOL sampling by genus, family, order
-		ftol_sampling_by_rank %>% 
-		count(rank) %>%
-		# Add n species
-		bind_rows(
-			sanger_sampling %>%
-				filter(outgroup == FALSE) %>%
-				select(-outgroup) %>%
-				summarize(n = n(), rank = "species")
-		) %>%
-		# Join to accepted number of species, genus, family, order
-		left_join(
-			count(accepted_sampling_by_rank, rank, name = "n_accepted") %>%
-				bind_rows(
-					summarize(accepted_species, n_accepted = n(), rank = "species")
-				),
-			by = "rank"
-		) %>%
-		# Calculate coverage
-		mutate(
-			coverage_p = percent(n / n_accepted, accuracy = 0.1),
-			coverage = glue("{number(n, accuracy = 1)}/{number(n_accepted, accuracy = 1)}")) # nolint
-	
-	switch(
-		ret_type,
-		"cov_by_rank" = coverage_by_rank,
-		"total_sampling" = total_sampling,
-		stop("Must choose 'cov_by_rank'  or 'total_sampling' for 'ret_type'")
-	)
-	
+  sanger_sampling, 
+  accepted_species, ret_type = c("cov_by_rank", "total_sampling")) {
+  
+  # Tally accepted sampling by rank
+  accepted_sampling_by_rank <- tally_accepted_sampling_by_rank(
+    accepted_species)
+  
+  # Tally FTOL sampling by rank
+  ftol_sampling_by_rank <-
+    sanger_sampling %>%
+    # Exclude outgroup
+    filter(outgroup == FALSE) %>%
+    select(-outgroup) %>%
+    # drop suborder
+    select(-suborder) %>%
+    pivot_longer(names_to = "rank", values_to = "name", -species) %>%
+    group_by(rank) %>%
+    count(name) %>%
+    ungroup
+  
+  # Calculate coverage by rank
+  coverage_by_rank <- left_join(
+    ftol_sampling_by_rank,
+    rename(accepted_sampling_by_rank, n_accepted = n),
+    by = c("rank", "name")
+  ) %>%
+    mutate(coverage = n/n_accepted)
+  
+  # Format overall sampling for printing in MS
+  total_sampling <-
+    # Start with FTOL sampling by genus, family, order
+    ftol_sampling_by_rank %>% 
+    count(rank) %>%
+    # Add n species
+    bind_rows(
+      sanger_sampling %>%
+        filter(outgroup == FALSE) %>%
+        select(-outgroup) %>%
+        summarize(n = n(), rank = "species")
+    ) %>%
+    # Join to accepted number of species, genus, family, order
+    left_join(
+      count(accepted_sampling_by_rank, rank, name = "n_accepted") %>%
+        bind_rows(
+          summarize(accepted_species, n_accepted = n(), rank = "species")
+        ),
+      by = "rank"
+    ) %>%
+    # Calculate coverage
+    mutate(
+      coverage_p = percent(n / n_accepted, accuracy = 0.1),
+      coverage = glue("{number(n, accuracy = 1)}/{number(n_accepted, accuracy = 1)}")) # nolint
+  
+  switch(
+    ret_type,
+    "cov_by_rank" = coverage_by_rank,
+    "total_sampling" = total_sampling,
+    stop("Must choose 'cov_by_rank'  or 'total_sampling' for 'ret_type'")
+  )
+  
 }
 
 #' Tally the number of accepted species in pteridocat by rank
@@ -429,14 +429,14 @@ calculate_ftol_coverage <- function(
 #' @return Tibble
 #' 
 tally_accepted_sampling_by_rank <- function(accepted_species) {
-	accepted_species %>%
-		select(-scientificName) %>%
-		pivot_longer(names_to = "rank", values_to = "name", -species) %>%
-		group_by(rank) %>%
-		count(name) %>%
-		ungroup %>%
-		# Note that nothogenera have no family or order
-		filter(!is.na(name))
+  accepted_species %>%
+    select(-scientificName) %>%
+    pivot_longer(names_to = "rank", values_to = "name", -species) %>%
+    group_by(rank) %>%
+    count(name) %>%
+    ungroup %>%
+    # Note that nothogenera have no family or order
+    filter(!is.na(name))
 }
 
 #' Calculate coverage of species and other taxonomic ranks in plastome
@@ -454,65 +454,65 @@ tally_accepted_sampling_by_rank <- function(accepted_species) {
 #' @return Tibble
 #' 
 calculate_backbone_coverage <- function(
-	plastome_tree, sanger_sampling,
-	accepted_species, ret_type = c("cov_by_rank", "total_sampling")) {
-	
-	# Tally accepted sampling by rank
-	accepted_sampling_by_rank <- tally_accepted_sampling_by_rank(accepted_species)
-	
-	# Tally backbone sampling by rank
-	bb_sampling <-
-		tibble(species = plastome_tree$tip.label) %>%
-		# Add higher taxonomy
-		left_join(sanger_sampling, by = "species") %>%
-		# Drop OG
-		filter(outgroup == FALSE) %>%
-		select(-outgroup) %>%# drop suborder
-		# drop suborder
-		select(-suborder)
-	
-	# Calculate coverage by rank
-	bb_sampling_by_rank <-
-		bb_sampling %>%
-		pivot_longer(names_to = "rank", values_to = "name", -species) %>%
-		group_by(rank) %>%
-		count(name) %>%
-		ungroup %>%
-		left_join(
-			rename(accepted_sampling_by_rank, n_accepted = n),
-			by = c("rank", "name")
-		) %>%
-		mutate(coverage = n/n_accepted)
-	
-	# Format sampling for printing in MS
-	bb_total_sampling <-
-		# Start with backbone sampling by genus, family, order
-		bb_sampling_by_rank %>% 
-		count(rank) %>%
-		# Add n species
-		bind_rows(
-			summarize(bb_sampling, n = n(), rank = "species")
-		) %>%
-		# Join to accepted number of species, genus, family, order
-		left_join(
-			count(accepted_sampling_by_rank, rank, name = "n_accepted") %>%
-				bind_rows(
-					summarize(accepted_species, n_accepted = n(), rank = "species")
-				),
-			by = "rank"
-		) %>%
-		# Calculate coverage
-		mutate(
-			coverage_p = percent(n / n_accepted),
-			coverage = glue("{number(n, accuracy = 1)}/{number(n_accepted, accuracy = 1)}"))
-	
-	switch(
-		ret_type,
-		"cov_by_rank" = bb_sampling_by_rank,
-		"total_sampling" = bb_total_sampling,
-		stop("Must choose 'cov_by_rank'  or 'total_sampling' for 'ret_type'")
-	)
-	
+  plastome_tree, sanger_sampling,
+  accepted_species, ret_type = c("cov_by_rank", "total_sampling")) {
+  
+  # Tally accepted sampling by rank
+  accepted_sampling_by_rank <- tally_accepted_sampling_by_rank(accepted_species)
+  
+  # Tally backbone sampling by rank
+  bb_sampling <-
+    tibble(species = plastome_tree$tip.label) %>%
+    # Add higher taxonomy
+    left_join(sanger_sampling, by = "species") %>%
+    # Drop OG
+    filter(outgroup == FALSE) %>%
+    select(-outgroup) %>%# drop suborder
+    # drop suborder
+    select(-suborder)
+  
+  # Calculate coverage by rank
+  bb_sampling_by_rank <-
+    bb_sampling %>%
+    pivot_longer(names_to = "rank", values_to = "name", -species) %>%
+    group_by(rank) %>%
+    count(name) %>%
+    ungroup %>%
+    left_join(
+      rename(accepted_sampling_by_rank, n_accepted = n),
+      by = c("rank", "name")
+    ) %>%
+    mutate(coverage = n/n_accepted)
+  
+  # Format sampling for printing in MS
+  bb_total_sampling <-
+    # Start with backbone sampling by genus, family, order
+    bb_sampling_by_rank %>% 
+    count(rank) %>%
+    # Add n species
+    bind_rows(
+      summarize(bb_sampling, n = n(), rank = "species")
+    ) %>%
+    # Join to accepted number of species, genus, family, order
+    left_join(
+      count(accepted_sampling_by_rank, rank, name = "n_accepted") %>%
+        bind_rows(
+          summarize(accepted_species, n_accepted = n(), rank = "species")
+        ),
+      by = "rank"
+    ) %>%
+    # Calculate coverage
+    mutate(
+      coverage_p = percent(n / n_accepted),
+      coverage = glue("{number(n, accuracy = 1)}/{number(n_accepted, accuracy = 1)}"))
+  
+  switch(
+    ret_type,
+    "cov_by_rank" = bb_sampling_by_rank,
+    "total_sampling" = bb_total_sampling,
+    stop("Must choose 'cov_by_rank'  or 'total_sampling' for 'ret_type'")
+  )
+  
 }
 
 # Monophyly and ages ----
@@ -525,8 +525,8 @@ calculate_backbone_coverage <- function(
 #' @return Number of the parent node of the species
 #' 
 get_parent <- function(tree, species) {
-	node <- which(tree$tip.label == species)
-	phangorn::Ancestors(tree, node, type = "parent")
+  node <- which(tree$tip.label == species)
+  phangorn::Ancestors(tree, node, type = "parent")
 }
 
 #' Add "major clade" to Sanger sampling table
@@ -539,14 +539,14 @@ get_parent <- function(tree, species) {
 #' @return Tibble withh column "major_clade" added
 #'
 add_major_clade <- function(data) {
-	data %>%
-		mutate(
-			major_clade = coalesce(suborder, order),
-			major_clade = case_when(
-				major_clade %in% c("Ophioglossales", "Psilotales") ~ "Ophioglossales + Psilotales", #nolint
-				TRUE ~ major_clade
-			)
-		)
+  data %>%
+    mutate(
+      major_clade = coalesce(suborder, order),
+      major_clade = case_when(
+        major_clade %in% c("Ophioglossales", "Psilotales") ~ "Ophioglossales + Psilotales", #nolint
+        TRUE ~ major_clade
+      )
+    )
 }
 
 #' Make tibble summarizing sampling of Sanger dataset
@@ -560,36 +560,36 @@ add_major_clade <- function(data) {
 #' "family"  "subfamily"  "major_clade" "outgroup"
 #'
 make_sanger_sampling_tbl <- function(
-	plastome_metadata_renamed,
-	sanger_tree, ppgi_taxonomy
+  plastome_metadata_renamed,
+  sanger_tree, ppgi_taxonomy
 ) {
-	
-	# check monophyly ----
-	# Make tibble of outgroup species
-	og_species <-
-		plastome_metadata_renamed %>%
-		select(species, outgroup) %>%
-		filter(outgroup == TRUE)
-	
-	# Make tibble with one row per species in Sanger sampling
-	tibble(species = sanger_tree$tip.label) %>%
-		# Add higher-level taxonomy
-		mutate(
-			genus = str_split(species, "_") %>% map_chr(1)
-		) %>%
-		left_join(
-			select(
-				ppgi_taxonomy, order, suborder, family, subfamily, genus), by = "genus"
-		) %>%
-		# Add major_clade
-		add_major_clade() %>%
-		# Add outgroup status
-		left_join(og_species, by = "species") %>%
-		mutate(outgroup = replace_na(outgroup, FALSE)) %>%
-		verify(sum(outgroup) == nrow(og_species)) %>%
-		# Check for match for tips with tree
-		verify(all(species %in% sanger_tree$tip.label)) %>%
-		verify(all(sanger_tree$tip.label %in% .$species))
+  
+  # check monophyly ----
+  # Make tibble of outgroup species
+  og_species <-
+    plastome_metadata_renamed %>%
+    select(species, outgroup) %>%
+    filter(outgroup == TRUE)
+  
+  # Make tibble with one row per species in Sanger sampling
+  tibble(species = sanger_tree$tip.label) %>%
+    # Add higher-level taxonomy
+    mutate(
+      genus = str_split(species, "_") %>% map_chr(1)
+    ) %>%
+    left_join(
+      select(
+        ppgi_taxonomy, order, suborder, family, subfamily, genus), by = "genus"
+    ) %>%
+    # Add major_clade
+    add_major_clade() %>%
+    # Add outgroup status
+    left_join(og_species, by = "species") %>%
+    mutate(outgroup = replace_na(outgroup, FALSE)) %>%
+    verify(sum(outgroup) == nrow(og_species)) %>%
+    # Check for match for tips with tree
+    verify(all(species %in% sanger_tree$tip.label)) %>%
+    verify(all(sanger_tree$tip.label %in% .$species))
 }
 
 #' Get results of monophyly test for various taxa
@@ -600,11 +600,11 @@ make_sanger_sampling_tbl <- function(
 #' @return Tibble
 #'
 get_result_monophy <- function(solution, taxlevels) {
-	MonoPhy::GetResultMonophyly(solution, taxlevels = taxlevels) %>%
-		magrittr::extract2(1) %>%
-		rownames_to_column("taxon") %>%
-		as_tibble() %>%
-		janitor::clean_names()
+  MonoPhy::GetResultMonophyly(solution, taxlevels = taxlevels) %>%
+    magrittr::extract2(1) %>%
+    rownames_to_column("taxon") %>%
+    as_tibble() %>%
+    janitor::clean_names()
 }
 
 #' Get summary of monophyly test
@@ -614,15 +614,15 @@ get_result_monophy <- function(solution, taxlevels) {
 #'
 #' @return Tibble
 get_summary_monophy <- function(solution, taxlevels) {
-	mp_sum <- MonoPhy::GetSummaryMonophyly(solution, taxlevels = taxlevels)
-	
-	mp_sum %>%
-		magrittr::extract2(1) %>%
-		rownames_to_column("var") %>%
-		as_tibble() %>%
-		mutate(tax_level = names(mp_sum)) %>%
-		janitor::clean_names() %>%
-		select(tax_level, var, taxa, tips)
+  mp_sum <- MonoPhy::GetSummaryMonophyly(solution, taxlevels = taxlevels)
+  
+  mp_sum %>%
+    magrittr::extract2(1) %>%
+    rownames_to_column("var") %>%
+    as_tibble() %>%
+    mutate(tax_level = names(mp_sum)) %>%
+    janitor::clean_names() %>%
+    select(tax_level, var, taxa, tips)
 }
 
 #' Assess monophyly
@@ -640,23 +640,23 @@ get_summary_monophy <- function(solution, taxlevels) {
 #' @return List; results of MonoPhy::AssessMonophyly()
 #'
 assess_monophy <- function(
-	taxon_sampling, tree,
-	og_taxa = NULL,
-	tax_levels) {
-	tax_levels <- c("species", tax_levels) %>% unique()
-	# Root tree
-	if (!is.null(og_taxa)) {
-		tree <- phytools::reroot(
-			tree,
-			getMRCA(tree, og_taxa)
-		)
-	}
-	# Check monophyly
-	taxon_sampling %>%
-		verify("species" %in% colnames(.)) %>%
-		select(species, all_of(tax_levels)) %>%
-		as.data.frame() %>%
-		MonoPhy::AssessMonophyly(tree, .)
+  taxon_sampling, tree,
+  og_taxa = NULL,
+  tax_levels) {
+  tax_levels <- c("species", tax_levels) %>% unique()
+  # Root tree
+  if (!is.null(og_taxa)) {
+    tree <- phytools::reroot(
+      tree,
+      getMRCA(tree, og_taxa)
+    )
+  }
+  # Check monophyly
+  taxon_sampling %>%
+    verify("species" %in% colnames(.)) %>%
+    select(species, all_of(tax_levels)) %>%
+    as.data.frame() %>%
+    MonoPhy::AssessMonophyly(tree, .)
 }
 
 
@@ -671,16 +671,16 @@ assess_monophy <- function(
 #' @return Character vector: age of the clade defined by the two genera
 #' 
 get_crown_age_from_genus_pair <- function(tip_pair, sanger_sampling, plastid_tree_dated) {
-	tree_height <- max(phytools::nodeHeights(plastid_tree_dated))
-	sanger_sampling %>%
-		filter(genus %in% tip_pair) %>%
-		group_by(genus) %>%
-		slice(1) %>%
-		pull(species) %>%
-		ape::getMRCA(plastid_tree_dated, .) %>%
-		phytools::nodeheight(plastid_tree_dated, .) %>%
-		magrittr::subtract(tree_height, .) %>%
-		number(accuracy = 0.1)
+  tree_height <- max(phytools::nodeHeights(plastid_tree_dated))
+  sanger_sampling %>%
+    filter(genus %in% tip_pair) %>%
+    group_by(genus) %>%
+    slice(1) %>%
+    pull(species) %>%
+    ape::getMRCA(plastid_tree_dated, .) %>%
+    phytools::nodeheight(plastid_tree_dated, .) %>%
+    magrittr::subtract(tree_height, .) %>%
+    number(accuracy = 0.1)
 }
 
 
@@ -695,63 +695,63 @@ get_crown_age_from_genus_pair <- function(tip_pair, sanger_sampling, plastid_tre
 #'
 #' @return Tibble with columns "family" and "age" (stem age of the family)
 get_stem_family_age <- function(
-	sanger_sampling, 
-	plastid_tree_dated, ppgi_taxonomy) {
-	
-	# Get overall tree height
-	tree_height <- max(phytools::nodeHeights(plastid_tree_dated))
-	
-	# Get ages for families
-	family_monophy <- 
-		select(sanger_sampling, species, family) %>%
-		assess_monophy(
-			taxon_sampling = .,
-			tree = plastid_tree_dated,
-			tax_levels = "family"
-		) %>%
-		get_result_monophy(1) %>%
-		rename(family = taxon) %>%
-		# Filter to ferns
-		left_join(unique(select(ppgi_taxonomy, family, class)), by = "family") %>%
-		filter(class == "Polypodiopsida") %>%
-		select(-class)
-	
-	# Get stem nodes of monotypic families
-	family_monotypic_stem_node <-
-		family_monophy %>%
-		filter(monophyly == "Monotypic") %>%
-		left_join(select(sanger_sampling, family, species), by = "family") %>%
-		assert(is_uniq, family) %>%
-		mutate(stem_node = map_dbl(species, ~get_parent(plastid_tree_dated, .))) %>%
-		assert(not_na, stem_node) %>%
-		select(family, stem_node)
-	
-	# Get stem nodes of monophyletic families
-	family_monophyletic_stem_node <-
-		family_monophy %>%
-		filter(monophyly == "Yes") %>%
-		mutate(
-			mrca = parse_number(mrca),
-			stem_node = map_dbl(
-				mrca,
-				~phangorn::Ancestors(plastid_tree_dated, ., type = "parent"))
-		) %>%
-		select(family, stem_node)
-	
-	# Combine nodes, get ages
-	bind_rows(family_monotypic_stem_node, family_monophyletic_stem_node) %>%
-		mutate(
-			# Height is distance above root
-			height = map_dbl(stem_node, ~phytools::nodeheight(
-				tree = plastid_tree_dated, node = .))
-		) %>%
-		mutate(
-			# Age is the total length of the tree minus height
-			age = tree_height - height
-		) %>%
-		assert(is_uniq, family) %>%
-		assert(not_na, everything()) %>%
-		select(family, age)
+  sanger_sampling, 
+  plastid_tree_dated, ppgi_taxonomy) {
+  
+  # Get overall tree height
+  tree_height <- max(phytools::nodeHeights(plastid_tree_dated))
+  
+  # Get ages for families
+  family_monophy <- 
+    select(sanger_sampling, species, family) %>%
+    assess_monophy(
+      taxon_sampling = .,
+      tree = plastid_tree_dated,
+      tax_levels = "family"
+    ) %>%
+    get_result_monophy(1) %>%
+    rename(family = taxon) %>%
+    # Filter to ferns
+    left_join(unique(select(ppgi_taxonomy, family, class)), by = "family") %>%
+    filter(class == "Polypodiopsida") %>%
+    select(-class)
+  
+  # Get stem nodes of monotypic families
+  family_monotypic_stem_node <-
+    family_monophy %>%
+    filter(monophyly == "Monotypic") %>%
+    left_join(select(sanger_sampling, family, species), by = "family") %>%
+    assert(is_uniq, family) %>%
+    mutate(stem_node = map_dbl(species, ~get_parent(plastid_tree_dated, .))) %>%
+    assert(not_na, stem_node) %>%
+    select(family, stem_node)
+  
+  # Get stem nodes of monophyletic families
+  family_monophyletic_stem_node <-
+    family_monophy %>%
+    filter(monophyly == "Yes") %>%
+    mutate(
+      mrca = parse_number(mrca),
+      stem_node = map_dbl(
+        mrca,
+        ~phangorn::Ancestors(plastid_tree_dated, ., type = "parent"))
+    ) %>%
+    select(family, stem_node)
+  
+  # Combine nodes, get ages
+  bind_rows(family_monotypic_stem_node, family_monophyletic_stem_node) %>%
+    mutate(
+      # Height is distance above root
+      height = map_dbl(stem_node, ~phytools::nodeheight(
+        tree = plastid_tree_dated, node = .))
+    ) %>%
+    mutate(
+      # Age is the total length of the tree minus height
+      age = tree_height - height
+    ) %>%
+    assert(is_uniq, family) %>%
+    assert(not_na, everything()) %>%
+    select(family, age)
 }
 
 #' Filter monophyly table to ferns, add taxonomic level
@@ -766,39 +766,39 @@ get_stem_family_age <- function(
 #' @return Tibble
 #' 
 add_tax_levels_to_monophyly <- function(
-	monophy_by_clade, ppgi_taxonomy,
-	sanger_sampling) {
-	
-	ppgi_tax_levels <-
-		ppgi_taxonomy %>%
-		select(class:genus) %>%
-		pivot_longer(
-			names_to = "tax_level",
-			values_to = "taxon",
-			-class
-		) %>%
-		filter(!is.na(taxon)) %>%
-		unique()
-	
-	# Add taxonomic level to monophy by clade table
-	monophy_by_clade_tax_level <-
-		monophy_by_clade %>%
-		assert(not_na, monophyly) %>%
-		assert(in_set("Monotypic", "Yes", "No"), monophyly) %>%
-		left_join(ppgi_tax_levels, by = "taxon") %>%
-		# Drop lycophytes
-		filter(class != "Lycopodiopsida") %>%
-		# Exclude Equisetum subgenera, outgroups
-		filter(!str_detect(taxon, "subgen")) %>%
-		assert(not_na, class) %>%
-		verify(all(class == "Polypodiopsida")) %>%
-		select(-class) %>%
-		left_join(
-			unique(select(sanger_sampling, taxon = genus, outgroup)),
-			by = "taxon") %>%
-		mutate(outgroup = replace_na(outgroup, FALSE)) %>%
-		filter(outgroup != TRUE) %>%
-		assert(not_na, tax_level)
+  monophy_by_clade, ppgi_taxonomy,
+  sanger_sampling) {
+  
+  ppgi_tax_levels <-
+    ppgi_taxonomy %>%
+    select(class:genus) %>%
+    pivot_longer(
+      names_to = "tax_level",
+      values_to = "taxon",
+      -class
+    ) %>%
+    filter(!is.na(taxon)) %>%
+    unique()
+  
+  # Add taxonomic level to monophy by clade table
+  monophy_by_clade_tax_level <-
+    monophy_by_clade %>%
+    assert(not_na, monophyly) %>%
+    assert(in_set("Monotypic", "Yes", "No"), monophyly) %>%
+    left_join(ppgi_tax_levels, by = "taxon") %>%
+    # Drop lycophytes
+    filter(class != "Lycopodiopsida") %>%
+    # Exclude Equisetum subgenera, outgroups
+    filter(!str_detect(taxon, "subgen")) %>%
+    assert(not_na, class) %>%
+    verify(all(class == "Polypodiopsida")) %>%
+    select(-class) %>%
+    left_join(
+      unique(select(sanger_sampling, taxon = genus, outgroup)),
+      by = "taxon") %>%
+    mutate(outgroup = replace_na(outgroup, FALSE)) %>%
+    filter(outgroup != TRUE) %>%
+    assert(not_na, tax_level)
 }
 
 #' Summarize (non-)monophyletic status of ferns in FTOL
@@ -813,40 +813,40 @@ add_tax_levels_to_monophyly <- function(
 #' @return Tibble
 #' 
 summarize_fern_monophyly <- function(
-	monophy_by_clade_tax_level, ppgi_taxonomy,
-	check = TRUE) {
-	
-	if (isTRUE(check)) {
-	monophy_by_clade_tax_level %>%
-		filter(tax_level != "genus", monophyly == "No") %>%
-		verify(
-			taxon == "Polypodioideae",
-			success_fun = success_logical,
-			error_fun = err_msg(
-				"Polypodioideae is not the only non-monophyletic taxon above genus")
-			)
-	}
-		
-	# Get order of taxonomic levels
-	tax_levels_order <-
-		ppgi_taxonomy %>%
-		select(order:genus) %>%
-		colnames()
-	
-	# Make summary table
-	monophy_by_clade_tax_level %>%
-		group_by(tax_level) %>%
-		count(monophyly) %>%
-		mutate(total = sum(n)) %>%
-		ungroup() %>%
-		rowwise() %>%
-		mutate(percent = n/total) %>%
-		ungroup() %>%
-		mutate(
-			tax_level = factor(tax_level, levels = tax_levels_order),
-			monophyly = factor(monophyly, levels = c("Monotypic", "Yes", "No"))
-		) %>%
-		arrange(tax_level, monophyly)
+  monophy_by_clade_tax_level, ppgi_taxonomy,
+  check = TRUE) {
+  
+  if (isTRUE(check)) {
+    monophy_by_clade_tax_level %>%
+      filter(tax_level != "genus", monophyly == "No") %>%
+      verify(
+        taxon == "Polypodioideae",
+        success_fun = success_logical,
+        error_fun = err_msg(
+          "Polypodioideae is not the only non-monophyletic taxon above genus")
+      )
+  }
+  
+  # Get order of taxonomic levels
+  tax_levels_order <-
+    ppgi_taxonomy %>%
+    select(order:genus) %>%
+    colnames()
+  
+  # Make summary table
+  monophy_by_clade_tax_level %>%
+    group_by(tax_level) %>%
+    count(monophyly) %>%
+    mutate(total = sum(n)) %>%
+    ungroup() %>%
+    rowwise() %>%
+    mutate(percent = n/total) %>%
+    ungroup() %>%
+    mutate(
+      tax_level = factor(tax_level, levels = tax_levels_order),
+      monophyly = factor(monophyly, levels = c("Monotypic", "Yes", "No"))
+    ) %>%
+    arrange(tax_level, monophyly)
 }
 
 #' Make table of non-monophyletic fern genera in FTOL
@@ -859,15 +859,15 @@ summarize_fern_monophyly <- function(
 #' @return Tibble: nonmonophyletic genera in FTOL
 #' 
 make_nonmonophy_gen_tab <- function(
-	fern_monophy_by_clade_tax_level, ppgi_taxonomy) {
-	
-	fern_monophy_by_clade_tax_level %>%
-		assert(not_na, tax_level, outgroup) %>%
-		filter(tax_level == "genus", monophyly == "No", outgroup == FALSE) %>%
-		rename(genus = taxon) %>%
-		select(-c(monophyly, mrca, tax_level, outgroup)) %>%
-		left_join(select(ppgi_taxonomy, genus, family, subfamily), by = "genus") %>%
-		select(family, subfamily, everything())
+  fern_monophy_by_clade_tax_level, ppgi_taxonomy) {
+  
+  fern_monophy_by_clade_tax_level %>%
+    assert(not_na, tax_level, outgroup) %>%
+    filter(tax_level == "genus", monophyly == "No", outgroup == FALSE) %>%
+    rename(genus = taxon) %>%
+    select(-c(monophyly, mrca, tax_level, outgroup)) %>%
+    left_join(select(ppgi_taxonomy, genus, family, subfamily), by = "genus") %>%
+    select(family, subfamily, everything())
 }
 
 # Formatting ----
@@ -893,11 +893,11 @@ number <- function(...) {scales::number(big.mark = ",", ...)}
 #'
 #' @result Dataframe
 tabyl_fmt <- function(...) {
-	tabyl(...) %>%
-		mutate(
-			percent = percent(percent, accuracy = 0.1),
-			n = number(n, accuracy = 1)
-		)
+  tabyl(...) %>%
+    mutate(
+      percent = percent(percent, accuracy = 0.1),
+      n = number(n, accuracy = 1)
+    )
 }
 
 # References ----
@@ -909,17 +909,17 @@ tabyl_fmt <- function(...) {
 #' @return Data frame with one column 'key'
 #' 
 extract_citations <- function(rmd_file) {
-	read_lines(rmd_file) %>%
-		stringr::str_split(" |;") %>% 
-		unlist %>% 
-		magrittr::extract(., stringr::str_detect(., "@")) %>% 
-		stringr::str_remove_all("^[^@]*") %>%
-		stringr::str_remove_all('\\[|\\]|\\)|\\(|\\.$|,|\\{|\\}|\\\\|\\"') %>% 
-		magrittr::extract(., stringr::str_detect(., "^@|^-@")) %>% 
-		stringr::str_remove_all("^@|^-@") %>% 
-		unique %>% 
-		sort %>%
-		tibble(key = .)
+  read_lines(rmd_file) %>%
+    stringr::str_split(" |;") %>% 
+    unlist %>% 
+    magrittr::extract(., stringr::str_detect(., "@")) %>% 
+    stringr::str_remove_all("^[^@]*") %>%
+    stringr::str_remove_all('\\[|\\]|\\)|\\(|\\.$|,|\\{|\\}|\\\\|\\"') %>% 
+    magrittr::extract(., stringr::str_detect(., "^@|^-@")) %>% 
+    stringr::str_remove_all("^@|^-@") %>% 
+    unique %>% 
+    sort %>%
+    tibble(key = .)
 }
 
 #' Filter a list of references in YAML format to those occurring in an Rmd file
@@ -932,39 +932,39 @@ extract_citations <- function(rmd_file) {
 #' @return NULL; externally, the filtered YAML will be written to `yaml_out`
 #' 
 filter_refs_yaml <- function(rmd_file, yaml_in = "ms/main_library.yaml", yaml_out = "ms/references.yaml", silent = FALSE) {
-	
-	# Parse RMD file and extract citation keys
-	citations <- purrr::map_df(rmd_file, extract_citations)
-	
-	# Read in YAML including all references exported from Zotero
-	if (inherits(yaml_in, "character")) {
-		ref_yaml <- yaml::read_yaml(yaml_in)
-	} else if (inherits(yaml_in, "list")) {
-		ref_yaml <- yaml_in
-	} else {
-		stop("`yaml_in` must be a path to a YAML file (string) or a list read in with yaml::read_yaml()")
-	}
-	
-	# Extract all citation keys from full YAML
-	cite_keys_all <- purrr::map_chr(ref_yaml$references, "id") %>%
-		tibble::tibble(
-			key = .,
-			order = 1:length(.)
-		)
-	
-	# Check that all keys in the yaml are present in the input YAML
-	missing <- citations %>% dplyr::anti_join(cite_keys_all, by = "key")
-	
-	if (nrow(missing) > 0 && silent == FALSE)
-		warning(glue::glue("The following ref keys are present in the Rmd but missing from the input YAML: {missing$key}"))
-	
-	cite_keys_filtered <- citations %>% dplyr::inner_join(cite_keys_all, by = "key")
-	
-	# Filter YAML to only those citation keys in the RMD
-	ref_yaml_filtered <- list(references = ref_yaml$references[cite_keys_filtered$order])
-	
-	# Write out the YAML file
-	yaml::write_yaml(ref_yaml_filtered, file = yaml_out)
+  
+  # Parse RMD file and extract citation keys
+  citations <- purrr::map_df(rmd_file, extract_citations)
+  
+  # Read in YAML including all references exported from Zotero
+  if (inherits(yaml_in, "character")) {
+    ref_yaml <- yaml::read_yaml(yaml_in)
+  } else if (inherits(yaml_in, "list")) {
+    ref_yaml <- yaml_in
+  } else {
+    stop("`yaml_in` must be a path to a YAML file (string) or a list read in with yaml::read_yaml()")
+  }
+  
+  # Extract all citation keys from full YAML
+  cite_keys_all <- purrr::map_chr(ref_yaml$references, "id") %>%
+    tibble::tibble(
+      key = .,
+      order = 1:length(.)
+    )
+  
+  # Check that all keys in the yaml are present in the input YAML
+  missing <- citations %>% dplyr::anti_join(cite_keys_all, by = "key")
+  
+  if (nrow(missing) > 0 && silent == FALSE)
+    warning(glue::glue("The following ref keys are present in the Rmd but missing from the input YAML: {missing$key}"))
+  
+  cite_keys_filtered <- citations %>% dplyr::inner_join(cite_keys_all, by = "key")
+  
+  # Filter YAML to only those citation keys in the RMD
+  ref_yaml_filtered <- list(references = ref_yaml$references[cite_keys_filtered$order])
+  
+  # Write out the YAML file
+  yaml::write_yaml(ref_yaml_filtered, file = yaml_out)
 }
 
 # Figure output ----
@@ -980,14 +980,14 @@ filter_refs_yaml <- function(rmd_file, yaml_in = "ms/main_library.yaml", yaml_ou
 #' @return String.
 #' 
 result_file <- function (result_num, extension) {
-	
-	fs::path(
-		here::here("results"),
-		result_num %>%
-			str_remove_all("\\.") %>% 
-			str_replace_all(" ", "_")
-	) %>%
-		fs::path_ext_set(extension)
+  
+  fs::path(
+    here::here("results"),
+    result_num %>%
+      str_remove_all("\\.") %>% 
+      str_replace_all(" ", "_")
+  ) %>%
+    fs::path_ext_set(extension)
 }
 
 # Captions ----
@@ -1050,9 +1050,9 @@ pagebreak_pdf <- function(rmd_params = params) {ifelse(rmd_params$doc_type == "p
 #' @return Phylogeny (list of class "phylo")
 #' 
 rescale_tree <- function(tree, scale){
-	tree$edge.length <-
-		tree$edge.length/max(phytools::nodeHeights(tree)[,2])*scale
-	return(tree)
+  tree$edge.length <-
+    tree$edge.length/max(phytools::nodeHeights(tree)[,2])*scale
+  return(tree)
 }
 
 #' Get node height corresponding to the most recent common
@@ -1064,8 +1064,8 @@ rescale_tree <- function(tree, scale){
 #' @return Height of the MRCA node of the tips
 #' 
 node_height_from_tips <- function(phy, tips) {
-	ape::getMRCA(phy, tips) %>%
-		phytools::nodeheight(phy, .)
+  ape::getMRCA(phy, tips) %>%
+    phytools::nodeheight(phy, .)
 }
 
 # Etc -----
@@ -1077,26 +1077,26 @@ node_height_from_tips <- function(phy, tips) {
 #'
 #' @return Bootstrap support as % of that node
 get_bs <- function(phy, tips) {
-	node_select <- ape::getMRCA(phy, tips)
-	as_tibble(phy) %>%
-		filter(node == node_select) %>%
-		pull(label) %>%
-		parse_number() %>%
-		magrittr::multiply_by(0.01) %>%
-		percent()
+  node_select <- ape::getMRCA(phy, tips)
+  as_tibble(phy) %>%
+    filter(node == node_select) %>%
+    pull(label) %>%
+    parse_number() %>%
+    magrittr::multiply_by(0.01) %>%
+    percent()
 }
 
 # Helper function to add plot_group:
 # a "rank" that may be at order or suborder level for plotting
 add_plot_group <- function(data) {
-	data %>%
-		mutate(
-			plot_group = coalesce(suborder, order),
-			plot_group = case_when(
-				plot_group %in% c("Ophioglossales", "Psilotales") ~ "Ophioglossales + Psilotales",
-				TRUE ~ plot_group
-			)
-		)
+  data %>%
+    mutate(
+      plot_group = coalesce(suborder, order),
+      plot_group = case_when(
+        plot_group %in% c("Ophioglossales", "Psilotales") ~ "Ophioglossales + Psilotales",
+        TRUE ~ plot_group
+      )
+    )
 }
 
 #' Get tips of a phylogenetic tree in their plotted order
@@ -1107,13 +1107,13 @@ add_plot_group <- function(data) {
 #' @param tree List of class "phylo"
 #' @return Character vector
 get_tips_in_ape_plot_order <- function(tree) {
-	assertthat::assert_that(inherits(tree, "phylo"))
-	# First filter out internal nodes
-	# from the the second column of the edge matrix
-	is_tip <- tree$edge[,2] <= length(tree$tip.label)
-	ordered_tips <- tree$edge[is_tip, 2]
-	# Use this vector to extract the tips in the right order
-	tree$tip.label[ordered_tips]
+  assertthat::assert_that(inherits(tree, "phylo"))
+  # First filter out internal nodes
+  # from the the second column of the edge matrix
+  is_tip <- tree$edge[,2] <= length(tree$tip.label)
+  ordered_tips <- tree$edge[is_tip, 2]
+  # Use this vector to extract the tips in the right order
+  tree$tip.label[ordered_tips]
 }
 
 #' Calculate frequency of missing bases in a DNA sequence matrix
@@ -1128,13 +1128,13 @@ get_tips_in_ape_plot_order <- function(tree) {
 #' @return Number: the frequency of missing bases in the matrix
 #' 
 base_freq_missing <- function(
-	seqs, missing_base_codes = c("n", "-", "?"), 
-	start = 1, end = ncol(seqs),
-	freq = FALSE) {
-	assertthat::assert_that(is.matrix(seqs))
-	assertthat::assert_that(end > start)
-	base_freq <- ape::base.freq(seqs[, start:end], all = TRUE, freq = freq)
-	sum(base_freq[missing_base_codes])
+  seqs, missing_base_codes = c("n", "-", "?"), 
+  start = 1, end = ncol(seqs),
+  freq = FALSE) {
+  assertthat::assert_that(is.matrix(seqs))
+  assertthat::assert_that(end > start)
+  base_freq <- ape::base.freq(seqs[, start:end], all = TRUE, freq = freq)
+  sum(base_freq[missing_base_codes])
 }
 
 # Generate custom error message for assertr
@@ -1153,34 +1153,34 @@ err_msg <- function(msg) stop(msg, call. = FALSE)
 #' @return Character vector: the functions citing the tables and references,
 #' in the order they appear in the Rmd file.
 check_ft_order <- function(type = "all", rmd_file = "ms/manuscript.Rmd") {
-	
-	# Run inline code when purling
-	options(knitr.purl.inline = TRUE)
-	
-	# Make a temporary file to write out just inline R code from the SI Rmd
-	temp_file <- tempfile()
-	
-	# Generate R script including inline R code from the ms Rmd
-	suppressMessages(knitr::purl(rmd_file, output = temp_file))
-	
-	# Trim this R script down to only functions that define figure and table captions
-	refs <- read_lines(temp_file) %>%
-		magrittr::extract(
-			str_detect(., "^figure\\(|^table\\(|^s_figure\\(|^s_table\\(|^figure_num\\(|^table_num\\(|^s_figure_num\\(|^s_table_num\\(")
-		) %>%
-		unique
-	
-	# Delete the temporary file
-	fs::file_delete(temp_file)
-	
-	switch(
-		type,
-		"all" = refs,
-		"fig" = refs[str_detect(refs, "fig")],
-		"s_fig" = refs[str_detect(refs, "s_fig")],
-		"tab" = refs[str_detect(refs, "tab")],
-		"s_tab" = refs[str_detect(refs, "s_tab")],
-		stop("Must choose 'all', 'fig', 's_fig', 'tab', or 's_tab' for type")
-	)
-	
+  
+  # Run inline code when purling
+  options(knitr.purl.inline = TRUE)
+  
+  # Make a temporary file to write out just inline R code from the SI Rmd
+  temp_file <- tempfile()
+  
+  # Generate R script including inline R code from the ms Rmd
+  suppressMessages(knitr::purl(rmd_file, output = temp_file))
+  
+  # Trim this R script down to only functions that define figure and table captions
+  refs <- read_lines(temp_file) %>%
+    magrittr::extract(
+      str_detect(., "^figure\\(|^table\\(|^s_figure\\(|^s_table\\(|^figure_num\\(|^table_num\\(|^s_figure_num\\(|^s_table_num\\(")
+    ) %>%
+    unique
+  
+  # Delete the temporary file
+  fs::file_delete(temp_file)
+  
+  switch(
+    type,
+    "all" = refs,
+    "fig" = refs[str_detect(refs, "fig")],
+    "s_fig" = refs[str_detect(refs, "s_fig")],
+    "tab" = refs[str_detect(refs, "tab")],
+    "s_tab" = refs[str_detect(refs, "s_tab")],
+    stop("Must choose 'all', 'fig', 's_fig', 'tab', or 's_tab' for type")
+  )
+  
 }
