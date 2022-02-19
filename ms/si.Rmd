@@ -44,6 +44,8 @@ params:
 bibliography: 
 - `r here::here("ms/si_references.yaml")`
 - `r here::here("ms/si_references_other.yaml")`
+- `r here::here("ms/si_references_other.yaml")`
+- `r here::here("ms/si_fossils.bib")`
 ---
 
 ```{r setup-si, include = FALSE}

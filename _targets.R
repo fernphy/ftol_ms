@@ -169,5 +169,21 @@ tar_plan(
 		output_dir = "results",
 		output_format = "bookdown::pdf_document2",
 		params = list(doc_type = "pdf")
+	),
+	tar_render(
+		si_2_doc,
+		"ms/si2.Rmd",
+		knit_root_dir = "ms",
+		output_dir = "results",
+		output_format = "bookdown::word_document2",
+		params = list(doc_type = "doc")
+	),
+	tar_render(
+		si_2_pdf,
+		"ms/si2.Rmd",
+		knit_root_dir = "ms",
+		output_dir = "results",
+		output_format = "bookdown::pdf_document2",
+		params = list(doc_type = "pdf")
 	)
 )
