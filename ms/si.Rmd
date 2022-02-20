@@ -247,6 +247,7 @@ write_csv(fossils_table, result_file(s_table("fossils"), "csv"))
 Fossils used as calibration points for molecular dating (`r result_file(s_table("fossils"), "csv") %>% fs::path_file()`).
 "n_fos" is the fossil ID number used in our fossil database (https://github.com/pteridophy/fossils).
 "minimum_age" (Ma) is the age used for calibration; "lower" is the lower limit of the oldest stratigraphic age for the fossil; "upper" is the upper limit of the oldest stratigraphic age for the fossil.
+For detailed notes and full references for each fossil, see Appendix S2.
 
 \newpage
 

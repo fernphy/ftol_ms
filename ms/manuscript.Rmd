@@ -398,7 +398,7 @@ smooth_best <-
 ```
 
 We rooted the ML tree on bryophytes and estimated divergence dates using penalized likelihood with treePL [@Smith2012].
-We selected `r n_calibrations_ferns` fern fossils to use as calibration points from a curated list of `r n_fern_fossils_total` fern fossil taxa (`r s_table("fossils")`).
+We selected `r n_calibrations_ferns` fern fossils to use as calibration points from a curated list of `r n_fern_fossils_total` fern fossil taxa (`r s_table("fossils")`, Appendix S2).
 In the case of redundant fossils (those calibrating the same node in the phylogeny; `r eg`, stems of families that are sister to each other, such as Dipteridaceae and Matoniaceae) we selected the fossil with the oldest age (`r ie`, the upper limit of the oldest stratigraphic period assigned to the fossil). 
 We assigned fossils to lineages only after consulting the original publication (as opposed to only using the fossil species or genus) so we could reassess the identification relative to changes in taxonomy and hypotheses of phylogenetic relationships.
 Taxon concepts may vary between the original publication and currently applied taxonomy (`r eg`, Dicksoniaceae *sensu lato* including other tree fern families used in description of the fossil but Dicksoniaceae *sensu stricto* used currently) and hypotheses of phylogenetic relationships among extant species may change (`r eg`, *Dennstaedtia* used in description of a fossil but this genus now known to be polyphyletic); in both cases, the resulting node to be calibrated for a given fossil will also change.

@@ -108,6 +108,35 @@ print_fossil <- function(fossil_data, fossil_select) {
 }
 ```
 
+```{r load-captions-si2, cache = FALSE}
+# Source captions numbers from MS
+# 
+# So that caption numbers are in order of appearance in MS
+
+# Run inline code when purling
+options(knitr.purl.inline = TRUE)
+
+# Make a temporary file to write out just inline R code from the SI Rmd
+temp_file <- tempfile()
+
+# Generate R script including inline R code from the ms Rmd
+knitr::purl(here::here("ms/manuscript.Rmd"), output = temp_file)
+
+# Trim this R script down to only functions that define figure and table captions
+read_lines(temp_file) %>%
+  magrittr::extract(
+    str_detect(., "^figure\\(|^table\\(|^s_figure\\(|^s_table\\(|^figure_num\\(|^table_num\\(|^s_figure_num\\(|^s_table_num\\(")
+  ) %>%
+  unique %>%
+  write_lines(temp_file)
+
+# Source the code. This will load the caption functions in the right order.
+source(temp_file, local = TRUE)
+
+# Delete the temporary file
+fs::file_delete(temp_file)
+```
+
 ```{r prep-fossil-data}
 # Set path to fossil data
 fossils_data_path <- here::here("_targets/user/data_raw/Fossils_Ferns.csv")
@@ -168,7 +197,7 @@ These data are exported from the FernCal v1.0 database (https://github.com/pteri
 
 Taxonomy of extant taxa follows pteridocat v1.0 database (https://github.com/pteridophy/pteridocat).
 
-For a summary of these data in CSV format, see Table FIXME <add table number>.
+For a summary of these data in CSV format, see `r s_table("fossils")`.
 
 \newpage
 
