@@ -184,7 +184,7 @@ Keywords: Fern~1~, Phylogeney~2~, Plastome~3~, PPGI~4~, Pteridophyte~5~, *rbcL*~
 
 Ferns, with about `r number(12000)` species, are the second most diverse clade of vascular plants after seed plants.
 Ferns have received intense focus from molecular systematists, resulting in the publication of molecular phylogenies for every major clade and DNA sequences for more than one third of all fern species.
-Global fern phylogenies have been published periodically, but as molecular systematics research continues at a rapid pace, these quickly become outdated.
+Global fern phylogenies have been published periodically, but as molecular systematics research continues at a rapid pace, these become quickly outdated.
 
 Here, we develop a mostly automated, reproducible, open pipeline to generate a continuously updated fern tree of life (FTOL) from DNA sequence data available via GenBank.
 Our tailored sampling strategy combines whole plastomes (few taxa, many loci) with commonly sequenced plastid regions (many taxa, few loci) to obtain a global, species-level fern phylogeny with high resolution along the backbone and maximal sampling across the tips.
@@ -232,6 +232,7 @@ The plastid genome has been the most widely sequenced genomic compartment in fer
 Our sampling includes two major categories of sequence data: 1) seven loci (*atpA*, *atpB*, *matK*, *rbcL*, *rps4*, *trnL*--*trnF*, and *rps4*--*trnS*) that have been frequently used for molecular systematics of ferns and are typically obtained by PCR and Sanger sequencing ("Sanger loci"); and 2) a much larger set of single-copy loci typically obtained from next-generation sequencing of the plastome ("plastome loci").
 Here, the *trnL*--*trnF* locus includes the *trnL* intron, the 3' *trnL* exon, and the *trnL*--*trnF* intergenic spacer; the *rps4*--*trnS* locus includes only the *rps4*--*trnS* intergenic spacer.
 The set of plastome loci is based on the list of 83 protein-coding genes of @Wei2017a, which was filtered to only genes that show no evidence of duplication (77 genes, including *atpA*, *atpB*, *matK*, *rbcL*, and *rps4*), and then combined with the *trnL*--*trnF* and *rps4*--*trnS* loci (79 loci total).
+Here, "locus" refers to an individual gene, intergenic spacer, or a unit comprised of these in the case of *trnL*--*trnF*.
 
 ## Dataset construction
 
@@ -339,7 +340,7 @@ We inspected the initial Sanger phylogeny to identify any remaining rogues or na
 We checked for monophyly at taxonomic levels at or above genus using the R package "MonoPhy" [@Schwery2016].
 We updated our taxonomic database if the molecular data clearly indicated the current usage of a synonym was incorrect [`r eg`, a taxonomic intruder into an otherwise expected monophyletic genus with a synonym available for that genus\; expected monophyly follows @PteridophytePhylogenyGroupI2016].
 However, this was not possible in all cases, particularly in groups that are in need of taxonomic revision and are known to include non-monophyletic genera (`r eg`, cheilanthoid ferns, grammitid ferns, microsoroid ferns).
-While we consider our phylogeny may serve as a guide for future taxonomic revisions, we did not make any taxonomic changes that would require valid publication according to the International Code of Nomenclature for Algae, Fungi, and Plants FIXME <<add citation>>.
+While we consider our phylogeny may serve as a guide for future taxonomic revisions, we did not make any taxonomic changes that would require valid publication according to the International Code of Nomenclature for Algae, Fungi, and Plants [@Turland2018].
 
 Based on the results of this inspection, we updated the list of rogue accessions to be excluded, updated the taxonomic database, and then re-ran all analyses up to this step.
 During each iteration of the analysis, it is possible that the GenBank accessions added in place of the excluded rogues themselves include rogues.
@@ -403,7 +404,6 @@ We assigned fossils to lineages only after consulting the original publication (
 Taxonomic concepts may vary between the original publication and currently applied taxonomy (`r eg`, Dicksoniaceae *sensu lato* including other tree fern families used in description of the fossil but Dicksoniaceae *sensu stricto* used currently) and hypotheses of phylogenetic relationships among extant species may change (`r eg`, *Dennstaedtia* used in description of a fossil but this genus now known to be polyphyletic); in both cases, the resulting node to be constrained for a given fossil could change.
 We also applied two constraints outside of ferns, including the most recent common ancestor (MRCA) of euphyllophytes (`r fossils$Euphyllophytes$age` Ma) and MRCA of tracheophytes (`r fossils$Tracheophytes$age` Ma), and fixed the root age (land plants) at 475 Ma as in @Testo2016a.
 All constraints other than the root are minimum ages.
-
 
 We tested rate smoothing parameters in treePL ranging from `r smooth_start` to `r smooth_end` (each varies by one order of magnitude).
 A value of `r smooth_best` was selected, based on the smallest chi-squared value, for the final analysis.
@@ -1551,8 +1551,6 @@ div_times_plot <-
     color = "grey20",
     lab_color = "grey30",
     height = unit(1, "lines"),
-    # FIXME: change this to true when issue gets resolved
-    # https://github.com/willgearty/deeptime/issues/41
     expand = TRUE,
     size = 3) +
   guides(shape = guide_legend(nrow = 2)) +

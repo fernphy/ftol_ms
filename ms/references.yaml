@@ -1764,6 +1764,58 @@ references:
   type: article-journal
   URL: papers://ebd7d3df-d8f1-4be8-bcf7-4fb07ababf30/Paper/p1319
   volume: '52'
+- id: Turland2018
+  accessed:
+  - year: 2022
+    month: 2
+    day: 21
+  citation-key: Turland2018
+  collection-title: Regnum Vegetabile
+  DOI: 10.12705/Code.2018
+  editor:
+  - family: Turland
+    given: Nicholas
+  - family: Wiersema
+    given: John
+  - family: Barrie
+    given: Fred
+  - family: Greuter
+    given: Werner
+  - family: Hawksworth
+    given: David
+  - family: Herendeen
+    given: Patrick
+  - family: Knapp
+    given: Sandra
+  - family: Kusber
+    given: Wolf-Henning
+  - family: Li
+    given: De-Zhu
+  - family: Marhold
+    given: Karol
+  - family: May
+    given: Tom
+  - family: McNeill
+    given: John
+  - family: Monro
+    given: Anna
+  - family: Prado
+    given: Jefferson
+  - family: Price
+    given: Michelle
+  - family: Smith
+    given: Gideon
+  ISBN: 978-3-946583-16-5
+  issued:
+  - year: 2018
+    month: 6
+    day: 26
+  publisher: Koeltz Botanical Books
+  source: DOI.org (Crossref)
+  title: International Code of Nomenclature for algae, fungi, and plants
+  type: book
+  URL: https://www.iapt-taxon.org/nomen/main.php
+  volume: '159'
 - id: Wei2017a
   author:
   - family: Wei
