@@ -1,5 +1,5 @@
 ---
-title: "An open and continuously updated fern tree of life (FTOL)"
+title: "An Open and Continuously Updated Fern Tree of Life (FTOL)"
 mainfont: Roboto-Regular.ttf
 fontsize: 11pt
 mainfontoptions: 
@@ -160,7 +160,7 @@ n_calibrations_total <-
 
 ^1^Department of Biological Sciences, Graduate School of Science, The University of Tokyo, Tokyo, Japan
 
-^2^Department of Botany, National Museum of Natural History, Smithsonian Institution, Washington, D.C., USA
+^2^Department of Botany, National Museum of Natural History, Smithsonian Institution, Washington, District of Columbia, United States
 
 ^3^Departamento de Botánica, Instituto de Biología, Universidad Nacional Autónoma de México, Mexico City, Mexico
 
@@ -182,64 +182,63 @@ Keywords: Fern~1~, Phylogeney~2~, Plastome~3~, PPGI~4~, Pteridophyte~5~, *rbcL*~
 
 # Abstract
 
-Ferns (ca. 12,000 spp.) are the second most diverse clade of vascular plants after seed plants and have received intense focus from molecular systematists, resulting in the publication of molecular trees for nearly all major clades and DNA sequences for more than one third of all fern species deposited in GenBank.
-Global trees including all ferns have been published periodically, but as molecular systematics research continues at a rapid pace, such trees quickly become outdated.
+Ferns, with about `r number(12000)` species, are the second most diverse clade of vascular plants after seed plants.
+Ferns have received intense focus from molecular systematists, resulting in the publication of molecular phylogenies for every major clade and DNA sequences for more than one third of all fern species.
+Global fern phylogenies have been published periodically, but as molecular systematics research continues at a rapid pace, these quickly become outdated.
 
-Here, we develop a mostly automated, reproducible, open pipeline to generate a continuously updated fern tree of life (FTOL) from DNA sequence data on GenBank.
-Our tailored sampling strategy combines whole plastomes (few taxa, many loci) with Sanger-sequenced loci (many taxa, few loci) to obtain a global fern phylogeny with high resolution along the backbone and maximum sampling across the tips.
-We use an expert-curated reference taxonomy to resolve synonyms in compliance with Pteridophyte Phylogeny Group I (PPGI), the community-driven taxonomic system widely accepted by many pteridologists.
+Here, we develop a mostly automated, reproducible, open pipeline to generate a continuously updated fern tree of life (FTOL) from DNA sequence data available via GenBank.
+Our tailored sampling strategy combines whole plastomes (few taxa, many loci) with commonly sequenced plastid regions (many taxa, few loci) to obtain a global, species-level fern phylogeny with high resolution along the backbone and maximal sampling across the tips.
+We use an expert-curated reference taxonomy to resolve synonyms in general compliance with Pteridophyte Phylogeny Group I (PPG I), the community-driven taxonomic system widely accepted by many pteridologists.
 
 The current FTOL includes `r comma(n_sanger_ferns)` species, an increase of more than 20% relative to the previous largest fern phylogeny.
-We also used an updated and expanded list of `r n_calibrations_ferns` fern fossil calibration points to date the tree, and estimated ages for most families and deeper clades to be significantly older compared to previous studies.
+Using an updated and expanded list of `r n_calibrations_ferns` fern fossil calibration points, we find estimated ages for most families and deeper clades to be significantly older than earlier studies.
 
-FTOL and its accompanying datasets including the fossil list and taxonomic database will be updated on a semi-annual basis and be made available via a web portal and R packages, enabling researchers to have immediate access to the most recent, comprehensively sampled fern phylogeny.
-FTOL will be useful for anybody studying this important group of plants over a wide range of taxonomic scales from smaller clades to the entire tree.
-We anticipate FTOL will be particularly relevant for macroecological studies at the regional to global scale and will inform future taxonomic systems with the most recent hypothesis of fern phylogeny.
+FTOL and its accompanying datasets including the fossil list and taxonomic database will be updated on a regular basis and made available via a web portal and R packages, enabling immediate access to the most up-to-date, comprehensively-sampled fern phylogeny.
+FTOL will be useful for anybody studying this important group of plants over a wide range of taxonomic scales, from smaller clades to the entire tree.
+We anticipate FTOL will be particularly relevant for macroecological studies at regional to global scales and will inform future taxonomic systems with the most recent hypothesis of fern phylogeny.
 
 # Introduction
 
-Ferns (ca. 12,000 species) are the second most diverse clade of vascular plants after seed plants (ca. 300,000 species), and are a useful study system for understanding processes of biogeography [@Tryon1986; @Kato1993], community ecology [e.g., @Hennequin2014; @Lehtonen2015], and speciation [e.g., @Kao2020].
-A well-sampled molecular phylogeny is key to any investigation of fern evolutionary biology.
-Fortunately, ferns have received relatively intense focus from molecular systematists, resulting in the publication of molecular trees for nearly all major clades and DNA sequences for more than one third all currently recognized fern species deposited in GenBank.
+Ferns (ca. `r number(12000)` species) are the second most diverse clade of vascular plants after seed plants (ca. `r number(300000)` species) and are a useful study system for understanding processes of biogeography [@Tryon1986; @Kato1993], community ecology [e.g., @Hennequin2014; @Lehtonen2015], and speciation [e.g., @Kao2020].
+Key to any investigation of evolutionary biology in this group is a well-sampled phylogeny.
+Fortunately, ferns have received relatively intense focus from molecular systematists, which has resulted in the publication of trees for all major clades and DNA sequence data for more than one third of all currently recognized fern species. 
 Thus, there is both sufficient sampling and a pressing need for a globally sampled fern phylogeny.
 
-Past efforts to construct such a global phylogeny have steadily increased in number of species as sequences in GenBank have accumulated [@Pryer2004a; @Lehtonen2011; @Schuettpelz2007; @Testo2016a].
-Indeed, accumulation of plastid fern accessions in GenBank show no sign of slowing since the most recent global phylogeny of ferns [@Testo2016a\; `r figure("genbank")`].
-There is a need therefore, not only for a global fern phylogeny, but one that is self-updating to keep pace with the continued accumulation of molecular data.
-This will eliminate the need for researchers to "rebuild the wheel" each time they want to use a globally sampled fern phylogeny.
+Past efforts to construct such a global phylogeny have steadily expanded their sampling as sequences have been added to GenBank [@Pryer2004a; @Lehtonen2011; @Schuettpelz2007; @Testo2016a].
+Indeed, growth of of plastid fern accessions in GenBank show no sign of slowing since the most recent global phylogeny of ferns [@Testo2016a\; `r figure("genbank")`].
+There is a need therefore, not only for a global fern phylogeny, but one that is continuously updated to keep pace with the rapid accumulation of molecular data.
+This would eliminate the need for researchers to "rebuild the wheel" each time they want to use a globally sampled fern phylogeny.
 
-Multiple efforts exist to automatically or semi-automatically generate trees for any arbitrary part of the tree of life [@Antonelli2016], a tree for all plants [@Eiserhardt2018], or even the entire tree of life at once [@Hinchliff2015] which would subsume a global fern phylogeny.
-While these may be appropriate in some cases, they may not produce an optimal fern phylogeny due to the need to take "one-size-fits-all" approaches to accommodate such a wide phylogenetic breadth. 
-By focusing methods and datasets specifically on ferns, it should be possible to generate a higher quality end-product (tree) that can be used "as-is" by biologists studying these organisms.
-Furthermore, there is much to be gained from integrating a carefully designed global fern phylogeny with the fern systematics community that would not be possible with a "tree of all life" or "tree of all plants".
+Multiple frameworks have been put forth to automatically or semi-automatically generate trees for any arbitrary part of the tree of life [@Antonelli2016], all plants [@Eiserhardt2018], or even the entire tree of life at once [@Hinchliff2015] which would subsume a global fern phylogeny.
+While these may be appropriate in some cases, they are not expected to produce an optimal fern phylogeny due to the need to take a "one-size-fits-all" approach to accommodate such a wide phylogenetic breadth.
+By focusing methods and datasets specifically on ferns, it should be possible to generate a higher quality end-product (tree) that can then be used "as-is" by biologists studying these organisms.
+Furthermore, there is much to be gained from integrating a carefully designed global fern phylogeny with the fern systematics community that would not be as easily accomplished with a "tree of all life" or "tree of all plants".
 
-Recently, a genus-level taxonomy of ferns and lycophytes was established following a open, community-driven model [@PteridophytePhylogenyGroupI2016\; hereafter "PPGI"].
-Thanks to this community-first approach, PPGI has been widely accepted and used (cited 881 times on Google Scholar as of writing).
-However, there were clearly problematic (non-monophyletic) genera at the time PPGI was published, and many new taxonomic changes have been (and will continue to be) made since [e.g., @Almeida2017; @Shang2018; @Zhang2020].
-It is anticipated that "PPGII" will be an online, open resource that can be updated as necessary (Schuettpelz, pers. comm.).
-We envision an open, continuously updated global fern phylogeny that is directly integrated with PPGII so that taxonomic decisions reflecting phylogeny can be made based on community consensus using the most recently available data.
+Recently, a genus-level taxonomy of ferns and lycophytes was established using an inclusive, community-driven approach  [@PteridophytePhylogenyGroupI2016\; hereafter "PPG I"].
+PPG I has been widely accepted and used, but there were problematic (non-monophyletic) genera included at the time of publication, and many taxonomic changes have been (and will continue to be) proposed since [`r eg`, @Almeida2017; @Shang2018; @Zhang2020].
+The next iteration of PPG (`r ie`, PPG II) will ideally be an online, open resource that can be updated as necessary.
+We envision an open, continuously updated global fern phylogeny that could be directly integrated with PPG II such that taxonomic decisions can be made based on community consensus and the most recently available data.
 
-Here, we leverage our specialized taxonomic knowledge to design a custom, fully reproducible, mostly automated pipeline to generate a maximally sampled global fern tree of life (FTOL).
-We plan to run the pipeline on a semi-annual basis and make the results freely available online through a web portal and R package.
+Here, we leverage specialized taxonomic knowledge to design a custom, fully reproducible, mostly automated pipeline to generate a maximally sampled global fern tree of life (FTOL).
+We plan to run the pipeline on a regular basis and make the results freely available online through a web portal and R package.
 This will enable anybody interested in the biology of ferns to have access to the most recent hypothesis of fern phylogeny.
-We anticipate FTOL will have several impacts for the field of fern systematics and evolution: 1) it will always provide the most up-to-date snapshot of our collective understanding of fern phylogeny; 2) it will allow for continuous assessment of taxonomy, and indicate those parts of the tree that are in need of taxonomic revision; 3) it will be an important source of data for phylogenetic comparative and macroevolutionary studies of ferns.
+We anticipate FTOL will have several impacts for the field of fern systematics and evolution: 1) it will always provide the most up-to-date snapshot of our collective understanding of fern phylogeny; 2) it will allow for continuous assessment of taxonomy, and indicate those parts of the tree that are in need of taxonomic revision; and 3) it will be an important source of data for phylogenetic comparative and macroevolutionary studies of ferns.
 
 # Materials and Methods
 
 ## Locus selection
 
 The plastid genome has been the most widely sequenced genomic compartment in ferns by far (`r figure("genbank")`), so we used plastid loci to build our tree.
-Our sampling includes two major categories of sequence data: 1) seven loci (*atpA*, *atpB*, *matK*, *rbcL*, *rps4*, *trnL*--*trnF*, and *rps4*--*trnS*) that have been frequently used for molecular systematics of ferns and are typically obtained by PCR and Sanger sequencing ("Sanger loci"); and 2) a much larger set of single-copy, coding genes typically obtained from next-generation sequencing of the plastome ("plastome loci").
-Here, the locus *trnL*--*trnF* includes the *trnL* intron, the 3' *trnL* exon, and the spacer between *trnL* and *trnF*; the locus *rps4*--*trnS* includes the spacer between *rps4* and *trnS*.
-The set of plastome loci is based on the list of 83 protein-coding genes of @Wei2017a, which was filtered to only genes that show no evidence of duplication (77 genes), then combined with the two spacers (79 loci total).
-The plastome loci include all seven Sanger loci.
+Our sampling includes two major categories of sequence data: 1) seven loci (*atpA*, *atpB*, *matK*, *rbcL*, *rps4*, *trnL*--*trnF*, and *rps4*--*trnS*) that have been frequently used for molecular systematics of ferns and are typically obtained by PCR and Sanger sequencing ("Sanger loci"); and 2) a much larger set of single-copy loci typically obtained from next-generation sequencing of the plastome ("plastome loci").
+Here, the *trnL*--*trnF* locus includes the *trnL* intron, the 3' *trnL* exon, and the *trnL*--*trnF* intergenic spacer; the *rps4*--*trnS* locus includes only the *rps4*--*trnS* intergenic spacer.
+The set of plastome loci is based on the list of 83 protein-coding genes of @Wei2017a, which was filtered to only genes that show no evidence of duplication (77 genes, including *atpA*, *atpB*, *matK*, *rbcL*, and *rps4*), and then combined with the *trnL*--*trnF* and *rps4*--*trnS* loci (79 loci total).
 
 ## Dataset construction
 
 All sequences were downloaded from GenBank.
-GenBank queries were formatted including locus name, "Polypodiopsida[ORGN]", and "[PDAT]" to specify sequence date range (e.g., 1980/01/01[PDAT]:2021/12/12[PDAT]) so that a given query always results in the same set of sequences regardless of when the query is made.
+GenBank queries were formatted to include locus name, "Polypodiopsida[ORGN]", and "[PDAT]" to specify sequence date range (e.g., 1980/01/01[PDAT]:2021/12/12[PDAT]) so that a given query always results in the same set of sequences regardless of when the query is made.
 Names including the terms "aff." or "cf.", hybrid formulas, and environmental DNA samples were excluded.
-There is no formal definition of genomic vs. Sanger sequences in GenBank, so we used an empirical sequence length cutoff to distinguish between Sanger (=< `r number(7000)` bp) or plastome sequences (> `r number(7000)` bp) with the "[SLEN]" term.
+There is no formal definition of genomic vs. Sanger sequences in GenBank, so we used an empirical sequence length cutoff to distinguish between Sanger (≤ `r number(7000)` bp) or plastome sequences (> `r number(7000)` bp) with the "[SLEN]" term.
 
 There is a lack of consensus on sequence annotation in GenBank; the same locus may be annotated using different names, or not annotated at all.
 To avoid missing sequences due to differences in annotation format, we used the "Reference_Blast_Extract.py" script of  superCRUNCH [@Portik2020] to extract target loci from GenBank FASTA files.
@@ -254,54 +253,55 @@ The cleaned alignments were then used as references for superCRUNCH to obtain a 
 
 ## Taxonomic name resolution
 
-One goal of this project is to generate a phylogeny that is consistent with PPGI.
-Species names in GenBank, which use the NCBI taxonomy [@Federhen2012; @Schoch2020], do not necessarily conform to PPGI.
+This project aimed to generate a phylogeny that is consistent with PPG I, while accounting for taxonomic changes that have been made since the publication of PPG I.
+Species names in GenBank, which use the NCBI taxonomy [@Federhen2012; @Schoch2020], do not necessarily conform to PPG I.
 Furthermore, the NCBI taxonomy is not curated specifically for ferns and includes many fern synonyms.
-Therefore, we standardized all species names in the GenBank sequences against a reference taxonomy.
-We designed the reference taxonomy for this project based on the World Ferns database v.12.8 [@Hassler2022], which conforms to PPGI (with some exceptions explained below) and is available in Darwin Core format [@DarwinCore2009] via the Catalog of Life [@COL2366].
+Therefore, we standardized all species names in the GenBank sequences against a newly generated reference taxonomy.
+Our reference taxonomy is based on the World Ferns database v.12.8 [@Hassler2022], which conforms to PPG I (with some exceptions explained below) and is available in Darwin Core format [@DarwinCore2009] via the Catalog of Life [@COL2366].
 
-We used the taxastand R package [@Nitta2021] to resolve species names, which can account for differences in formatting of taxonomic authors (`r eg`, parenthetical basionym author present or absent) as well as perform fuzzy matching, which is needed to account for spelling errors or variations in author names.
-We manually inspected any fuzzily matched or non-matching names.
-This revealed some species names in GenBank that were lacking in the World Ferns database, spelling errors, as well as some names in the database that needed to be treated differently (`r eg`, changes in synonymy).
-Therefore, we updated and edited the World Ferns database using the dwctaxon R package (FIXME add citation), which is designed to work with taxonomic data in the Darwin Core format.
-We refer to the resulting taxonomic database as "pteridocat", and have made it freely available online (https://github.com/joelnitta/pteridocat) so that other researchers may standardize taxonomic names in their data to match those of FTOL.
+To resolve species names, we used the taxastand R package [@Nitta2021], which can account for differences in formatting of taxonomic authors (`r eg`, parenthetical basionym author present or absent) and perform fuzzy matching, which is needed to account for spelling errors or variations in author names.
 
-There are differences between pteridocat and PPGI, mostly at the genus level.
-In the time since PPGI was published, several new genera have been published.
-Furthermore, multiple genera included in PPGI were known to be non-monophyletic and included on a tentative basis [@PteridophytePhylogenyGroupI2016].
-Pteridocat includes newly published genera and some genera that were not recognized by PPGI as well as nothogenera, which were not included in PPGI [@Liu2020a].
-Differences between pteridocat and PPGI are summarized in `r s_table("genera_diff")`.
+We manually inspected any fuzzy matched or non-matching names.
+This revealed some species names in GenBank that were missing in the World Ferns database, spelling errors, as well as some names in the database that needed to be treated differently (`r eg`, changes in synonymy).
+We thus updated and edited the initial World Ferns database using the dwctaxon R package (FIXME add citation), which is designed to work with taxonomic data in the Darwin Core format.
+We refer to the resulting taxonomic database as "pteridocat," and have made it freely available online (https://github.com/joelnitta/pteridocat) so that other researchers may standardize taxonomic names in their data to match those of FTOL.
+
+There are differences between pteridocat and PPG I, mostly at the genus level.
+In the time since PPG I was introduced, several new genera have been published.
+Furthermore, multiple genera included in PPG I were known to be non-monophyletic and provisionally circumscribed [@PteridophytePhylogenyGroupI2016].
+Pteridocat includes newly published genera, some genera that were not recognized by PPG I, as well as nothogenera, which were not included in PPG I [@Liu2020a].
+Differences between pteridocat and PPG I are summarized in `r s_table("genera_diff")`.
 
 ## Removal of rogue sequences using BLAST
 
-Another potential issue with GenBank sequences is the presence of misidentified sequences, poor quality sequences, and contaminations (hereafter collectively "rogues").
+Another potential issue with GenBank sequences is the presence of misidentified sequences, poor quality sequences, and contaminations (hereafter collectively referred to as "rogues").
 We removed putative rogues from Sanger sequences as follows.
 First, we constructed a BLAST library including all extracted Sanger sequences.
 Next, we conducted one BLAST search for each Sanger sequence against the library (all-by-all BLAST).
-We compared the families (following PPGI) of the matching sequences to each query; in the case the top three best matches belonged to a different family than the query, that query was considered a contamination and excluded from further analysis.
+We compared the families (following PPG I) of the matching sequences to each query; in the case the top three best matches belonged to a different family than the query, that query was considered a contaminant and excluded from further analysis.
 For Cyatheales and Saccolomatineae, which include several closely related small families, we used the order and sub-order level, respectively, instead of family.
 Species belonging to monotypic families were not considered for this filtering.
-While this method cannot account for rogues at finer taxonomic levels, it is an efficient method to remove obviously incorrect sequences.
+While this method cannot account for rogues at finer taxonomic levels, it is an efficient approach for removing obviously erroneous sequences.
 We inspected all accessions flagged this way as rogues before excluding them.
-In the case that that mismatch of family was due to incorrect taxonomy (`r eg`, species name on GenBank matches the correct family but name used in the taxonomic database does not), we updated the taxonomic database accordingly.
+In cases where the family mismatch was due to incorrect taxonomy (`r eg`, the species name in GenBank matches the correct family but the name used in the taxonomic database does not), we updated the taxonomic database accordingly.
 
 ## Sequence concatenation and selection
 
-A typical step in multilocus workflows is to concatenate loci across samples.
-For phylogenetic studies aiming to produce one tip per species, this is often done by concatenating the longest sequence per locus within each species.
+A typical step in multilocus phylogenetic workflows is to concatenate loci across samples.
+For phylogenetic studies aiming to include one tip per species, this is often done by concatenating the longest sequence per locus within each species.
 However, such an approach is potentially problematic because accessions on GenBank may be misidentified and/or species may not be monophyletic.
 Therefore, we concatenated accessions and selected one final set of concatenated loci per species as follows (here, we refer to "accession" to mean a single locus within a GenBank accession; GenBank accessions may have multiple loci per accession, but we already split those out using superCRUNCH as described previously).
 First, we constructed gene trees with FastTree [@Price2009; @Price2010] on default settings, and classified species as monophyletic if they were monophyletic in all gene trees including multiple accessions of that species.
-We then concatenated loci that met any of the following three conditions: 1) if a species was monophyletic, loci were concatenated by selecting the longest accession per locus within that species; 2) if all accessions originated from the same voucher specimen, loci were concatenated across accessions; 3) if all accessions for a given species originated from only one publication, loci were concatenated across accessions.
+Then, we concatenated loci that met any of the following three conditions: 1) if a species was monophyletic, loci were concatenated by selecting the longest accession per locus within that species; 2) if all accessions originated from the same voucher specimen, loci were concatenated across accessions; 3) if all accessions for a given species originated from only one publication, loci were concatenated across accessions.
 Accessions not meeting any of these conditions were not concatenated.
-All calculations of sequence length excluded missing bases.
+All calculations of sequence length excluded missing bases ("?", "N", or "-").
 
-We then selected the final set of concatenated loci for each species based on presence of *rbcL* and sequence length.
+We selected the final set of concatenated loci for each species based on presence of *rbcL* and sequence length.
 We sought to maximize representation of *rbcL* as this is historically the most sequenced locus for ferns, and maximal sampling of one locus has been shown to improve results in super-matrix phylogenies [@Talavera2021].
 Our procedure for selecting accessions for each species is as follows.
 
 1. If accessions are concatenated including *rbcL* and at least one other locus, select the set of concatenated accessions with the greatest total sequence length.
-2. Otherwise, if accessions include *rbcL*, select the accession with the longest *rbcL* sequence.
+2. Otherwise, if accessions include *rbcL* only, select the accession with the longest *rbcL* sequence.
 3. Otherwise, select the accession or set of concatenated accessions with the greatest total sequence length.
 
 The above steps were not needed for plastome data, as each plastome sequence on GenBank originates from a single voucher specimen.
@@ -309,15 +309,14 @@ For these, we selected one specimen per species with the longest combined sequen
 
 ## Sequence alignment
 
-For non-spacer regions, we aligned each locus separately with MAFFT with automatic adjustment for sequence direction and other settings on default. Spacer regions are difficult to align across higher taxonomic levels within ferns (e.g., family or higher) as they include frequent indels; however, spacer regions are very useful for phylogenetic analysis at finer levels (`r eg`, within genera or family) where slower-evolving genes like *rbcL* may not provide enough resolution.
+For non-spacer regions (genes), we aligned each locus separately in MAFFT with automatic adjustment for sequence direction and other settings on default. Spacer regions are difficult to align across higher taxonomic levels within ferns (`r eg`, family or higher) as they include frequent indels; however, spacer regions are very useful for phylogenetic analysis at finer scales (`r eg`, within genera or family) where slower-evolving genes like *rbcL* may not provide enough resolution.
 Therefore, we first aligned spacer regions for each family with MAFFT, then merged the subalignments using the MAFFT "\-\-merge" option.
 This retains the indels within each subalignment while aligning across subalignments.
 For some small families with fewer than three species each that could be used for subalignments, these were added as "singletons" during the MAFFT "\-\-merge".
-Anemiaceae showed an extremely high number of indels compared to other families and could not be reliably aligned across families, so we excluded it from the spacer region data.
+Anemiaceae showed an extremely high number of indels compared to other families and could not be reliably aligned across families, so we excluded it from the spacer region data (*trnL*--*trnF* and *rps4*--*trnS*).
 We also excluded outgroups from the spacer region data as they cannot be reliably aligned to ferns.
 
-Next, we removed poorly aligned regions from the alignments using trimAl.
-We removed regions with >1% or >5% of sequences having gaps from coding regions or spacers, respectively.
+We removed poorly aligned regions, including those with >1% or >5% of sequences having gaps, from the alignments using trimAl [@Capella-Gutierrez2009].
 
 ## Phylogenetic analysis
 
@@ -331,7 +330,7 @@ Node support was assessed with `r number(1000)` ultrafast rapid bootstrap replic
 
 ### Initial Sanger phylogeny
 
-Next, we used the backbone phylogeny as a constraint tree to conduct initial phylogenetic analysis of the concatenated Sanger dataset in IQ-TREE with the "-fast" option and the GTR+I+G model.
+We used the backbone (plastome) phylogeny as a constraint tree to conduct initial phylogenetic analysis of the concatenated Sanger dataset in IQ-TREE with the "-fast" option and the GTR+I+G model.
 We prioritized computation speed for this step, as we needed to repeat it multiple times as described in the next section.
 
 ### Removal of rogue sequences based on initial Sanger phylogeny
@@ -340,11 +339,11 @@ We inspected the initial Sanger phylogeny to identify any remaining rogues or na
 We checked for monophyly at taxonomic levels at or above genus using the R package "MonoPhy" [@Schwery2016].
 We updated our taxonomic database if the molecular data clearly indicated the current usage of a synonym was incorrect [`r eg`, a taxonomic intruder into an otherwise expected monophyletic genus with a synonym available for that genus\; expected monophyly follows @PteridophytePhylogenyGroupI2016].
 However, this was not possible in all cases, particularly in groups that are in need of taxonomic revision and are known to include non-monophyletic genera (`r eg`, cheilanthoid ferns, grammitid ferns, microsoroid ferns).
-While we consider our phylogeny may serve as a guide for future taxonomic revisions, we did not make any taxonomic changes that would require valid publication according to the International Code of Nomenclature for Algae, Fungi, and Plants.
+While we consider our phylogeny may serve as a guide for future taxonomic revisions, we did not make any taxonomic changes that would require valid publication according to the International Code of Nomenclature for Algae, Fungi, and Plants FIXME <<add citation>>.
 
-Based on the results of this inspection, we updated the list of rogue accessions to exclude, updated the taxonomic database, then re-ran all analyses up to this step.
-When re-running the analysis, it is possible that there were newly added GenBank accessions in place of the excluded rogues that themselves are rogues.
-Therefore, we repeated this process until the monophyly of all higher-level (`r eg` genus rank and higher) taxa that were expected to be monophyletic according to @PteridophytePhylogenyGroupI2016 was either confirmed or could not be achieved due to outstanding taxonomic issues.
+Based on the results of this inspection, we updated the list of rogue accessions to be excluded, updated the taxonomic database, and then re-ran all analyses up to this step.
+During each iteration of the analysis, it is possible that the GenBank accessions added in place of the excluded rogues themselves include rogues.
+Therefore, we repeated this process until the monophyly of all higher-level (`r eg`, genus rank and higher) taxa that were expected to be monophyletic according to @PteridophytePhylogenyGroupI2016 was either confirmed or could not be achieved due to outstanding taxonomic issues.
 
 ### Final Sanger phylogeny
 
@@ -398,20 +397,22 @@ smooth_best <-
 ```
 
 We rooted the ML tree on bryophytes and estimated divergence dates using penalized likelihood with treePL [@Smith2012].
-We selected `r n_calibrations_ferns` fern fossils to use as calibration points from a curated list of `r n_fern_fossils_total` fern fossil taxa (`r s_table("fossils")`, Appendix S2).
-In the case of redundant fossils (those calibrating the same node in the phylogeny; `r eg`, stems of families that are sister to each other, such as Dipteridaceae and Matoniaceae) we selected the fossil with the oldest age (`r ie`, the upper limit of the oldest stratigraphic period assigned to the fossil). 
-We assigned fossils to lineages only after consulting the original publication (as opposed to only using the fossil species or genus) so we could reassess the identification relative to changes in taxonomy and hypotheses of phylogenetic relationships.
-Taxon concepts may vary between the original publication and currently applied taxonomy (`r eg`, Dicksoniaceae *sensu lato* including other tree fern families used in description of the fossil but Dicksoniaceae *sensu stricto* used currently) and hypotheses of phylogenetic relationships among extant species may change (`r eg`, *Dennstaedtia* used in description of a fossil but this genus now known to be polyphyletic); in both cases, the resulting node to be calibrated for a given fossil will also change.
-We also applied two calibration points outside of ferns including the most recent common ancestor (MRCA) of euphyllophytes (`r fossils$Euphyllophytes$age` Ma) and MRCA of tracheophytes (`r fossils$Tracheophytes$age` Ma), and fixed the root age (land plants) at 475 Ma [@Testo2016a].
-All calibration points other than the root are minimum ages.
+We selected `r n_calibrations_ferns` fern fossils to use as constraints from a curated list of `r n_fern_fossils_total` fern fossil taxa (`r s_table("fossils")`, Appendix S2).
+In the case of redundant fossils (those assignable to the same node in the phylogeny; `r eg`, stems of families that are sister to each other, such as Dipteridaceae and Matoniaceae) we selected the fossil with the oldest age (`r ie`, the upper limit of the oldest stratigraphic period assigned to the fossil). 
+We assigned fossils to lineages only after consulting the original publication (as opposed to simply relying on the fossil name) so we could reassess the identification relative to changes in taxonomy and hypotheses of phylogenetic relationships.
+Taxonomic concepts may vary between the original publication and currently applied taxonomy (`r eg`, Dicksoniaceae *sensu lato* including other tree fern families used in description of the fossil but Dicksoniaceae *sensu stricto* used currently) and hypotheses of phylogenetic relationships among extant species may change (`r eg`, *Dennstaedtia* used in description of a fossil but this genus now known to be polyphyletic); in both cases, the resulting node to be constrained for a given fossil could change.
+We also applied two constraints outside of ferns, including the most recent common ancestor (MRCA) of euphyllophytes (`r fossils$Euphyllophytes$age` Ma) and MRCA of tracheophytes (`r fossils$Tracheophytes$age` Ma), and fixed the root age (land plants) at 475 Ma as in @Testo2016a.
+All constraints other than the root are minimum ages.
 
-We tested rate smoothing parameters in treePL ranging from `r smooth_start` to `r smooth_end` (each varies by one order of magnitude); a value of `r smooth_best` was selected with the smallest chi-squared value for final analysis.
+
+We tested rate smoothing parameters in treePL ranging from `r smooth_start` to `r smooth_end` (each varies by one order of magnitude).
+A value of `r smooth_best` was selected, based on the smallest chi-squared value, for the final analysis.
 To construct confidence intervals for the estimated divergence times, we constructed 100 bootstrap trees (trees with identical topology but different branchlengths) using IQ-TREE and dated each using treePL with the same settings used for the ML tree [@Maurin2020].
 
 ## Reproducibility
 
 The workflow is managed in R [@RCoreTeam2020a] with the targets package [@Landau2021].
-Code used to generate FTOL is available at https://github.com/joelnitta/ftol.
+Code used to generate FTOL and compile this manuscript is available at https://github.com/pteridophylo/ftol_flow and https://github.com/pteridophylo/ftol_ms, respectively.
 A docker image to run the code is available at https://hub.docker.com/r/joelnitta/ftol.
 
 # Results
@@ -514,13 +515,13 @@ Extraction of target loci with superCRUNCH recovered `r n_accs_extract` accessio
 Manual inspection of the initial tree resulted in a list of `r n_accs_exclude` accessions to be excluded as rogues.
 `r n_accs_first_filter` accessions were retained after excluding these rogues and species names that could not be resolved to an accepted name in the taxonomic database.
 `r n_accs_second_filter` accessions were retained after excluding rogues identified by the all-by-all BLAST search.
-The final selection of Sanger loci (one set of concatenated accessions per species or one accession per species if conditions for concatenation not met) included `r n_accs_raw_final` accessions (`r n_accs_final` sequences when counting distinct loci within each accession separately).
+The final selection of Sanger loci (one set of concatenated accessions per species or one accession per species if conditions for concatenation not met) included `r n_accs_raw_final` accessions (`r n_accs_final` sequences when counting distinct loci within each accession separately; `r s_table("accs")`).
 The most frequent method for joining accessions across loci was by `r last(join_by_count)$join_by` (`r last(join_by_count)$n` species; `r last(join_by_count)$percent`).
 `r join_by_count$unjoined$n` species (`r join_by_count$unjoined$percent`) had accessions that could not be joined or only included one of the seven loci (`r s_table("join_by")`).
 
 The initial GenBank query for fern plastomes resulted in `r n_plast_accs_query` accessions.
 `r n_plast_first_filter` accessions were retained after excluding rogues and species names that could not be resolved.
-Selection of the longest set of concatenated sequences per species resulted in `r n_accs_plast_final` accessions (species).
+Selection of the longest set of concatenated sequences per species resulted in `r n_accs_plast_final` accessions (species; `r s_table("accs")`).
 
 ## Taxon and locus sampling
 
@@ -867,7 +868,7 @@ FTOL cannot substitute for systematic careful studies at finer taxonomic scales 
 One feature of FTOL that sets it apart from the vast majority of other fern phylogenetic studies is its iterative nature.
 Unlike most other published fern phylogenies, the current version of FTOL described in this manuscript is not meant to be the last.
 Rather, we plan to re-run these analyses as additional data become available on GenBank, and release updated versions of the tree on a regular, semi-annual basis.
-We envision that FTOL will be integrated with the next iteration of PPG, PPGII, to provide the most recent hypotheses on the monophyly of various fern taxa, which will in turn enable a more natural classification system.
+We envision that FTOL will be integrated with the next iteration of PPG, PPG II, to provide the most recent hypotheses on the monophyly of various fern taxa, which will in turn enable a more natural classification system.
 
 Furthermore, FTOL will not only grow in size with time, but also become more refined.
 We are aware that our methodology cannot produce a "perfect" tree, nor is that our goal.
