@@ -28,6 +28,19 @@ tar_plan(
   pteridocat_ppgi_diff_notes = read_csv(
     pteridocat_ppgi_diff_notes_path
   ),
+  # - Fossil ferns data
+  tar_files_input(
+    fossil_ferns_path,
+    fs::path(ftol_cache, "user/data_raw/Fossils_Ferns.csv")
+  ),
+  fossil_ferns_raw = read_csv(fossil_ferns_path, skip = 1) %>%
+    janitor::clean_names(),
+  # - Seed plant trees from Barahona et al 2020
+  tar_files_input(
+    spermato_trees_path,
+    "_targets/user/data_raw/angiosperm-time-tree-2.0-v2.0.zip"
+  ),
+  spermato_trees = load_barahona_trees(spermato_trees_path),
   # - Targets from FTOL workflow
   plastome_metadata_renamed = tar_read(
     plastome_metadata_renamed,
@@ -53,12 +66,6 @@ tar_plan(
     monophy_by_clade,
     store = ftol_cache
   ),
-  tar_files_input(
-    fossil_ferns_path,
-    fs::path(ftol_cache, "user/data_raw/Fossils_Ferns.csv")
-  ),
-  fossil_ferns_raw = read_csv(fossil_ferns_path, skip = 1) %>%
-    janitor::clean_names(),
   
   # GenBank ----
   # Analyze number of fern accessions and species in GenBank by type of DNA 

@@ -294,6 +294,72 @@ parse_du_dates <- function(du_2021_si_path) {
     select(author, lineage, affinities, affinities_group, median, low, high)
 }
 
+#' Load dated angiosperm trees from Barahona et al 2020
+#' 
+#' Ramírez-Barahona S, Sauquet H, Magallón S (2020) The delayed and 
+#' geographically heterogeneous diversification of flowering plant families. 
+#' Nature Ecology & Evolution 1–7. https://doi.org/10/gg45rb
+#'
+#' @param zip_path Path to zip file of supplemental data from 
+#' Barahona et al 2020, downloaded from
+#' https://zenodo.org/record/4721917/files/spiritu-santi/angiosperm-time-tree-2.0-v2.0.zip
+#' 
+#' @return List of trees named after analysis scheme
+#' 
+load_barahona_trees <- function(zip_path) {
+  
+  # Make temp dir for unzipping
+  temp_dir <- fs::path(tempdir(), "angiosperm-time-tree")
+  
+  if (fs::dir_exists(temp_dir)) fs::dir_delete(temp_dir)
+  
+  fs::dir_create(temp_dir)
+  
+  # Files we want are in a zip file within the zip file
+  # Unzip Data10_mcctrees.zip first
+  
+  unzip(
+    zipfile = zip_path,
+    files = "spiritu-santi-angiosperm-time-tree-2.0-7303f80/data/Supplementary/Data10_mcctrees.zip",
+    junkpaths = TRUE,
+    exdir = temp_dir
+  )
+  
+  # Tree files of interest
+  
+  tree_files <- c(
+    "CC_complete_MCCv_2.tre",
+    "CC_conservative_MCCv_2.tre",
+    "RC_complete_MCCv_2.tre",
+    "RC_conservative_MCCv_2.tre",
+    "UC_complete_MCCv_2.tre",
+    "UC_conservative_MCCv_2.tre"
+  )
+  
+  tree_names <- str_remove_all(tree_files, "_MCCv_2\\.tre")
+  
+  # Next unzip the tree files within Data10_mcctrees.zip
+  
+  unzip(
+    zipfile = fs::path(temp_dir, "Data10_mcctrees.zip"),
+    files = tree_files,
+    junkpaths = TRUE,
+    exdir = temp_dir
+  )
+  
+  # Read in as list of trees, named by analysis scheme
+  res <-
+    tree_files %>%
+    fs::path(temp_dir, .) %>%
+    map(~ape::read.nexus(.)) %>%
+    set_names(tree_names)
+  
+  if (fs::dir_exists(temp_dir)) fs::dir_delete(temp_dir)
+  
+  return(res)
+  
+}
+
 # Coverage ----
 
 #' Make a tibble of accepted species in pteridocat taxonomic database
