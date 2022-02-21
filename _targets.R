@@ -31,7 +31,7 @@ tar_plan(
   # - Fossil ferns data
   tar_files_input(
     fossil_ferns_path,
-    fs::path(ftol_cache, "user/data_raw/Fossils_Ferns.csv")
+    fs::path("_targets/user/data_raw/Fossils_Ferns.csv")
   ),
   fossil_ferns_raw = read_csv(fossil_ferns_path, skip = 1) %>%
     janitor::clean_names(),

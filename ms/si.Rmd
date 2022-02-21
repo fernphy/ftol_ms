@@ -221,14 +221,6 @@ fossils_table <-
   inner_join(
     select(fossil_calibration_tips, fossil_taxon), by = "fossil_taxon") %>%
   verify(nrow(.) == nrow(fossil_calibration_tips)) %>%
-  rowwise() %>%
-  mutate(
-    note = jntools::paste3(notes_21, notes_22sep = ". ") %>%
-      str_replace_all("\\.\\.", "\\.") %>%
-      na_if(".") %>%
-      str_replace_all(" \\.$", "\\.")
-  ) %>%
-  ungroup() %>%
   select(
     n_fos, minimum_age, node_calibrated, fossil_taxon, 
     lower = lower_limit_of_oldest_stratigraphic_age,
@@ -236,7 +228,7 @@ fossils_table <-
     stratigraphic_age, 
     country, type_locality, formation,
     organs, specimen_holotype, collection,
-    reference, note
+    reference
   )
 ```
 

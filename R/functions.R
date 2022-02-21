@@ -966,6 +966,60 @@ tabyl_fmt <- function(...) {
     )
 }
 
+#' Print a single category of fossil data
+#'
+#' @param fossil_data Fossil data in long form, filtered to a single
+#' fossil
+#' @param cat_select Category of data to print
+#'
+#' @return Character vector
+
+print_fossil_cat <- function(fossil_data, cat_select) {
+  data <-
+    fossil_data %>% filter(category == cat_select)
+  
+  c(
+    md_heading(cat_select, 3),
+    md_bullet(data$text),
+    md_blank()
+  )
+}
+
+#' Print data for a single fossil
+#'
+#' @param fossil_data Fossil data in long form
+#' @param fossil_select Selected fossil to print
+#'
+#' @return Character vector
+#'
+#' @examples
+#' print_fossil(fossils_long, "Acrostichum intertrappeum") %>%
+#' 	glue::as_glue()
+print_fossil <- function(fossil_data, fossil_select) {
+  # Filter data to only selected fossil
+  data <-
+    fossil_data %>% filter(fossil_taxon == fossil_select)
+  
+  # Print name of fossil as header in italics
+  header <-
+    data %>% 
+    filter(var == "fossil_taxon_header") %>%
+    pull(value) %>%
+    str_replace_all("_", " ") %>%
+    md_italic() %>%
+    md_heading(1)
+  
+  categories <- data %>%
+    filter(!is.na(category)) %>%
+    pull(category) %>%
+    unique()
+  
+  body <- map(categories, ~print_fossil_cat(data, .)) %>%
+    unlist()
+  
+  c(header, body, md_rule())
+}
+
 # References ----
 
 #' Extract citations (formatted like `[@key]`) from an Rmd file

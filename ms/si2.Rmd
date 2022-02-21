@@ -32,6 +32,7 @@ header-includes:
   - \renewcommand{\headrulewidth}{0pt} # delete line beneath header
   - \fancyhead[RE,RO]{Supplementary Material} # add header on right side
   - \fancyhead[LO,LE]{} # suppress automatic section header on left side
+  - \setlength{\headheight}{13.6pt}
   - \cfoot{\thepage} # footer
 editor_options: 
   chunk_output_type: console
@@ -52,60 +53,12 @@ library(tidyverse)
 library(assertr)
 ```
 
-```{r custom-funcs}
-#' Print a single category of fossil data
-#'
-#' @param fossil_data Fossil data in long form, filtered to a single
-#' fossil
-#' @param cat_select Category of data to print
-#'
-#' @return Character vector
-
-print_fossil_cat <- function(fossil_data, cat_select) {
-  data <-
-    fossil_data %>% filter(category == cat_select)
-  
-  c(
-    md_heading(cat_select, 3),
-    md_bullet(data$text),
-    md_blank()
-  )
-}
-
-#' Print data for a single fossil
-#'
-#' @param fossil_data Fossil data in long form
-#' @param fossil_select Selected fossil to print
-#'
-#' @return Character vector
-#'
-#' @examples
-#' print_fossil(fossils_long, "Acrostichum_intertrappeum") %>%
-#' 	glue::as_glue()
-print_fossil <- function(fossil_data, fossil_select) {
-  # Filter data to only selected fossil
-  data <-
-    fossils_long %>% filter(fossil_taxon == fossil_select)
-  
-  # Print name of fossil as header in italics
-  header <-
-    data %>% 
-    filter(var == "fossil_taxon_header") %>%
-    pull(value) %>%
-    str_replace_all("_", " ") %>%
-    md_italic() %>%
-    md_heading(1)
-  
-  categories <- data %>%
-    filter(!is.na(category)) %>%
-    pull(category) %>%
-    unique()
-  
-  body <- map(categories, ~print_fossil_cat(data, .)) %>%
-    unlist()
-  
-  c(header, body, md_rule())
-}
+```{r load-targets-si-2}
+# Targets from MS workflow
+tar_load(
+  fossil_ferns_path,
+  store = here::here("_targets")
+)
 ```
 
 ```{r load-captions-si2, cache = FALSE}
@@ -138,12 +91,9 @@ fs::file_delete(temp_file)
 ```
 
 ```{r prep-fossil-data}
-# Set path to fossil data
-fossils_data_path <- here::here("_targets/user/data_raw/Fossils_Ferns.csv")
-
 # Extract fossil categories (first row of fossil data)
 fossils_categories <-
-  read_csv(fossils_data_path, n_max = 1) %>%
+  read_csv(fossil_ferns_path, n_max = 1) %>%
   pivot_longer(names_to = "category", values_to = "raw_names", everything()) %>%
   mutate(
     category = str_replace_all(category, "\\.\\.\\.[0-9]+", "skip") %>%
@@ -154,7 +104,7 @@ fossils_categories <-
 
 # Get raw column names
 fossils_raw_names <-
-  read_csv(fossils_data_path, skip = 1)
+  read_csv(fossil_ferns_path, skip = 1)
 
 # Load data with cleaned column names
 fossils_clean_names <- fossils_raw_names %>% janitor::clean_names()
@@ -201,9 +151,10 @@ For a summary of these data in CSV format, see `r s_table("fossils")`.
 
 \newpage
 
-```{r print-fossils, include = TRUE, results = "asis", eval = TRUE}
-unique(fossils_long$fossil_taxon) %>%
-  map(~print_fossil(fossils_long, .)) %>%
+```{r print-fossils, include = TRUE, results = "asis"}
+taxa <- unique(fossils_long$fossil_taxon)
+
+map(taxa, ~print_fossil(fossils_long, .)) %>%
   unlist() %>%
   glue::as_glue()
 ```
