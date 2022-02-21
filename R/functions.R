@@ -1184,3 +1184,10 @@ check_ft_order <- function(type = "all", rmd_file = "ms/manuscript.Rmd") {
   )
   
 }
+
+# Count the number of non-missing bases in a DNA sequence
+#' @param seq List of class DNAbin of length one.
+count_non_missing <- function(seq) {
+  bases <- ape::base.freq(seq, all = TRUE, freq = TRUE)
+  sum(bases[!names(bases) %in% c("n", "N", "-", "?")])
+}
