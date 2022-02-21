@@ -1541,7 +1541,7 @@ div_times_plot <-
     limits = ages_sampling$source, 
     labels = ages_sampling$label) +
   scale_y_discrete(labels = family_labs, expand = expansion(add = 0.7)) +
-  scale_x_reverse("Age (millions of years)") +
+  scale_x_reverse("Age (millions of years)", expand = c(0,0)) +
   coord_geo(
     dat = list("periods", "eras"),
     pos = list("b", "b"),
@@ -1553,7 +1553,7 @@ div_times_plot <-
     height = unit(1, "lines"),
     # FIXME: change this to true when issue gets resolved
     # https://github.com/willgearty/deeptime/issues/41
-    expand = FALSE,
+    expand = TRUE,
     size = 3) +
   guides(shape = guide_legend(nrow = 2)) +
   theme_bw() +
