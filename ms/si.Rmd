@@ -92,7 +92,8 @@ tar_load(
     fossil_calibration_tips,
     ppgi_taxonomy,
     monophy_by_clade,
-    acc_table_long),
+    acc_table_long,
+    plastome_seqs_combined_filtered),
   store = ftol_cache
 )
 
@@ -260,6 +261,10 @@ GenBank accessions used in this study (`r result_file(s_table("accs"), "csv") %>
 ```{r join-by, results = "markup"}
 # Make table showing method of joining accessions across loci
 sanger_accessions_selection %>% 
+    # Remove outgroup and plastome species
+  anti_join(
+    unique(select(plastome_seqs_combined_filtered, species)),
+    by = "species") %>%
   left_join(select(sanger_sampling, species, outgroup), by = "species") %>%
   # FIXME why is this NA?
   # filter(is.na(outgroup)) %>%

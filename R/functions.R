@@ -1048,6 +1048,7 @@ extract_citations <- function(rmd_file) {
 #' @param yaml_in String or list; if string, the path to the YAML file to filter.
 #' If list, should be result of reading in a YAML file with yaml::read_yaml()
 #' @param yaml_out Path to write filtered YAML reference file
+#' @param silent Logical; should a warning be issued for missing references?
 #'
 #' @return NULL; externally, the filtered YAML will be written to `yaml_out`
 #' 

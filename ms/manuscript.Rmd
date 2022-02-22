@@ -451,18 +451,23 @@ n_accs_first_filter <- count_accs(sanger_seqs_combined_filtered)
 # rogues based on BLAST
 n_accs_second_filter <- count_accs(sanger_seqs_rogues_removed)
 
-# Number of GenBank accessions in final selection
+# Number of GenBank accessions in final selection, excluding plastome
 # first convert to long form
 sanger_accessions_selection_long <-
   sanger_accessions_selection %>%
+  # Remove outgroup and plastome species
+  anti_join(
+    unique(select(plastome_seqs_combined_filtered, species)),
+    by = "species") %>%
+  # Remove plastome species
   select(contains("accession")) %>%
   pivot_longer(values_to = "accession", everything()) %>%
   filter(!is.na(accession))
 
-# Count number of raw accessions in final selection
+# Count number of raw accessions in final Sanger selection
 n_accs_raw_final <- count_accs(sanger_accessions_selection_long)
 
-# Count number of accessions in final selection, split by locus
+# Count number of accessions in final Sanger selection, split by locus
 n_accs_final <- 
   sanger_accessions_selection_long %>%
   # Count accessions containing different loci as distinct
@@ -471,9 +476,23 @@ n_accs_final <-
     accession = paste(name, accession, sep = "_")) %>%
   count_accs()
 
+n_species_sanger <- 
+  sanger_accessions_selection %>% 
+  # Remove outgroup and plastome species
+  anti_join(
+    unique(select(plastome_seqs_combined_filtered, species)),
+    by = "species") %>%
+  pull(species) %>%
+  n_distinct() %>%
+  number()
+
 # Analyze join by method
 join_by_count <-
   sanger_accessions_selection %>% 
+  # Remove outgroup and plastome species
+  anti_join(
+    unique(select(plastome_seqs_combined_filtered, species)),
+    by = "species") %>%
   assert(not_na, join_by, species) %>%
   assert(is_uniq, species) %>%
   tabyl(join_by) %>%
@@ -510,14 +529,13 @@ n_accs_plast_final <-
   count_accs()
 ```
 
-The initial GenBank query for the seven Sanger loci resulted in `r n_accs_query` accessions ("accessions" in this case includes some cases where a single accession contains multiple loci).
+The initial GenBank query for the seven Sanger loci resulted in `r n_accs_query` accessions (note that in some cases a single accession may contain multiple loci).
 Extraction of target loci with superCRUNCH recovered `r n_accs_extract` accessions.
 Manual inspection of the initial tree resulted in a list of `r n_accs_exclude` accessions to be excluded as rogues.
-`r n_accs_first_filter` accessions were retained after excluding these rogues and species names that could not be resolved to an accepted name in the taxonomic database.
-`r n_accs_second_filter` accessions were retained after excluding rogues identified by the all-by-all BLAST search.
-The final selection of Sanger loci (one set of concatenated accessions per species or one accession per species if conditions for concatenation not met) included `r n_accs_raw_final` accessions (`r n_accs_final` sequences when counting distinct loci within each accession separately; `r s_table("accs")`).
-The most frequent method for joining accessions across loci was by `r last(join_by_count)$join_by` (`r last(join_by_count)$n` species; `r last(join_by_count)$percent`).
-`r join_by_count$unjoined$n` species (`r join_by_count$unjoined$percent`) had accessions that could not be joined or only included one of the seven loci (`r s_table("join_by")`).
+After excluding these and species names that could not be resolved to an accepted name in the taxonomic database, `r n_accs_first_filter` accessions were retained.
+After further excluding rogues identified by the all-by-all BLAST search, `r n_accs_second_filter` accessions were retained.
+The final selection of Sanger loci (one set of concatenated accessions per species or one accession per species if conditions for concatenation were not met) included `r n_accs_raw_final` accessions (`r n_accs_final` sequences when counting distinct loci within each accession separately; `r s_table("accs")`) representing `r n_species_sanger` species (not including species in the plastome dataset).
+The most frequent method for joining accessions across loci was by `r last(join_by_count)$join_by` (`r last(join_by_count)$n` species; `r last(join_by_count)$percent`); `r join_by_count$unjoined$n` species (`r join_by_count$unjoined$percent`) had accessions that could not be joined or only included one of the seven loci (`r s_table("join_by")`).
 
 The initial GenBank query for fern plastomes resulted in `r n_plast_accs_query` accessions.
 `r n_plast_first_filter` accessions were retained after excluding rogues and species names that could not be resolved.
