@@ -229,13 +229,13 @@ count_ncbi_species_by_year <- function(gb_taxa, ncbi_names, year_range) {
 #' the evolution of ferns. Molecular Phylogenetics and Evolution 105:200–211. 
 #' https://doi.org/10.1016/j.ympev.2016.09.003
 #'
-#' @param testo_sundue_2016_si_path Path to Testo and Sundue 2016 SI file
+#' @param file Path to Testo and Sundue 2016 SI file
 #'
 #' @return Tibble
 #' 
-parse_ts_dates <- function(testo_sundue_2016_si_path) {
+parse_ts_dates <- function(file) {
   readxl::read_excel(
-    testo_sundue_2016_si_path,
+    file,
     # Divergence dates are in the 5th sheet
     sheet = 5,
     skip = 1
@@ -358,6 +358,16 @@ load_barahona_trees <- function(zip_path) {
   
   return(res)
   
+}
+
+#' Load fossil fern data
+#'
+#' @param file Path to fossil fern data (CSV file)
+#'
+#' @return Tibble
+load_fossil_data <- function(file) {
+  read_csv(file, skip = 1) %>%
+    janitor::clean_names()
 }
 
 # Coverage ----
@@ -1311,4 +1321,45 @@ check_ft_order <- function(type = "all", rmd_file = "ms/manuscript.Rmd") {
 count_non_missing <- function(seq) {
   bases <- ape::base.freq(seq, all = TRUE, freq = TRUE)
   sum(bases[!names(bases) %in% c("n", "N", "-", "?")])
+}
+
+#' Extract the best-scoring model from an IQTREE report
+#'
+#' @param iqtree_log Raw IQTREE report file (ending in .iqtree) read into R
+#'
+#' @return Best-scoring model **by BIC**
+#' 
+extract_iqtree_mod <- function(iqtree_log) {
+  iqtree_log[
+    str_detect(iqtree_log, "Best-fit model according to BIC")] %>%
+    str_match("BIC: ([^$]+)$") %>%
+    magrittr::extract(,2)
+}
+
+#' Extract number of iterations from an IQTREE log
+#'
+#' @param iqtree_log Raw IQTREE log file (ending in .log) read into R
+#'
+#' @return Number of iterations used by IQTREE search
+#' 
+extract_iqtree_iter <- function(iqtree_log) {
+  iqtree_log[
+    str_detect(iqtree_log, "TREE SEARCH COMPLETED AFTER")] %>%
+    str_match("TREE SEARCH COMPLETED AFTER ([0-9]+) ") %>%
+    magrittr::extract(,2) %>%
+    parse_number() %>%
+    number(accuracy = 1)
+}
+
+#' Extract number of bootstrap correlation coefficient from an IQTREE log
+#'
+#' @param iqtree_log Raw IQTREE log file (ending in .log) read into R
+#'
+#' @return Number of iterations used by IQTREE search
+#' 
+extract_iqtree_corr <- function(iqtree_log) {
+  iqtree_log[
+    str_detect(iqtree_log, "Bootstrap correlation coefficient of split occurrence frequencies: ")] %>%
+    str_match("Bootstrap correlation coefficient of split occurrence frequencies: ([^$]+)$") %>%
+    magrittr::extract(,2)
 }

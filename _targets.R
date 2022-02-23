@@ -15,32 +15,40 @@ tar_plan(
   # Load data ----
   # - Dates from Testo and Sundue 2016 SI
   # (includes Rothfels 2015, Schuettpelz & Pryer 2009)
-  tar_files_input(
-    testo_sundue_2016_si_path,
-    "_targets/user/data_raw/1-s2.0-S1055790316302287-mmc2.xlsx"
+  tar_file_read(
+    other_dates,
+    "_targets/user/data_raw/1-s2.0-S1055790316302287-mmc2.xlsx",
+    parse_ts_dates(file = !!.x)
   ),
-  other_dates = parse_ts_dates(testo_sundue_2016_si_path),
   # - Notes on differences between Pteridocat and PPGI
-  tar_files_input(
-    pteridocat_ppgi_diff_notes_path,
-    "_targets/user/data_raw/pteridocat_ppgi_diff_notes.csv"
-  ),
-  pteridocat_ppgi_diff_notes = read_csv(
-    pteridocat_ppgi_diff_notes_path
+  tar_file_read(
+    pteridocat_ppgi_diff_notes,
+    "_targets/user/data_raw/pteridocat_ppgi_diff_notes.csv",
+    readr::read_csv(file = !!.x)
   ),
   # - Fossil ferns data
-  tar_files_input(
-    fossil_ferns_path,
-    fs::path("_targets/user/data_raw/Fossils_Ferns.csv")
+  tar_file_read(
+    fossil_ferns_raw,
+    "_targets/user/data_raw/Fossils_Ferns.csv",
+    load_fossil_data(file = !!.x)
   ),
-  fossil_ferns_raw = read_csv(fossil_ferns_path, skip = 1) %>%
-    janitor::clean_names(),
   # - Seed plant trees from Barahona et al 2020
-  tar_files_input(
-    spermato_trees_path,
-    "_targets/user/data_raw/angiosperm-time-tree-2.0-v2.0.zip"
+  tar_file_read(
+    spermato_trees,
+    "_targets/user/data_raw/angiosperm-time-tree-2.0-v2.0.zip",
+    load_barahona_trees(zip_path = !!.x)
   ),
-  spermato_trees = load_barahona_trees(spermato_trees_path),
+  # Iqtree logs
+  tar_file_read(
+    plastome_iqtree_report,
+    fs::path(ftol_cache, "user/intermediates/iqtree/plastome/plastome_alignment.phy.iqtree"), #nolint
+    readr::read_lines(file = !!.x)
+  ),
+  tar_file_read(
+    plastome_iqtree_log,
+    fs::path(ftol_cache, "user/intermediates/iqtree/plastome/plastome_alignment.phy.log"), #nolint
+    readr::read_lines(file = !!.x)
+  ),
   # - Targets from FTOL workflow
   plastome_metadata_renamed = tar_read(
     plastome_metadata_renamed,
@@ -83,11 +91,10 @@ tar_plan(
     pattern = map(gb_query)
   ),
   # - Load NCBI taxonomy
-  tar_file(taxdump_zip_file, fs::path(
-    ftol_cache, "user/data_raw/taxdmp_2022-02-01.zip")),
-  ncbi_names = load_ncbi_names(
-    taxdump_zip_file,
-    unique(gb_taxa$taxid)
+  tar_file_read(
+    ncbi_names,
+    fs::path(ftol_cache, "user/data_raw/taxdmp_2022-02-01.zip"),
+    load_ncbi_names(taxdump_zip_file = !!.x, taxid_keep = unique(gb_taxa$taxid))
   ),
   # - Count number of species and accessions in GenBank
   # by genomic compartment per year
@@ -127,10 +134,11 @@ tar_plan(
   family_stem_ages = get_stem_family_age(
     sanger_sampling, plastid_tree_dated, ppgi_taxonomy),
   # - Read in Du 2021 dates
-  tar_files_input(
-    du_2021_si_path,
-    "_targets/user/data_raw/cla12457-sup-0003-tables1-s5.docx"),
-  du_dates_all = parse_du_dates(du_2021_si_path),
+  tar_file_read(
+    du_dates_all,
+    "_targets/user/data_raw/cla12457-sup-0003-tables1-s5.docx",
+    parse_du_dates(du_2021_si_path = !!.x)
+  ),
   # Summarize fern monophyly
   # - filter to ferns, add taxonomic levels
   fern_monophy_by_clade_tax_level = add_tax_levels_to_monophyly(
@@ -155,6 +163,7 @@ tar_plan(
     output_format = "bookdown::word_document2",
     params = list(doc_type = "doc")
   ),
+  # Render MS and each SI in docx (for submission) and pdf (for preprint)
   tar_render(
     ms_pdf,
     "ms/manuscript.Rmd",
