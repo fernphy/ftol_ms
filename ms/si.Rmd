@@ -92,7 +92,9 @@ tar_load(
     ppgi_taxonomy,
     monophy_by_clade,
     acc_table_long,
-    plastome_seqs_combined_filtered),
+    plastome_seqs_combined_filtered,
+    sanger_tree_rooted,
+    fossil_calibrations_for_treepl),
   store = ftol_cache
 )
 
@@ -341,6 +343,63 @@ knitr::read_chunk(
 ```{r plot-prep-main}
 ```
 
+```{r fossil-map}
+# Make tibble with node number and label for ggtree
+node_labs_tbl <-
+  fossil_calibrations_for_treepl %>%
+  transmute(
+    fossil_label = str_remove_all(min, "min = "),
+    node = map2_dbl(taxon_1, taxon_2, ~ape::getMRCA(sanger_tree_rooted, c(.x, .y))),
+    calibration_type = case_when(
+      !is.na(min) & is.na(max) ~ "minimum",
+      !is.na(min) & !is.na(max) ~ "fixed",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  assert(not_na, calibration_type) %>%
+  right_join(
+    tibble(
+      node = Ntip(sanger_tree_rooted) + seq_along(sanger_tree_rooted$node.label)
+    ), by = "node"
+  ) %>%
+  mutate(
+    fossil_label = replace_na(fossil_label, ""),
+    calibration_type = replace_na(calibration_type, "none")) %>%
+  arrange(node)
+
+# Make plot
+fossil_map_plot <- 
+  ggtree(
+    sanger_tree_rooted,
+    branch.length = "none", size = 0.1) %<+% node_labs_tbl +
+  # Add node points
+  geom_nodepoint(
+    aes(color = calibration_type), size = 1) +
+  scale_color_manual(
+    values = c(
+      minimum = palette_okabe_ito("vermillion"), 
+      fixed = palette_okabe_ito("skyblue"),
+      none = "transparent")) +
+  # Add node labels
+  geom_text(aes(label = fossil_label), hjust = 0, size = 1.0, color = "grey20") +
+  # Add tip labels
+  geom_tiplab(aes(label = label), size = 0.5) +
+  theme(legend.position = "bottom")
+ 
+# Save plot
+ggsave(
+  plot = fossil_map_plot,
+  file = (result_file(s_figure("fossil_map"), "pdf")),
+  height = 60, width = 8, units = "in",
+  limitsize = FALSE)
+```
+
+**`r s_figure("fossil_map")`**.
+Maximum likelihood fern phylongey with node labels indicating placement of fossil constraints (`r result_file(s_figure("fossil_map"), "pdf") %>% fs::path_file()`).
+Number for each constraint is age in Ma.
+
+\newpage
+
 ```{r locus-upset, fig.width = 7, fig.height = 5}
 # Make tibble with one row per locus per species
 sanger_alignment_tbl %>%
@@ -520,5 +579,3 @@ For other studies, point indicates best (most likely) estimate [@Schuettpelz2007
 @Du2021 used six different dating schemes; for details, see that paper.
 Codes in parentheses after family names indicate major clade as in `r figure("ftol")`.
 Period name abbreviations as follows: FIXME.
-
-\newpage

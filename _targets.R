@@ -40,11 +40,6 @@ tar_plan(
   ),
   # Iqtree logs
   tar_file_read(
-    plastome_iqtree_report,
-    fs::path(ftol_cache, "user/intermediates/iqtree/plastome/plastome_alignment.phy.iqtree"), #nolint
-    readr::read_lines(file = !!.x)
-  ),
-  tar_file_read(
     plastome_iqtree_log,
     fs::path(ftol_cache, "user/intermediates/iqtree/plastome/plastome_alignment.phy.log"), #nolint
     readr::read_lines(file = !!.x)

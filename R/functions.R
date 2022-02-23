@@ -1323,16 +1323,17 @@ count_non_missing <- function(seq) {
   sum(bases[!names(bases) %in% c("n", "N", "-", "?")])
 }
 
-#' Extract the best-scoring model from an IQTREE report
+#' Extract the best-scoring model from an IQTREE log
 #'
-#' @param iqtree_log Raw IQTREE report file (ending in .iqtree) read into R
+#' @param iqtree_log Raw IQTREE log file (ending in .log) read into R
 #'
-#' @return Best-scoring model **by BIC**
+#' @return Best-scoring model
 #' 
 extract_iqtree_mod <- function(iqtree_log) {
   iqtree_log[
-    str_detect(iqtree_log, "Best-fit model according to BIC")] %>%
-    str_match("BIC: ([^$]+)$") %>%
+    # Formatted for IQTREE2
+    str_detect(iqtree_log, "Best-fit model: ")] %>%
+    str_match("([^ ]+) chosen") %>%
     magrittr::extract(,2)
 }
 

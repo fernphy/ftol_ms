@@ -74,27 +74,28 @@ tar_load(
   c(
     accs_exclude,
     fern_sanger_seqs_raw,
-    raw_fasta_all,
-    sanger_seqs_combined_filtered,
-    sanger_seqs_rogues_removed,
-    sanger_accessions_selection,
-    plastome_seqs_combined_filtered,
+    fossil_calibration_tips,
+    monophy_by_clade,
+    plastid_calibration_dates,
+    plastid_tree_dated,
+    plastome_alignment,
+    plastome_alignment_tbl,
     plastome_metadata_raw_all,
     plastome_metadata_renamed,
-    sanger_alignment,
-    plastome_alignment,
     plastome_metadata_renamed,
-    ppgi_taxonomy,
-    plastid_calibration_dates,
-    pteridocat,
-    sanger_alignment_tbl,
-    plastome_alignment_tbl,
-    monophy_by_clade,
+    plastome_seqs_combined_filtered,
     plastome_tree,
-    plastid_tree_dated,
-    fossil_calibration_tips,
-    ts_fossil_calibration_tips,
-    treepl_cv_results),
+    ppgi_taxonomy,
+    pteridocat,
+    raw_fasta_all,
+    sanger_accessions_selection,
+    sanger_alignment,
+    sanger_alignment_tbl,
+    sanger_seqs_combined_filtered,
+    sanger_seqs_rogues_removed,
+    treepl_cv_results,
+    ts_fossil_calibration_tips
+  ),
   store = ftol_cache
 )
 
@@ -115,7 +116,6 @@ tar_load(
     family_stem_ages,
     fern_monophy_summ_tbl,
     fern_nonmono_gen,
-    plastome_iqtree_report,
     plastome_iqtree_log
   ),
   store = here::here("_targets")
@@ -405,7 +405,7 @@ In the case of redundant fossils (those assignable to the same node in the phylo
 We assigned fossils to lineages only after consulting the original publication (as opposed to simply relying on the fossil name) so we could reassess the identification relative to changes in taxonomy and hypotheses of phylogenetic relationships.
 Taxonomic concepts may vary between the original publication and currently applied taxonomy (`r eg`, Dicksoniaceae *sensu lato* including other tree fern families used in description of the fossil but Dicksoniaceae *sensu stricto* used currently) and hypotheses of phylogenetic relationships among extant species may change (`r eg`, *Dennstaedtia* used in description of a fossil but this genus now known to be polyphyletic); in both cases, the resulting node to be constrained for a given fossil could change.
 We also applied two constraints outside of ferns, including the most recent common ancestor (MRCA) of euphyllophytes (`r fossils$Euphyllophytes$age` Ma) and MRCA of tracheophytes (`r fossils$Tracheophytes$age` Ma), and fixed the root age (land plants) at 475 Ma as in @Testo2016a and @Qi2018.
-All constraints other than the root are minimum ages.
+All constraints other than the root are minimum ages (`r s_figure("fossil_map")`).
 
 We tested rate smoothing parameters in treePL ranging from `r smooth_start` to `r smooth_end` (each varies by one order of magnitude).
 A value of `r smooth_best` was selected, based on the smallest chi-squared value, for the final analysis.
@@ -775,7 +775,7 @@ fern_nonmono_gen %>%
     success_fun = success_logical)
 ```
 
-The best-scoring model according to BIC selected for the backbone phylogeny was `r extract_iqtree_mod(plastome_iqtree_report)`.
+The best-scoring model according to BIC selected for the backbone phylogeny was `r extract_iqtree_mod(plastome_iqtree_log)`.
 The tree search completed after `r extract_iqtree_iter(plastome_iqtree_log)` iterations, at which point the bootstrap correlation coefficient of split occurrence frequencies was `r extract_iqtree_corr(plastome_iqtree_log)`.
 
 Ferns are strongly supported as monophyletic (BS `r ferns_bs`; all subsequent relationships mentioned received BS >=`r percent(.98)` in the backbone phylogeny unless otherwise indicated).
