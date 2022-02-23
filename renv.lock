@@ -1401,9 +1401,14 @@
     "tarchetypes": {
       "Package": "tarchetypes",
       "Version": "0.4.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "24c9eb58a70cef665befbcc9891572de"
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "ropensci",
+      "RemoteRepo": "tarchetypes",
+      "RemoteRef": "main",
+      "RemoteSha": "d8fb11d0655438678142458d89ed36c7a5c5c903",
+      "Hash": "5d7628cdc67a3b9d63a5b5b1395d2ebf"
     },
     "targets": {
       "Package": "targets",
