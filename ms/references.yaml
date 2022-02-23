@@ -546,6 +546,40 @@ references:
   title: Synthesis of phylogeny and taxonomy into a comprehensive tree of life
   type: article-journal
   URL: http://www.pnas.org/lookup/doi/10.1073/pnas.1423041112
+- id: Hoang2018
+  accessed:
+  - year: 2022
+    month: 2
+    day: 6
+  author:
+  - family: Hoang
+    given: Diep Thi
+  - family: Chernomor
+    given: Olga
+  - family: Haeseler
+    given: Arndt
+    non-dropping-particle: von
+  - family: Minh
+    given: Bui Quang
+  - family: Vinh
+    given: Le Sy
+  citation-key: Hoang2018
+  container-title: Molecular Biology and Evolution
+  DOI: 10/gcxrqg
+  ISSN: 0737-4038, 1537-1719
+  issue: '2'
+  issued:
+  - year: 2018
+    month: 2
+    day: 1
+  language: en
+  page: 518-522
+  source: DOI.org (Crossref)
+  title: 'UFBoot2: Improving the Ultrafast Bootstrap Approximation'
+  title-short: UFBoot2
+  type: article-journal
+  URL: https://academic.oup.com/mbe/article/35/2/518/4565479
+  volume: '35'
 - id: Kalyaanamoorthy2017
   accessed:
   - year: 2022
@@ -1320,6 +1354,33 @@ references:
   - year: 2020
   title: 'R: A language and environment for statistical computing. 4.0.2'
   type: article-journal
+- id: Rothfels2012
+  author:
+  - family: Rothfels
+    given: Carl J.
+  - family: Larsson
+    given: A
+  - family: Kuo
+    given: Li-Yaung
+  - family: Korall
+    given: Petra
+  - family: Chiou
+    given: Wen-Liang
+  - family: Pryer
+    given: Kathleen M
+  citation-key: Rothfels2012
+  container-title: Systematic Biology
+  ISSN: 1076-836X
+  issue: '3'
+  issued:
+  - year: 2012
+    month: 5
+  page: 490-509
+  title: Overcoming deep roots, fast rates, and short internodes to resolve the ancient
+    rapid radiation of Eupolypod II ferns
+  type: article-journal
+  URL: papers://ebd7d3df-d8f1-4be8-bcf7-4fb07ababf30/Paper/p2178
+  volume: '61'
 - id: Rothfels2015a
   author:
   - family: Rothfels
@@ -1561,6 +1622,36 @@ references:
   type: article-journal
   URL: https://peerj.com/articles/cs-56
   volume: '2'
+- id: Sessa2012b
+  accessed:
+  - year: 2022
+    month: 2
+    day: 23
+  author:
+  - family: Sessa
+    given: Emily B.
+  - family: Zimmer
+    given: Elizabeth A.
+  - family: Givnish
+    given: Thomas J.
+  citation-key: Sessa2012b
+  container-title: Molecular Phylogenetics and Evolution
+  container-title-short: Molecular Phylogenetics and Evolution
+  DOI: 10.1016/j.ympev.2012.05.009
+  ISSN: '10557903'
+  issue: '3'
+  issued:
+  - year: 2012
+    month: 9
+  language: en
+  page: 563-581
+  source: DOI.org (Crossref)
+  title: 'Reticulate evolution on a global scale: A nuclear phylogeny for New World
+    *Dryopteris* (Dryopteridaceae)'
+  title-short: Reticulate evolution on a global scale
+  type: article-journal
+  URL: https://linkinghub.elsevier.com/retrieve/pii/S1055790312001753
+  volume: '64'
 - id: Shang2018
   author:
   - family: Shang
@@ -1699,6 +1790,24 @@ references:
   type: article-journal
   URL: https://onlinelibrary.wiley.com/doi/10.1111/2041-210X.13096
   volume: '10'
+- id: Sundue2013
+  author:
+  - family: Sundue
+    given: Michael A
+  - family: Rothfels
+    given: Carl J.
+  citation-key: Sundue2013
+  container-title: Annals of botany
+  DOI: 10.1093/aob/mct247
+  ISSN: 1095-8290
+  issued:
+  - year: 2013
+    month: 11
+  PMID: '24197753'
+  title: Stasis and convergence characterize morphological evolution in Eupolypod
+    II ferns
+  type: article-journal
+  URL: http://www.ncbi.nlm.nih.gov/pubmed/24197753
 - id: Talavera2021
   accessed:
   - year: 2021
@@ -1846,6 +1955,36 @@ references:
   type: article-journal
   URL: https://academic.oup.com/gbe/article-lookup/doi/10.1093/gbe/evx107
   volume: '9'
+- id: Wei2021a
+  accessed:
+  - year: 2022
+    month: 2
+    day: 23
+  author:
+  - family: Wei
+    given: Ran
+  - family: Zhao
+    given: Cun-Feng
+  - family: Xiang
+    given: Qiao-Ping
+  - family: Zhang
+    given: Xian-Chun
+  citation-key: Wei2021a
+  container-title: Molecular Phylogenetics and Evolution
+  container-title-short: Molecular Phylogenetics and Evolution
+  DOI: 10.1016/j.ympev.2021.107176
+  ISSN: '10557903'
+  issued:
+  - year: 2021
+    month: 8
+  language: en
+  page: '107176'
+  source: DOI.org (Crossref)
+  title: Ellipinema and ×Ellipisorus? Just Lepisorus (Polypodiaceae)!
+  title-short: Ellipinema and ×Ellipisorus?
+  type: article-journal
+  URL: https://linkinghub.elsevier.com/retrieve/pii/S1055790321001093
+  volume: '161'
 - id: Wei2022
   accessed:
   - year: 2022
@@ -2005,3 +2144,32 @@ references:
     with the description of a new genus, Ellipinema gen. nov., segregated from Lepisorus
   type: article-journal
   URL: https://doi.org/10.1016/j.ympev.2020.106803
+- id: Zhou2017a
+  accessed:
+  - year: 2022
+    month: 2
+    day: 23
+  author:
+  - family: Zhou
+    given: Xin-Mao
+  - family: Zhang
+    given: Li-Bing
+  citation-key: Zhou2017a
+  container-title: Taxon
+  container-title-short: taxon
+  DOI: 10.12705/665.5
+  ISSN: 0040-0262
+  issue: '5'
+  issued:
+  - year: 2017
+    month: 10
+    day: 24
+  language: en
+  page: 1065-1084
+  source: DOI.org (Crossref)
+  title: Nuclear and plastid phylogenies suggest ancient intersubgeneric hybridization
+    in the fern genus *Pyrrosia* (Polypodiaceae), with a classification of *Pyrrosia*
+    based on molecular and non-molecular evidence
+  type: article-journal
+  URL: http://doi.wiley.com/10.12705/665.5
+  volume: '66'

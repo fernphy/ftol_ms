@@ -114,7 +114,9 @@ tar_load(
     fossil_ferns_raw,
     family_stem_ages,
     fern_monophy_summ_tbl,
-    fern_nonmono_gen
+    fern_nonmono_gen,
+    plastome_iqtree_report,
+    plastome_iqtree_log
   ),
   store = here::here("_targets")
 )
@@ -265,7 +267,7 @@ To resolve species names, we used the taxastand R package [@Nitta2021], which ca
 We manually inspected any fuzzy matched or non-matching names.
 This revealed some species names in GenBank that were missing in the World Ferns database, spelling errors, as well as some names in the database that needed to be treated differently (`r eg`, changes in synonymy).
 We thus updated and edited the initial World Ferns database using the dwctaxon R package (FIXME add citation), which is designed to work with taxonomic data in the Darwin Core format.
-We refer to the resulting taxonomic database as "pteridocat," and have made it freely available online (https://github.com/joelnitta/pteridocat) so that other researchers may standardize taxonomic names in their data to match those of FTOL.
+We refer to the resulting taxonomic database as "pteridocat," and have made it freely available online (https://github.com/fernphy/pteridocat) so that other researchers may standardize taxonomic names in their data to match those of FTOL.
 
 There are differences between pteridocat and PPG I, mostly at the genus level.
 In the time since PPG I was introduced, several new genera have been published.
@@ -327,7 +329,7 @@ We generated a backbone phylogeny using maximum likelihood (ML) analysis of the 
 ModelFinder [@Kalyaanamoorthy2017] was implemented in IQ-TREE to select the best-fitting model of sequence evolution.
 To reduce computational burden, we only tested models based on the General Time Reversible (GTR) model [@Tavare1986] and did not partition the dataset.
 The best-fitting model was selected automatically by IQ-TREE according to Bayesian Information Criterion (BIC) score.
-Node support was assessed with `r number(1000)` ultrafast rapid bootstrap replicates [@Minh2013]. 
+Node support was assessed with up to `r number(1000)` ultrafast rapid bootstrap replicates [@Minh2013; @Hoang2018].
 
 ### Initial Sanger phylogeny
 
@@ -402,7 +404,7 @@ We selected `r n_calibrations_ferns` fern fossils to use as constraints from a c
 In the case of redundant fossils (those assignable to the same node in the phylogeny; `r eg`, stems of families that are sister to each other, such as Dipteridaceae and Matoniaceae) we selected the fossil with the oldest age (`r ie`, the upper limit of the oldest stratigraphic period assigned to the fossil). 
 We assigned fossils to lineages only after consulting the original publication (as opposed to simply relying on the fossil name) so we could reassess the identification relative to changes in taxonomy and hypotheses of phylogenetic relationships.
 Taxonomic concepts may vary between the original publication and currently applied taxonomy (`r eg`, Dicksoniaceae *sensu lato* including other tree fern families used in description of the fossil but Dicksoniaceae *sensu stricto* used currently) and hypotheses of phylogenetic relationships among extant species may change (`r eg`, *Dennstaedtia* used in description of a fossil but this genus now known to be polyphyletic); in both cases, the resulting node to be constrained for a given fossil could change.
-We also applied two constraints outside of ferns, including the most recent common ancestor (MRCA) of euphyllophytes (`r fossils$Euphyllophytes$age` Ma) and MRCA of tracheophytes (`r fossils$Tracheophytes$age` Ma), and fixed the root age (land plants) at 475 Ma as in @Testo2016a.
+We also applied two constraints outside of ferns, including the most recent common ancestor (MRCA) of euphyllophytes (`r fossils$Euphyllophytes$age` Ma) and MRCA of tracheophytes (`r fossils$Tracheophytes$age` Ma), and fixed the root age (land plants) at 475 Ma as in @Testo2016a and @Qi2018.
 All constraints other than the root are minimum ages.
 
 We tested rate smoothing parameters in treePL ranging from `r smooth_start` to `r smooth_end` (each varies by one order of magnitude).
@@ -412,7 +414,7 @@ To construct confidence intervals for the estimated divergence times, we constru
 ## Reproducibility
 
 The workflow is managed in R [@RCoreTeam2020a] with the targets package [@Landau2021].
-Code used to generate FTOL and compile this manuscript is available at https://github.com/pteridophylo/ftol_flow and https://github.com/pteridophylo/ftol_ms, respectively.
+Code used to generate FTOL and compile this manuscript is available at https://github.com/fernphy/ftol and https://github.com/fernphy/ftol_ms, respectively.
 A docker image to run the code is available at https://hub.docker.com/r/joelnitta/ftol.
 
 # Results
@@ -465,9 +467,11 @@ sanger_accessions_selection_long <-
   filter(!is.na(accession))
 
 # Count number of raw accessions in final Sanger selection
+# (excluding plastome)
 n_accs_raw_final <- count_accs(sanger_accessions_selection_long)
 
 # Count number of accessions in final Sanger selection, split by locus
+# (excluding plastome)
 n_accs_final <- 
   sanger_accessions_selection_long %>%
   # Count accessions containing different loci as distinct
@@ -476,6 +480,8 @@ n_accs_final <-
     accession = paste(name, accession, sep = "_")) %>%
   count_accs()
 
+# Count number of species in final Sanger selection
+# (excluding plastome)
 n_species_sanger <- 
   sanger_accessions_selection %>% 
   # Remove outgroup and plastome species
@@ -487,6 +493,7 @@ n_species_sanger <-
   number()
 
 # Analyze join by method
+# (excluding plastome)
 join_by_count <-
   sanger_accessions_selection %>% 
   # Remove outgroup and plastome species
@@ -505,6 +512,7 @@ join_by_count <-
 # Plastome ----
 # Don't include OG in calculations
 n_plast_accs_query <-
+  # initial search includes some accessions that were later excluded
   plastome_metadata_raw_all %>%
   left_join(
     select(plastome_metadata_renamed, accession, outgroup),
@@ -534,12 +542,11 @@ Extraction of target loci with superCRUNCH recovered `r n_accs_extract` accessio
 Manual inspection of the initial tree resulted in a list of `r n_accs_exclude` accessions to be excluded as rogues.
 After excluding these and species names that could not be resolved to an accepted name in the taxonomic database, `r n_accs_first_filter` accessions were retained.
 After further excluding rogues identified by the all-by-all BLAST search, `r n_accs_second_filter` accessions were retained.
-The final selection of Sanger loci (one set of concatenated accessions per species or one accession per species if conditions for concatenation were not met) included `r n_accs_raw_final` accessions (`r n_accs_final` sequences when counting distinct loci within each accession separately; `r s_table("accs")`) representing `r n_species_sanger` species (not including species in the plastome dataset).
+The final selection of Sanger loci (one set of concatenated accessions per species or one accession per species if conditions for concatenation were not met) after excluding species in the plastome dataset included `r n_accs_raw_final` accessions (`r n_accs_final` sequences when counting distinct loci within each accession separately; `r s_table("accs")`) representing `r n_species_sanger` species.
 The most frequent method for joining accessions across loci was by `r last(join_by_count)$join_by` (`r last(join_by_count)$n` species; `r last(join_by_count)$percent`); `r join_by_count$unjoined$n` species (`r join_by_count$unjoined$percent`) had accessions that could not be joined or only included one of the seven loci (`r s_table("join_by")`).
 
-The initial GenBank query for fern plastomes resulted in `r n_plast_accs_query` accessions.
-`r n_plast_first_filter` accessions were retained after excluding rogues and species names that could not be resolved.
-Selection of the longest set of concatenated sequences per species resulted in `r n_accs_plast_final` accessions (species; `r s_table("accs")`).
+The initial GenBank query for fern plastomes resulted in `r n_plast_accs_query` accessions, of which `r n_plast_first_filter` accessions were retained after excluding rogues and species with names that could not be resolved.
+Selection of the longest set of concatenated sequences per species yielded `r n_accs_plast_final` accessions representing unique species (`r s_table("accs")`).
 
 ## Taxon and locus sampling
 
@@ -668,16 +675,15 @@ bb_with_all_loci <-
   split(.$all_loci_sampled)
 ``` 
 
-Taxon sampling for the current version of FTOL includes `r total_sampling$species$coverage` species (`r total_sampling$species$coverage_p`), `r total_sampling$genus$coverage` genera (`r total_sampling$genus$coverage_p`), `r total_sampling$family$coverage` families, and `r total_sampling$order$coverage` orders of ferns (all coverage values are relative to the number of accepted species in Pteridocat).
+Taxon sampling for FTOL v1.0.0 includes `r total_sampling$species$coverage` species (`r total_sampling$species$coverage_p`), `r total_sampling$genus$coverage` genera (`r total_sampling$genus$coverage_p`), `r total_sampling$family$coverage` families, and `r total_sampling$order$coverage` orders of ferns (all coverage values are relative to the number of accepted species in Pteridocat v1.0.0).
 Coverage varied by major clade from `r tax_coverage %>% first %>% extract2("coverage")` (`r tax_coverage %>% first %>% extract2("clade")`) to `r tax_coverage %>% last %>% extract2("coverage")` (`r tax_coverage %>% last %>% extract2("clade")`) (`r figure("ftol")`). Taxon sampling for the backbone phylogeny (plastome loci) includes `r bb_total_sampling$species$n` species (`r bb_total_sampling$species$coverage_p`), `r bb_total_sampling$genus$coverage` genera (`r bb_total_sampling$genus$coverage_p`), `r bb_total_sampling$family$coverage` families (`r bb_total_sampling$family$coverage_p`), and `r bb_total_sampling$order$coverage` orders of ferns.
 
 The number of fern species sampled per locus in the Sanger dataset ranged from `r first(locus_total)$n` (*`r first(locus_total)$locus`*) to `r last(locus_total)$n`  (*`r last(locus_total)$locus`*).
-`r sp_mult_loci$true$n` species (`r sp_mult_loci$true$percent`) were sampled for more than one locus.
-Mean `r locus_summ$mean` ± `r locus_summ$sd` loci were sampled per species (all errors standard deviation unless otherwise mentioned).
+A majority of species (`r sp_mult_loci$true$n`; `r sp_mult_loci$true$percent`) were sampled for more than one locus.
+Mean `r locus_summ$mean` ± `r locus_summ$sd` loci were sampled per species (all errors are standard deviations unless otherwise mentioned).
 The most frequent type of locus sampling per species was *rbcL* alone (`r locus_comb$rbcL$n` species) (`r s_figure("locus-upset")`).
 The second most frequent type of locus sampling per species was all seven loci together (`r nth(locus_comb, length(locus_comb) - 1)$n` species). 
-Locus sampling per species in the plastome dataset ranged from `r bb_locus_summ$min` to `r bb_locus_summ$max` (mean `r bb_locus_summ$mean` ± `r bb_locus_summ$sd` loci per species).
-`r bb_with_all_loci$true$n` species (`r bb_with_all_loci$true$percent` of plastome species) included all 79 loci.
+Locus sampling per species in the plastome dataset ranged from `r bb_locus_summ$min` to `r bb_locus_summ$max` (mean `r bb_locus_summ$mean` ± `r bb_locus_summ$sd` loci per species); `r bb_with_all_loci$true$n` species (`r bb_with_all_loci$true$percent` of plastome species) included all 79 loci.
 
 ## DNA alignments
 
@@ -725,9 +731,10 @@ sanger_missing_by_gene <-
 The Sanger DNA alignment was `r number(ncol(sanger_alignment))` bp with `r sanger_missing_freq` missing data (missing bases or gaps) overall; rates of missing data by locus ranged from `r sanger_missing_by_gene %>% first() %>% extract2("missing")` (`r sanger_missing_by_gene %>% first() %>% extract2("gene")`) to `r sanger_missing_by_gene %>% last() %>% extract2("missing")` (`r sanger_missing_by_gene %>% last() %>% extract2("gene")`).
 The plastome DNA alignment was `r number(ncol(plastome_alignment))` bp with `r plastome_missing_freq` missing data. 
 
-## Topology
+## Phylogeny
 
-```{r topology-stats}
+```{r phylogeny-stats}
+# Bootstrap values for selected clades
 ferns_bs <- get_bs(plastome_tree, c("Equisetum_arvense", "Danaea_nodosa"))
 hym_gle_bs <- get_bs(plastome_tree, c("Dipteris_conjugata", "Hymenophyllum_polyanthos"))
 cyath_salv_bs <- get_bs(plastome_tree, c("Plagiogyria_adnata", "Azolla_filiculoides"))
@@ -738,7 +745,7 @@ fern_monophy_summ <-
   fern_monophy_summ_tbl %>%
   mutate(
     n = as.integer(n),
-    p = percent(percent)
+    p = percent(percent, accuracy = 1)
   ) %>%
   split(.$tax_level) %>%
   map(~split(., .$monophyly))
@@ -768,21 +775,17 @@ fern_nonmono_gen %>%
     success_fun = success_logical)
 ```
 
+The best-scoring model according to BIC selected for the backbone phylogeny was `r extract_iqtree_mod(plastome_iqtree_report)`.
+The tree search completed after `r extract_iqtree_iter(plastome_iqtree_log)` iterations, at which point the bootstrap correlation coefficient of split occurrence frequencies was `r extract_iqtree_corr(plastome_iqtree_log)`.
+
 Ferns are strongly supported as monophyletic (BS `r ferns_bs`; all subsequent relationships mentioned received BS >=`r percent(.98)` in the backbone phylogeny unless otherwise indicated).
 The first split within ferns separates a clade including Equisetidae and Ophioglossidae from all other species (`r figure("backbone")`).
 The next split separates Marattiales from the remaining ferns, the leptosporangiates (Polypodiidae).
 Within leptosporangiate ferns, Osmundales is sister to all other species.
 The next lineage to diverge is a clade including Hymenophyllales and Gleicheniales (BS `r hym_gle_bs`), followed by Schizaeales.
 Salviniales was recovered as sister to Cyatheales but without strong support (BS `r cyath_salv_bs`), which are in turn sister to Polypodiales. 
-
 The first split within Polypodiales separates a clade including Saccolomatineae and Lindsaeineae from the remainder of species, followed by the subsequent divergences of Pteridineae, then Dennstaedtiineae, which is sister to the eupolypods with moderate support (BS `r denn_poly_bs`).
 There are two major clades within eupolypods, Polypodiineae (eupolypods I) and Aspleniineae (eupolypods II).
-
-Within Polypodiineae, Hypodematiaceae is sister to all remaining species, which diverge successfully in the order Didymochlaenaceae, Dryopteridaceae, Lomariopsidaceae, Nephrolepidaceae, Tectariaceae, Oleandraceae, then finally Polypodiaceae sister to Davalliaceae.
-
-Within Aspleniineae, Cystopteridaceae is sister to the remaining species, which are split into two clades. 
-One clade consists of Rhacidosoraceae, Diplaziopsidaceae, Desmophlebiaceae, Hemidictyaceae and Aspleniaceae.
-The other clade includes Thelypteridaceae, Woodsiaceae, a clade comprised of Onocleaceae and Blechnaceae, and Athyriaceae.
 
 All sampled orders, suborders, families, and subfamilies were recovered as monophyletic (or monotypic) with the exception of Polypodioideae, which is known to be paraphyletic relative to Grammitidoideae [@PteridophytePhylogenyGroupI2016].
 `r fern_monophy_summ$genus$No$n` genera (`r fern_monophy_summ$genus$No$p`) were non-monophyletic (`r s_table("monophy")`).
@@ -817,16 +820,17 @@ plastome_gleich_genera_n <-
 ```
 
 The phylogenetic position of Equisetidae relative to other ferns has long been a point of contention in molecular systematics of ferns.
-We recovered Equisetidae as sister to Ophioglossidae (Psilotales + Ophioglossales), in agreement with other plastid phylogenomic analyses [@Grewe2013; @Ruhfel2014; @Gitzendanner2018b; @Lehtonen2019; @Kuo2018].
-This contradicts nuclear phylogenomic analyses [@Rothfels2015a; @Qi2018; @Shen2018], most plastid analyses with smaller numbers (`r ca` 3--17) of genes [@Schneider2004d; @Rai2010; @Kuo2011; @Testo2016a] and an analysis including mitochondrial data [@Knie2015], which have recovered Equisetidae as sister to all other ferns; some earlier plastid analyses based on Sanger data also recovered Equisetidae sister to Marattidae with low support [@Pryer2001; @Qiu2006; @Qiu2007].
-Aside from alternative resolutions of Equisetidae dependent on nuclear envelope or model parameters [@Wickett2014; @Kuo2018], structural support exists for both Equisetidae as sister to Ophioglossidae [`r ca` 550 bp intron in plastid *rps12i346*\; @Grewe2013] and Equisetidae as sister to all other ferns [`r ca` 70 bp intron in mitochondrial *rpl2*\; @Knie2015].
+Here, we recovered Equisetidae as sister to Ophioglossidae (Psilotales + Ophioglossales), in agreement with many other plastid phylogenomic analyses [@Grewe2013; @Ruhfel2014; @Gitzendanner2018b; @Lehtonen2019; @Kuo2018].
+However, this contradicts nuclear phylogenomic analyses [@Rothfels2015a; @Qi2018; @Shen2018], most plastid analyses with smaller numbers (`r ca` 3--17) of genes [@Schneider2004d; @Rai2010; @Kuo2011; @Testo2016a] and an analysis including mitochondrial data [@Knie2015], which have all recovered Equisetidae as sister to all other ferns.
+Some earlier plastid analyses based on Sanger data also recovered Equisetidae sister to Marattidae, albeit with generally low support [@Pryer2001; @Qiu2006; @Qiu2007].
+Aside from alternative resolutions of Equisetidae dependent on genomic compartment or model parameters [@Wickett2014; @Kuo2018], structural support exists for both Equisetidae as sister to Ophioglossidae [`r ca` 550 bp intron in plastid *rps12i346*\; @Grewe2013] and Equisetidae as sister to all other ferns [`r ca` 70 bp intron in mitochondrial *rpl2*\; @Knie2015].
 The clear contradiction between plastid and nuclear phylogenomic data may indicate ancient hybridization or introgression, but robust support for any particular scenario is lacking.
 
 Another enigmatic relationship in ferns is the placement of Hymenophyllales.
 The monophyly of Polypodiidae (leptosporangiate ferns) is well supported across many studies and not in doubt, as is the status of Osmundales as the first lineage to diverge from the remainder of leptosporangiates [@Pryer2001; @Schneider2004d; @Schuettpelz2007; @Kuo2011; @Testo2016a].
-However, the subsequent placement of Hymenophyllales differs across studies: some recover Hymenophyllales as the next diverging lineage after Osmundales [@Pryer2001; @Testo2016a; @Schneider2004d; @Schuettpelz2006; @Schuettpelz2007], while others recover a clade comprising Hymenophyllales sister to Gleicheniales, which then together are sister to the remaining non-Osmundales leptosporangiates [@Pryer2004a; @Lehtonen2017].
+However, the subsequent placement of Hymenophyllales differs across studies: some recover Hymenophyllales as the next diverging lineage after Osmundales [@Pryer2001; @Testo2016a; @Schneider2004d; @Schuettpelz2006; @Schuettpelz2007], while others recover a clade comprising Hymenophyllales sister to Gleicheniales, which then together are sister to the remaining (non-Osmundales) leptosporangiates [@Pryer2004a; @Lehtonen2017].
 Another possibility supported by recent transcriptomic studies is Hymenophyllaceae sister to Gleicheniaceae, which are in turn sister to Dipteridaceae, resulting in a paraphyletic Gleicheniales [@Qi2018; @Shen2018].
-We recovered a monophyletic Gleicheniales sister to Hymenophyllales with moderate support, a relationship that was also observed in some, but not all, analyses of plastome data by @Lehtonen2019 and @Kuo2018.
+Here, we recovered a monophyletic Gleicheniales sister to Hymenophyllales with moderate support, a relationship that was also observed in some, but not all, analyses of plastome data by @Lehtonen2019 and @Kuo2018.
 However, current plastome sampling only includes `r plastome_gleich_genera_n` out of `r ppgi_gleich_genera_n` genera of Gleicheniales; additional taxon sampling may help to resolve this relationship.
 
 Within Polypodiales, the relationship between suborders Pteridineae, Dennstaedtiineae and the eupolypods (Polypodiineae and Aspleniineae) has been difficult to resolve (here designated "P", "D", and "e", respectively).
@@ -834,46 +838,55 @@ Most previous plastid studies based on Sanger sequencing have recovered (P, (D, 
 We recover (D, (P, e)) with moderate support (BS `r denn_poly_bs`); this topology agrees with other phylogenomic studies based on whole plastomes [@Lu2015a; @Lehtonen2019] or nuclear data [@Rothfels2015a; @Qi2018; @Shen2018] as well as a plastid supermatrix [@Lehtonen2011].
 Recently the whole plastome study of @Du2021 recovered a novel topology comprising ((D, P), e) under some analysis settings but (P, (D, e)) under others.
 
+Relationships of families within Aspleniineae (eupolypods II) have been difficult resolve due to the ancient, rapid radiation of this clade [@Rothfels2012].
+Our analysis robustly resolves the relationships between all families in Aspleniineae and is in agreement with a recent plastome analysis with similar sampling [@Du2021].
+Notably, previous phylogenomic studies that had different or less well-supported topologies did not sample all eupolypod II families [Desmophlebiaceae and Hemidictyaceae absent\; @Wei2017a; @Qi2018; @Shen2018].
+The family sister to the remainder of Aspleniineae has been resolved as either Aspleniaceae [`r eg`, @Schneider2004d; @Testo2016a; @Shen2018] or Cystopteridaceae [`r eg`, @Kuo2011; @Wei2017a; @Qi2018].
+Here, we recovered Cystopteridaceae as sister to the remainder of eupolypod II families, which are split into two clades.
+One clade consists of Rhachidosoraceae, Diplaziopsidaceae, Aspleniaceae, Desmophlebiaceae, and Hemidictyaceae [RHADD clade of @Du2021; Clade E of @Sundue2013].
+The other clade includes Thelypteridaceae, Woodsiaceae, Athyriaceae, Onocleaceae, and Blechnaceae [WOBAT clade of @Du2021; Clade B of @Sundue2013].
+Each of these two clades is supported by morphological synapomorphies [@Sundue2013; @Du2021].
+
 Taken together, our results for nodes of contention in the fern phylogeny generally agree with other plastid phylogenomic analyses and are well within the realm of plausible hypotheses generated to date.
 We do not consider any of these nodes "solved" by our analysis.
 Rather, conclusive resolution apparently still awaits additional sampling and perhaps innovation in phylogenetic methods.
 
 ## Revisiting fossil calibration points in ferns
 
-We recovered older crown ages for ferns and other large clades as well as older stem ages for families relative to previous studies (Figures `r figure_num("divtimes")`, `r s_figure_num("du-ages")`).
-This may be due to the fact that we used a completely revised set of fossil calibration points relative to previous studies, which not only resulted in a more densely calibrated tree but also a higher number of fern families with minimum fossil ages.
-Several of the recent studies analyzing divergence times for global fern phylogenies all used a similar set of 24--26 fossil calibration points [@Schuettpelz2007b; @Testo2016a] or secondary calibration points based on studies using this set [@Rothfels2015a].
-However, we found several of these calibration points were not appropriately applied due to differences in taxonomic concepts between the original fossil publication and the phylogeny in which they were used.
+We recovered older crown ages for ferns and large clades therein, as well as older stem ages for families relative to previous studies (Figures `r figure_num("divtimes")`, `r s_figure_num("du-ages")`).
+This may be due to our use of a completely revised set of fossil calibration points relative to previous studies, which not only resulted in a more densely constrained tree but also a higher number of fern families with minimum fossil ages.
+Several recent studies exploring divergence times across a global fern phylogeny all used a similar set of 24--26 fossil calibration points [@Schuettpelz2007b; @Testo2016a] or secondary calibration points based on studies using this set [@Rothfels2015a].
+However, we found inconsistencies in the application of these fossils due to differences in taxonomic concepts between the original fossil publication and the studies in which they were used.
 Moreover, our set of calibration points more than doubles the number used by previous studies.
-It is likely that this expanded sampling has yielded older estimates for the stem age of many families, whereas previous studies tended to estimate similar ages by re-using the same (or very similar), more limited set of calibration points (Figures `r figure_num("divtimes")`, `r s_figure_num("du-ages")`).
+It is likely that this expanded sampling has yielded older estimates for the stem age of many families, whereas previous studies tended to estimate similar ages by re-using a similar, more limited set of calibration points (Figures `r figure_num("divtimes")`, `r s_figure_num("du-ages")`).
 
 <<FIXME: add discussion of some specific groups once we have final ages>>
 
 ## Plastid vs. nuclear fern trees
 
-Currently, the vast majority of publicly available DNA sequence data for ferns is Sanger-sequenced plastid gene regions (`r figure("genbank")`).
 Plastid sequences are convenient for phylogenetic analysis because they are essentially a single, uniparentally inherited linkage group, thus free from recombination.
-However, the plastid tree does not necessarily agree with trees inferred from other data sources.
-Conflict between plastid and nuclear phylogenies has been frequently observed in narrowly focused (`r eg`, genus level) studies using traditional Sanger sequencing, and has recently been demonstrated at deeper levels within Polypodiaceae using phylogenomic approaches [@Wei2022].
-Such conflict does not necessarily reflect insufficient methodology or sampling, but rather may be due processes including (but not limited to) introgression, lineage sorting, and hybridization at deep phylogenetic levels.
-Therefore, we have no expectation that there is a single fern tree of life; rather, multiple trees exist that each capture an element of biological reality, and FTOL is merely one such possible tree.
+However, a tree derived from plastid data may not reflect those inferred from other data sources.
+Conflict between plastid and nuclear phylogenies has been frequently observed in narrowly focused (`r eg`, genus level) studies using traditional Sanger sequencing [`r eg`, @Sessa2012b; @Zhou2017a; @Wei2021a] and has recently been demonstrated at deeper levels within Polypodiaceae using phylogenomic approaches [@Wei2022].
+Such conflict does not necessarily reflect insufficient methodology or sampling, but rather may be due processes including (but not limited to) introgression, lineage sorting, and hybridization at deep phylogenetic levels. 
+Therefore, a major future research goal for fern molecular systematics should be to combine nuclear and plastid datasets to infer species trees with comprehensive sampling.
 
-Recent studies using transcriptomics are clarifying the backbone of the fern phylogeny using many (25--2400) nuclear genes from representative species spanning the tree [@Rothfels2015a; @Qi2018; @Shen2018].
-The most comprehensively sampled phylogenomic study targeting ferns is the on-going Genealogy of Flagellate Plants (GoFlag) project, which seeks to generate genomic data (ca. 300 single-to-low copy nuclear gene regions) for all flagellate plants (bryophytes, lycophytes, ferns, and gymnosperms) [@Breinholt2021].
+Recent transcriptomic studies are gradually clarifying the backbone of the fern phylogeny using many (25--`r number(2400)`) nuclear genes from representative species spanning the tree [@Rothfels2015a; @Qi2018; @Shen2018].
+The most comprehensively sampled phylogenomic study targeting ferns is the on-going Genealogy of Flagellate Plants (GoFlag) project, which seeks to generate genomic data (ca. 300 single-to-low copy nuclear gene regions) for all flagellate plants [bryophytes, lycophytes, ferns, and gymnosperms\; @Breinholt2021].
 GoFlag data have recently been used in a phylogenomic analysis and taxonomic revision of Thelypteridaceae resulting in multiple new genera [@Fawcett2021; @Fawcett2021a], and additional phylogenomic analyses of other fern groups using GoFlag markers are to be expected in the near future.
-The rapid growth of genomic data notwithstanding, species level sampling of such nuclear phylogenomic datasets still is far less that available for plastid data (`r figure("genbank")`).
-Furthermore, many subclades of ferns are under active investigation using plastid markers using both Sanger and next-gen sequencing, and plastid data for previously unsampled species will likely continue to grow at a rapid pace.
-We therefore expect that the methodology outlined here will continue to be useful to generate a maximally sampled plastid fern tree of life for several more years.
+
+However, the rapid growth of genomic data notwithstanding, species level sampling of such nuclear phylogenomic datasets is still far less than that available for plastid data (`r figure("genbank")`).
+Furthermore, many subclades of ferns are under active investigation using both Sanger and next-gen sequencing of plastid markers, and plastid data for previously unsampled species will likely continue to grow at a rapid pace.
+We therefore expect that the methodology outlined here will continue to be useful to generate a maximally sampled plastid fern tree of life for many years to come.
 
 ## Accesibility and usage of FTOL
 
 We have sought to make FTOL easily available to support research on the evolution and ecology of ferns.
-FTOL is available via the "ftol" R package, as well as a web portal (FIXME: add URL when ready).
-Furthermore, we have made all the underlying data (`r eg`, DNA alignments, fossil calibration points) available so that other researchers can use these to conduct analyses such as further investigations of divergence times or phylogenetic analysis including custom DNA sequences [`r eg`\; @Nitta2021.08.26.457744].
+FTOL is available via the "ftolr" R package, as well as a web portal (https://fernphy.github.io).
+Furthermore, we have made all the underlying data (`r eg`, DNA alignments, fossil calibration points) available so that other researchers can use these to conduct analyses such as further investigations of divergence times or phylogenetic analysis including custom sets of DNA sequences [`r eg`, @Nitta2021.08.26.457744].
 
-A typical step in any analysis that joins data across multiple sources (`r eg`, trait data and a phylogeny) is to resolve taxonomic names so that the usage of synonyms does not prevent data from joining [@Page2008].
-During the preparation of FTOL, we developed two additional R packages that enable taxonomic name resolution to join data with FTOL: the "pteridocat" package (https://github.com/joelnitta/pteridocat) and the "taxastand" package (https://github.com/joelnitta/taxastand).
-We selected R because it is widely used by the ecological research community, well established, and freely available [@Lai2019].
+A typical step in any analysis that joins data across multiple sources (`r eg`, trait data and a phylogeny) is to resolve taxonomic names so that the usage of synonyms does not prevent data merging [@Page2008].
+During the preparation of FTOL, we developed two additional R packages that enable taxonomic name resolution to join data with FTOL: the "pteridocat" package (https://github.com/fernphy/pteridocat) and the "taxastand" package (https://github.com/joelnitta/taxastand).
+We selected R because it is widely used by the biological research community, well established, and freely available [@Lai2019].
 The "pteridocat" package includes the pteridocat taxonomic database as a data frame (tibble) in Darwin Core format.
 The "taxastand" package includes functions to resolve taxonomic names while taking account variation in taxonomic author format and orthographic variation.
 By using these two packages in combination, it should be straightforward for other researchers to map their own data onto FTOL, thus greatly enabling and enhancing studies including, but not limited to, comparative phylogenetics, biogeography, and community ecology in ferns.
@@ -881,24 +894,25 @@ By using these two packages in combination, it should be straightforward for oth
 ## FTOL as a living, community-driven resource
 
 We want to be clear that FTOL is no way meant to be the "official" fern phylogeny; it is simply one reasonable hypothesis that has been designed to be maximally inclusive at the species level.
-FTOL cannot substitute for systematic careful studies at finer taxonomic scales that include sampling multiple individuals per species and/or other sources (`r eg`, morphological, nuclear) of data, and such studies continue to be vital to our understanding of fern evolution.
+FTOL cannot substitute for careful systematic studies at finer taxonomic scales that include sampling of multiple individuals per species and/or other sources (`r eg`, morphological, nuclear) of data, and such studies continue to be vital to our understanding of fern evolution.
 
 One feature of FTOL that sets it apart from the vast majority of other fern phylogenetic studies is its iterative nature.
 Unlike most other published fern phylogenies, the current version of FTOL described in this manuscript is not meant to be the last.
-Rather, we plan to re-run these analyses as additional data become available on GenBank, and release updated versions of the tree on a regular, semi-annual basis.
-We envision that FTOL will be integrated with the next iteration of PPG, PPG II, to provide the most recent hypotheses on the monophyly of various fern taxa, which will in turn enable a more natural classification system.
+Rather, we plan to re-run these analyses as additional data become available on GenBank, and release updated versions of the tree on a regular basis.
+We envision that FTOL will be integrated with the next iteration of the Pteridophyte Phylogeny Group classification, PPG II, to provide the most recent hypotheses on the monophyly of various fern taxa, which will in turn enable a more natural classification system.
 
 Furthermore, FTOL will not only grow in size with time, but also become more refined.
 We are aware that our methodology cannot produce a "perfect" tree, nor is that our goal.
-Indeed, we anticipate that there will almost always be tips in the tree that need correction, either because they get overlooked (`r eg`, placement of species within genera, which we did not have the resources to inspect), or proper taxonomic treatment is not yet available (`r eg`, cheilanthoid ferns).
+Indeed, we anticipate that there will almost always be tips in the tree that need correction, either because they get overlooked (`r eg`, placement of species within genera, which we did not have the resources to inspect) or because an updated taxonomic treatment is not yet available (`r eg`, cheilanthoid ferns).
 That is why we have made our methodology (code), data, and software (R packages and docker image) completely open and available to the research community.
-It is our hope that other researchers using FTOL will contribute by making edits and suggestions, preferably through the GitHub repository (https://github.com/joelnitta/ftol).
+It is our hope that other researchers using FTOL will contribute by making edits and suggestions, preferably through the GitHub repository (https://github.com/fernphy/ftol).
 This way, FTOL will continually improve and keep pace with the currently available data and taxonomic hypotheses of ferns.
 
 # Acknowledgments {-}
 
-Members of the Iwasaki lab provided helpful comments that improved the manuscript.
-This study was supported by JSPS KAKENHI Grant Number 16H06279.
+Members of the Iwasaki lab provided comments that improved the manuscript.
+Alexander White provided helpful comments on an early version of the analysis.
+This study was supported by JSPS KAKENHI Grant Number 16H06279 and the Smithsonian National Museum of Natural History Peter Buck Fellowship (JHN).
 The authors thank Michael Hassler for maintaining the World Ferns taxonomic database and making it available to use for research.
 
 # References {-}

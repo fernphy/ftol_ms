@@ -184,6 +184,32 @@ references:
   title: Adetogramma (Polypodiaceae), a new monotypic fern genus segregated from Polypodium
   type: article-journal
   volume: '78'
+- id: Christenhusz2012
+  accessed:
+  - year: 2022
+    month: 2
+    day: 23
+  author:
+  - family: Christenhusz
+    given: Maarten J.M.
+  - family: Schneider
+    given: Harald
+  citation-key: Christenhusz2012
+  container-title: TAXON
+  container-title-short: Taxon
+  DOI: 10.1002/tax.612019
+  ISSN: '00400262'
+  issue: '2'
+  issued:
+  - year: 2012
+    month: 4
+  language: en
+  page: 465-466
+  source: DOI.org (Crossref)
+  title: (2054) Proposal to conserve the name *Drynaria* against *Aglaomorpha* (Polypodiaceae)
+  type: article-journal
+  URL: https://onlinelibrary.wiley.com/doi/10.1002/tax.612019
+  volume: '61'
 - id: Dong2018b
   accessed:
   - year: 2021
@@ -486,6 +512,36 @@ references:
   title: A community-derived classification for extant lycophytes and ferns
   type: article-journal
   volume: '54'
+- id: Schneider2008
+  accessed:
+  - year: 2022
+    month: 2
+    day: 23
+  author:
+  - family: Schneider
+    given: Harald
+  - family: Kreier
+    given: Hans-Peter
+  - family: Hovenkamp
+    given: Peter
+  - family: Janssen
+    given: Thomas
+  citation-key: Schneider2008
+  container-title: Botanical Journal of the Linnean Society
+  DOI: 10.1111/j.1095-8339.2008.00825.x
+  ISSN: 00244074, 10958339
+  issue: '4'
+  issued:
+  - year: 2008
+    month: 8
+  language: en
+  page: 645-656
+  source: DOI.org (Crossref)
+  title: Phylogenetic relationships of the fern genus *Christiopteris* shed new light
+    onto the classification and biogeography of drynarioid ferns
+  type: article-journal
+  URL: https://academic.oup.com/botlinnean/article-lookup/doi/10.1111/j.1095-8339.2008.00825.x
+  volume: '157'
 - id: SHALISKO2019
   author:
   - family: SHALISKO
@@ -583,6 +639,32 @@ references:
     based on an analysis of four plastid DNA regions
   type: article-journal
   volume: '162'
+- id: Wilson2016a
+  accessed:
+  - year: 2022
+    month: 2
+    day: 23
+  author:
+  - family: Wilson
+    given: Karen L.
+  citation-key: Wilson2016a
+  container-title: Taxon
+  container-title-short: Taxon
+  DOI: 10.12705/655.14
+  ISSN: '00400262'
+  issue: '5'
+  issued:
+  - year: 2016
+    month: 10
+    day: 26
+  language: en
+  page: 1150-1151
+  source: DOI.org (Crossref)
+  title: 'Report of the General Committee: 15'
+  title-short: Report of the General Committee
+  type: article-journal
+  URL: http://doi.wiley.com/10.12705/655.14
+  volume: '65'
 - id: Zhang2017
   author:
   - family: Zhang

@@ -38,14 +38,13 @@ editor_options:
   chunk_output_type: console
 params:
   doc_type: manual
+nocite: '@*'
 ---
 
 ---
 bibliography: 
 - `r here::here("ms/si_references.yaml")`
 - `r here::here("ms/si_references_other.yaml")`
-- `r here::here("ms/si_references_other.yaml")`
-- `r here::here("ms/si_fossils.bib")`
 ---
 
 ```{r setup-si, include = FALSE}
@@ -261,15 +260,10 @@ GenBank accessions used in this study (`r result_file(s_table("accs"), "csv") %>
 ```{r join-by, results = "markup"}
 # Make table showing method of joining accessions across loci
 sanger_accessions_selection %>% 
-    # Remove outgroup and plastome species
+  # Remove outgroup and plastome species
   anti_join(
     unique(select(plastome_seqs_combined_filtered, species)),
     by = "species") %>%
-  left_join(select(sanger_sampling, species, outgroup), by = "species") %>%
-  # FIXME why is this NA?
-  # filter(is.na(outgroup)) %>%
-  filter(outgroup == FALSE) %>%
-  select(-outgroup) %>%
   assert(not_na, join_by, species) %>%
   assert(is_uniq, species) %>%
   tabyl(join_by) %>%
