@@ -6,10 +6,6 @@ library(glue)
 
 source("R/functions.R")
 
-# Specify path to FTOL cache
-# FIXME: change to ftol_cache when ready
-ftol_cache <- here::here("working/_targets")
-
 tar_plan(
   
   # Load data ----
@@ -38,6 +34,12 @@ tar_plan(
     "_targets/user/data_raw/angiosperm-time-tree-2.0-v2.0.zip",
     load_barahona_trees(zip_path = !!.x)
   ),
+  # Specify path to FTOL cache
+  # FIXME: change to ftol_cache when ready
+  tar_file(
+    ftol_cache,
+    "working/_targets"
+  ),
   # Iqtree logs
   tar_file_read(
     plastome_iqtree_log,
@@ -53,8 +55,8 @@ tar_plan(
     plastome_tree,
     store = ftol_cache
   ),
-  plastid_tree_dated = tar_read(
-    plastid_tree_dated,
+  sanger_tree_dated = tar_read(
+    sanger_tree_dated,
     store = ftol_cache
   ),
   ppgi_taxonomy = tar_read(
@@ -114,7 +116,7 @@ tar_plan(
   # - Make Sanger sampling table
   sanger_sampling = make_sanger_sampling_tbl(
     plastome_metadata_renamed,
-    sanger_tree = plastid_tree_dated,
+    sanger_tree = sanger_tree_dated,
     ppgi_taxonomy = ppgi_taxonomy),
   # - Crown age of various clades
   crown_ages = list(
@@ -124,10 +126,10 @@ tar_plan(
     eupoly_i = c("Hypodematium", "Polypodium"),
     eupoly_ii = c("Cystopteris", "Asplenium")) %>%
     map(~get_crown_age_from_genus_pair(
-      ., sanger_sampling, plastid_tree_dated)),
+      ., sanger_sampling, sanger_tree_dated)),
   # - Stem age of fern families
   family_stem_ages = get_stem_family_age(
-    sanger_sampling, plastid_tree_dated, ppgi_taxonomy),
+    sanger_sampling, sanger_tree_dated, ppgi_taxonomy),
   # - Read in Du 2021 dates
   tar_file_read(
     du_dates_all,
