@@ -56,6 +56,11 @@ library(flextable)
 source(here::here("R/ms_packages.R"))
 ```
 
+```{r load-functions-si, eval = params$doc_type == "manual"}
+# Load functions (only if running interactively)
+source("_targets.R")
+```
+
 ```{r formatters-load-si}
 # Load formatting functions defined in functions.R
 knitr::read_chunk(
@@ -67,11 +72,6 @@ knitr::read_chunk(
 ```
 
 ```{r, formatters-si}
-```
-
-```{r load-functions-si, eval = params$doc_type == "manual"}
-# Load functions (only if running interactively)
-source(here::here("R/functions.R"))
 ```
 
 ```{r load-targets-si}
@@ -94,7 +94,8 @@ tar_load(
     acc_table_long,
     plastome_seqs_combined_filtered,
     sanger_tree_rooted,
-    fossil_calibrations_for_treepl),
+    fossil_calibrations_for_treepl,
+    sanger_tree_dated),
   store = ftol_cache
 )
 
@@ -111,7 +112,8 @@ tar_load(
     pteridocat_ppgi_diff_refs_out,
     pteridocat_ppgi_diff_notes,
     fern_monophy_summ_tbl,
-    fern_nonmono_gen
+    fern_nonmono_gen,
+    spermato_trees
   ),
   store = here::here("_targets")
 )
@@ -343,7 +345,7 @@ knitr::read_chunk(
 ```{r plot-prep-main}
 ```
 
-```{r fossil-map}
+```{r fossil-map-make}
 # Make tibble with node number and label for ggtree
 node_labs_tbl <-
   fossil_calibrations_for_treepl %>%
@@ -362,10 +364,10 @@ node_labs_tbl <-
 fossil_map_plot <- 
   ggtree(
     sanger_tree_rooted,
-    branch.length = "none", size = 0.1) %<+% node_labs_tbl +
+    branch.length = "none", size = 0.1, color = "grey30") %<+% node_labs_tbl +
   # Add node points
   geom_nodepoint(
-    aes(color = calibration_type), size = 1) +
+    aes(color = calibration_type), size = 0.6) +
   scale_color_manual(
     "Calibration type",
     values = c(
@@ -376,10 +378,11 @@ fossil_map_plot <-
   # Add node labels
   geom_text(aes(label = fossil_label), hjust = 0, size = 1.0, color = "grey20") +
   # Add tip labels
-  geom_tiplab(aes(label = label), size = 0.5) +
+  geom_tiplab(aes(label = label), size = 0.5, color = "grey30") +
   theme(legend.position = "bottom")
+```
 
-# Save plot
+```{r fossil-map-save, eval = params$doc_type == "doc"}
 ggsave(
   plot = fossil_map_plot,
   file = (result_file(s_figure("fossil_map"), "pdf")),
@@ -393,7 +396,7 @@ Number for each constraint is age in Ma.
 
 \newpage
 
-```{r locus-upset, fig.width = 7, fig.height = 5}
+```{r locus-upset, fig.width = 7, fig.height = 5, eval = params$doc_type != "manual"}
 # Make tibble with one row per locus per species
 sanger_alignment_tbl %>%
   mutate(taxon = map(align_trimmed, rownames)) %>%
@@ -418,7 +421,7 @@ Only top 20 combinations shown.
 
 \newpage
 
-```{r du-ages, fig.width = 7, fig.height = 5}
+```{r du-ages, fig.width = 7, fig.height = 5, eval = params$doc_type != "manual"}
 # Helper function for subsetting dates to get into
 # almost-long format
 subset_ages <- function(other_dates, author_sel) {
@@ -519,7 +522,6 @@ du_ages_sampling <-
   ) %>%
   mutate(source = fct_reorder(source, year))
 
-
 # Format y-axis text: show major clade in parentheses
 family_labs_tbl <-
   all_ages_with_du %>%
@@ -572,3 +574,100 @@ For other studies, point indicates best (most likely) estimate [@Schuettpelz2007
 @Du2021 used six different dating schemes; for details, see that paper.
 Codes in parentheses after family names indicate major clade as in `r figure("ftol")`.
 Period name abbreviations as follows: FIXME.
+
+\newpage
+
+```{r ltt, fig.width = 7, fig.height = 6, eval = params$doc_type != "manual"}
+# Make lineages through time (LTT) plot comparing Angiosperms and polypods
+
+## Angiosperms ##
+# FIXME: if we are really going to use this, move it to _targets.R
+# Li 2019 data
+li_species_tree <- ape::read.tree(here::here("_targets/user/data_raw/2881_dating_Species_extracted.tree"))
+li_og <- read_lines(here::here("_targets/user/data_raw/2881_dating_Species_extracted_og.txt"))
+li_angio_tree <- ape::drop.tip(li_species_tree, li_og)
+
+li_tt_data <- make_ltt_tib(li_angio_tree, "Li_2019") 
+
+# Define outgroup taxa
+og <- c(
+  "Pinales_Pinaceae_Pinus_spp", "Gnetales_Welwitschiaceae_Welwitschia_spp",
+  "Cycadales_Cycadaceae_Cycas_spp", "Gnetales_Gnetaceae_Gnetum_spp", 
+  "Pinales_Cupressaceae_Metasequoia_glyptostroboides", 
+  "Ginkgoales_Ginkgoaceae_Ginkgo_spp")
+
+# Drop outgroups
+angio_trees <-
+  map(spermato_trees, ~ape::drop.tip(., og))
+
+# Get data for LTT plot
+angio_tt_data <-
+  map2_df(angio_trees, names(angio_trees), ~make_ltt_tib(.x, .y))
+
+## Polypods ##
+
+# Get data for LTT plot
+poly_tt_data <-
+  sanger_sampling %>%
+  filter(order == "Polypodiales") %>%
+  pull(species) %>% 
+  ape::keep.tip(sanger_tree_dated, .) %>%
+  make_ltt_tib(., "Polypodiales") 
+
+## Combine and plot ##
+tt_data <-
+  bind_rows(angio_tt_data, poly_tt_data, li_tt_data)
+
+ltt_dataset_cols <- c(
+CC_complete = palette_okabe_ito("orange"),
+CC_conservative = palette_okabe_ito("skyblue"),
+RC_complete = palette_okabe_ito("bluishgreen"),
+RC_conservative = palette_okabe_ito("blue"),
+UC_complete = palette_okabe_ito("vermillion"),
+UC_conservative = palette_okabe_ito("reddishpurple"),
+Li_2019 = palette_okabe_ito("yellow"),
+Polypodiales = palette_okabe_ito("black")
+)
+
+raw_count <- ggplot(tt_data, aes(x = time, y = N, color = dataset)) +
+  geom_step() +
+  scale_y_continuous("Number of lineages") +
+  scale_x_reverse("Age (millions of years)") +
+  coord_geo(
+    dat = list("periods", "eras"),
+    pos = list("b", "b"),
+    abbrv = list(TRUE, FALSE),
+    xlim = c(310, 0),
+    fill = "transparent",
+    color = "grey20",
+    lab_color = "grey30",
+    height = unit(1, "lines"),
+    expand = FALSE,
+    size = 3) +
+  scale_color_manual("Dataset", values = ltt_dataset_cols) +
+  theme_bw()
+
+ggplot(tt_data, aes(x = time, y = log_n_percent, color = dataset)) +
+  geom_step() +
+  scale_y_continuous("Log number of lineages (as percent)", labels = scales::percent) +
+  scale_x_reverse("Age (millions of years)") +
+  coord_geo(
+    dat = list("periods", "eras"),
+    pos = list("b", "b"),
+    abbrv = list(TRUE, FALSE),
+    xlim = c(310, 0),
+    fill = "transparent",
+    color = "grey20",
+    lab_color = "grey30",
+    height = unit(1, "lines"),
+    expand = FALSE,
+    size = 3) +
+  scale_color_manual("Dataset", values = ltt_dataset_cols) +
+  theme_bw() +
+  theme(legend.position = "bottom")
+```
+
+**`r s_figure("ltt")`**.
+Lineage through time (LTT) plots for the fern order Polypodiales (black; this study) and angiosperms [colored lines\; @Li2019; @Ramirez-Barahona2020].
+Angiosperm datasets labeled with "CC", "RC", or "UC" correspond to the six analysis schemes of @Ramirez-Barahona2020.
+Log number of lineages shown as percent of total to enable comparison across trees.

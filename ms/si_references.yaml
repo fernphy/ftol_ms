@@ -37,6 +37,75 @@ references:
   type: article-journal
   URL: https://onlinelibrary.wiley.com/doi/10.1111/cla.12457
   volume: '37'
+- id: Li2019
+  accessed:
+  - year: 2022
+    month: 2
+    day: 18
+  author:
+  - family: Li
+    given: Hong-Tao
+  - family: Yi
+    given: Ting-Shuang
+  - family: Gao
+    given: Lian-Ming
+  - family: Ma
+    given: Peng-Fei
+  - family: Zhang
+    given: Ting
+  - family: Yang
+    given: Jun-Bo
+  - family: Gitzendanner
+    given: Matthew A.
+  - family: Fritsch
+    given: Peter W.
+  - family: Cai
+    given: Jie
+  - family: Luo
+    given: Yang
+  - family: Wang
+    given: Hong
+  - family: Bank
+    given: Michelle
+    non-dropping-particle: van der
+  - family: Zhang
+    given: Shu-Dong
+  - family: Wang
+    given: Qing-Feng
+  - family: Wang
+    given: Jian
+  - family: Zhang
+    given: Zhi-Rong
+  - family: Fu
+    given: Chao-Nan
+  - family: Yang
+    given: Jing
+  - family: Hollingsworth
+    given: Peter M.
+  - family: Chase
+    given: Mark W.
+  - family: Soltis
+    given: Douglas E.
+  - family: Soltis
+    given: Pamela S.
+  - family: Li
+    given: De-Zhu
+  citation-key: Li2019
+  container-title: Nature Plants
+  container-title-short: Nat. Plants
+  DOI: 10/ghdjtm
+  ISSN: 2055-0278
+  issue: '5'
+  issued:
+  - year: 2019
+    month: 5
+  language: en
+  page: 461-470
+  source: DOI.org (Crossref)
+  title: Origin of angiosperms and the puzzle of the Jurassic gap
+  type: article-journal
+  URL: http://www.nature.com/articles/s41477-019-0421-0
+  volume: '5'
 - id: PteridophytePhylogenyGroupI2016
   author:
   - literal: Pteridophyte Phylogeny Group I
@@ -50,6 +119,34 @@ references:
   title: A community-derived classification for extant lycophytes and ferns
   type: article-journal
   volume: '54'
+- id: Ramirez-Barahona2020
+  accessed:
+  - year: 2020
+    month: 7
+    day: 17
+  author:
+  - family: Ramírez-Barahona
+    given: Santiago
+  - family: Sauquet
+    given: Hervé
+  - family: Magallón
+    given: Susana
+  citation-key: Ramirez-Barahona2020
+  container-title: Nature Ecology & Evolution
+  DOI: 10/gg45rb
+  ISSN: 2397-334X
+  issued:
+  - year: 2020
+    month: 7
+    day: 6
+  language: en
+  page: 1-7
+  publisher: Nature Publishing Group
+  source: www.nature.com
+  title: The delayed and geographically heterogeneous diversification of flowering
+    plant families
+  type: article-journal
+  URL: https://www.nature.com/articles/s41559-020-1241-3
 - id: Rothfels2015a
   author:
   - family: Rothfels

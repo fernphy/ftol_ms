@@ -1199,6 +1199,26 @@ node_height_from_tips <- function(phy, tips) {
     phytools::nodeheight(phy, .)
 }
 
+#' Make a dataframe for a lineages-through-time (LTT) plot
+#' 
+#' Time is in units (millions of years) before present
+#'
+#' @param phy Phylogeny
+#' @param dataset Name of dataset to add (optional)
+#'
+make_ltt_tib <- function(phy, dataset = NULL) {
+  res <- ape:::ltt.plot.coords(phy, backward = TRUE, type = "S") %>%
+    as_tibble() %>%
+    mutate(time = time*-1) %>%
+    mutate(
+      log_n = log(N),
+      log_n_percent = log_n/max(log_n),
+      n_percent = N/max(N)
+    )
+  if (!is.null(dataset)) res <- mutate(res, dataset = dataset)
+  return(res)
+}
+
 # Etc -----
 
 #' Function to get support value in BS%

@@ -796,8 +796,8 @@ The subfamilies with the most non-monophyletic genera were `r top_nonmono_subfam
 
 We estimate the crown age of ferns to be `r crown_ages$ferns` ma.
 Ages of other major crown groups are leptosporangiates (`r crown_ages$leptos` ma), Polypodiales (`r crown_ages$polypodiales` ma), eupolypods I (`r crown_ages$eupoly_i` ma), and eupolypods II (`r crown_ages$eupoly_ii` ma).
-Except for eupolypods II, these ages are all older than those reported in the most recent global fern phylogeny [@Testo2016a].
-Estimated stem ages of fern families were generally older than previous studies (`r figure("divtimes")`).
+Except for crown ferns, these ages are all significantly older than those reported in the most recent global fern phylogeny [@Testo2016a].
+Estimated stem ages of fern families were also older than previous studies (`r figure("divtimes")`).
 We did not compare crown ages of families across studies because differences in crown ages in smaller clades are likely affected by species sampling.
 
 # Discussion
@@ -855,11 +855,14 @@ Rather, conclusive resolution apparently still awaits additional sampling and pe
 ## Revisiting fossil calibration points in ferns
 
 We recovered older crown ages for ferns and large clades therein, as well as older stem ages for families relative to previous studies (Figures `r figure_num("divtimes")`, `r s_figure_num("du-ages")`).
-This may be due to our use of a completely revised set of fossil calibration points relative to previous studies, which not only resulted in a more densely constrained tree but also a higher number of fern families with minimum fossil ages.
+This is almost certainly due to our use of a completely revised and greatly expanded set of fossil calibration points relative to previous studies, which not only resulted in a more densely constrained tree but also a higher number of fern families with minimum fossil ages.
 Several recent studies exploring divergence times across a global fern phylogeny all used a similar set of 24--26 fossil calibration points [@Schuettpelz2007b; @Testo2016a] or secondary calibration points based on studies using this set [@Rothfels2015a].
 However, we found inconsistencies in the application of these fossils due to differences in taxonomic concepts between the original fossil publication and the studies in which they were used.
 Moreover, our set of calibration points more than doubles the number used by previous studies.
 It is likely that this expanded sampling has yielded older estimates for the stem age of many families, whereas previous studies tended to estimate similar ages by re-using a similar, more limited set of calibration points (Figures `r figure_num("divtimes")`, `r s_figure_num("du-ages")`).
+
+Notably, the scenario of fern diversification suggested by our results strongly conflicts with the hypothesis that Polypodiales diversified in the shadow of angiosperms [@Schneider2004d].
+Rather, we estimate that polypod diversification occurred coincidentally or even preceding the diversification of angiosperms (`r s_figure("ltt")`).
 
 <<FIXME: add discussion of some specific groups once we have final ages>>
 
