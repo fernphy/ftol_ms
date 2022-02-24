@@ -366,7 +366,7 @@ load_barahona_trees <- function(zip_path) {
 #'
 #' @return Tibble
 load_fossil_data <- function(file) {
-  read_csv(file, skip = 1) %>%
+  read_csv(file) %>%
     janitor::clean_names()
 }
 
