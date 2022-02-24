@@ -356,16 +356,7 @@ node_labs_tbl <-
       TRUE ~ NA_character_
     )
   ) %>%
-  assert(not_na, calibration_type) %>%
-  right_join(
-    tibble(
-      node = Ntip(sanger_tree_rooted) + seq_along(sanger_tree_rooted$node.label)
-    ), by = "node"
-  ) %>%
-  mutate(
-    fossil_label = replace_na(fossil_label, ""),
-    calibration_type = replace_na(calibration_type, "none")) %>%
-  arrange(node)
+  assert(not_na, calibration_type) 
 
 # Make plot
 fossil_map_plot <- 
@@ -376,16 +367,18 @@ fossil_map_plot <-
   geom_nodepoint(
     aes(color = calibration_type), size = 1) +
   scale_color_manual(
+    "Calibration type",
     values = c(
       minimum = palette_okabe_ito("vermillion"), 
-      fixed = palette_okabe_ito("skyblue"),
-      none = "transparent")) +
+      fixed = palette_okabe_ito("skyblue")),
+    na.value = "transparent"
+  ) +
   # Add node labels
   geom_text(aes(label = fossil_label), hjust = 0, size = 1.0, color = "grey20") +
   # Add tip labels
   geom_tiplab(aes(label = label), size = 0.5) +
   theme(legend.position = "bottom")
- 
+
 # Save plot
 ggsave(
   plot = fossil_map_plot,

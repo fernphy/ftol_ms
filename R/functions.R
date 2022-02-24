@@ -742,19 +742,19 @@ assess_monophy <- function(
 #' to define the clade
 #' @param sanger_sampling Tibble with one row per species in the tree, including
 #' columns "genus", "family", etc.
-#' @param plastid_tree_dated Dated phylogeny
+#' @param sanger_tree_dated Dated phylogeny
 #'
 #' @return Character vector: age of the clade defined by the two genera
 #' 
-get_crown_age_from_genus_pair <- function(tip_pair, sanger_sampling, plastid_tree_dated) {
-  tree_height <- max(phytools::nodeHeights(plastid_tree_dated))
+get_crown_age_from_genus_pair <- function(tip_pair, sanger_sampling, sanger_tree_dated) {
+  tree_height <- max(phytools::nodeHeights(sanger_tree_dated))
   sanger_sampling %>%
     filter(genus %in% tip_pair) %>%
     group_by(genus) %>%
     slice(1) %>%
     pull(species) %>%
-    ape::getMRCA(plastid_tree_dated, .) %>%
-    phytools::nodeheight(plastid_tree_dated, .) %>%
+    ape::getMRCA(sanger_tree_dated, .) %>%
+    phytools::nodeheight(sanger_tree_dated, .) %>%
     magrittr::subtract(tree_height, .) %>%
     number(accuracy = 0.1)
 }
@@ -766,23 +766,23 @@ get_crown_age_from_genus_pair <- function(tip_pair, sanger_sampling, plastid_tre
 #'
 #' @param sanger_sampling Tibble with one row per species in the tree, including
 #' columns "genus", "family", etc.
-#' @param plastid_tree_dated Dated phylogeny 
+#' @param sanger_tree_dated Dated phylogeny 
 #' @param ppgi_taxonomy PPGI taxonomic system for ferns and lycophytes
 #'
 #' @return Tibble with columns "family" and "age" (stem age of the family)
 get_stem_family_age <- function(
   sanger_sampling, 
-  plastid_tree_dated, ppgi_taxonomy) {
+  sanger_tree_dated, ppgi_taxonomy) {
   
   # Get overall tree height
-  tree_height <- max(phytools::nodeHeights(plastid_tree_dated))
+  tree_height <- max(phytools::nodeHeights(sanger_tree_dated))
   
   # Get ages for families
   family_monophy <- 
     select(sanger_sampling, species, family) %>%
     assess_monophy(
       taxon_sampling = .,
-      tree = plastid_tree_dated,
+      tree = sanger_tree_dated,
       tax_levels = "family"
     ) %>%
     get_result_monophy(1) %>%
@@ -798,7 +798,7 @@ get_stem_family_age <- function(
     filter(monophyly == "Monotypic") %>%
     left_join(select(sanger_sampling, family, species), by = "family") %>%
     assert(is_uniq, family) %>%
-    mutate(stem_node = map_dbl(species, ~get_parent(plastid_tree_dated, .))) %>%
+    mutate(stem_node = map_dbl(species, ~get_parent(sanger_tree_dated, .))) %>%
     assert(not_na, stem_node) %>%
     select(family, stem_node)
   
@@ -810,7 +810,7 @@ get_stem_family_age <- function(
       mrca = parse_number(mrca),
       stem_node = map_dbl(
         mrca,
-        ~phangorn::Ancestors(plastid_tree_dated, ., type = "parent"))
+        ~phangorn::Ancestors(sanger_tree_dated, ., type = "parent"))
     ) %>%
     select(family, stem_node)
   
@@ -819,7 +819,7 @@ get_stem_family_age <- function(
     mutate(
       # Height is distance above root
       height = map_dbl(stem_node, ~phytools::nodeheight(
-        tree = plastid_tree_dated, node = .))
+        tree = sanger_tree_dated, node = .))
     ) %>%
     mutate(
       # Age is the total length of the tree minus height
