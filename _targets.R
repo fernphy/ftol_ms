@@ -22,12 +22,6 @@ tar_plan(
     "_targets/user/data_raw/pteridocat_ppgi_diff_notes.csv",
     readr::read_csv(file = !!.x)
   ),
-  # - Fossil ferns data
-  tar_file_read(
-    fossil_ferns_raw,
-    "_targets/user/data_raw/Fossils_Ferns.csv",
-    load_fossil_data(file = !!.x)
-  ),
   # - Seed plant trees from Barahona et al 2020
   tar_file_read(
     spermato_trees,

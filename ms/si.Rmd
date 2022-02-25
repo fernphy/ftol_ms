@@ -95,7 +95,8 @@ tar_load(
     plastome_seqs_combined_filtered,
     sanger_tree_rooted,
     fossil_calibrations_for_treepl,
-    sanger_tree_dated),
+    sanger_tree_dated,
+    fossil_ferns_all),
   store = ftol_cache
 )
 
@@ -108,7 +109,6 @@ tar_load(
     other_dates,
     du_dates_all,
     family_stem_ages,
-    fossil_ferns_raw,
     pteridocat_ppgi_diff_refs_out,
     pteridocat_ppgi_diff_notes,
     fern_monophy_summ_tbl,
@@ -221,9 +221,9 @@ References in "notes" column provided at end of Supplementary Materials.
 ```{r fossils-make}
 # Filter raw fossil data to just fossils used, write out as CSV
 fossils_table <-
-  fossil_ferns_raw %>%
+  fossil_ferns_all %>%
   inner_join(
-    select(fossil_calibration_tips, fossil_taxon), by = "fossil_taxon") %>%
+    unique(select(fossil_calibration_tips, n_fos)), by = "n_fos") %>%
   verify(nrow(.) == nrow(fossil_calibration_tips)) %>%
   select(
     n_fos, minimum_age, node_calibrated, fossil_taxon, 
