@@ -41,6 +41,12 @@ tar_plan(
     readr::read_lines(file = !!.x)
   ),
   tar_file_read(
+    sanger_iqtree_log,
+    fs::path(ftol_cache, "user/intermediates/iqtree/sanger/sanger_alignment.phy.2022-02-23.log"), #nolint
+    readr::read_lines(file = !!.x)
+  ),
+  # treePL results
+  tar_file_read(
     treepl_cv_results,
     fs::path(ftol_cache, "user/intermediates/treepl/treepl_cv_out.txt"),
     readr::read_lines(file = !!.x)

@@ -77,14 +77,14 @@ tar_load(
     fossil_calibration_tips,
     monophy_by_clade,
     plastid_calibration_dates,
-    plastid_tree_dated,
+    sanger_tree_dated,
     plastome_alignment,
     plastome_alignment_tbl,
     plastome_metadata_raw_all,
     plastome_metadata_renamed,
     plastome_metadata_renamed,
     plastome_seqs_combined_filtered,
-    plastome_tree,
+    plastome_tree_rooted,
     ppgi_taxonomy,
     pteridocat,
     raw_fasta_all,
@@ -103,20 +103,21 @@ tar_load(
 tar_load(
   c(
     accepted_species,
-    sanger_sampling,
-    coverage_by_rank,
-    total_coverage,
     bb_coverage_by_rank,
     bb_total_coverage,
-    gb_species_by_year,
-    ref_files,
-    other_dates,
+    coverage_by_rank,
     crown_ages,
-    fossil_ferns_raw,
     family_stem_ages,
     fern_monophy_summ_tbl,
     fern_nonmono_gen,
+    fossil_ferns_raw,
+    gb_species_by_year,
+    other_dates,
     plastome_iqtree_log,
+    ref_files,
+    sanger_iqtree_log,
+    sanger_sampling,
+    total_coverage,
     treepl_cv_results
   ),
   store = here::here("_targets")
@@ -737,14 +738,40 @@ The plastome DNA alignment was `r number(ncol(plastome_alignment))` bp with `r p
 
 ```{r phylogeny-stats}
 # Bootstrap values for selected clades
-ferns_bs <- get_bs(plastome_tree, c("Equisetum_arvense", "Danaea_nodosa"))
-hym_gle_bs <- get_bs(plastome_tree, c("Dipteris_conjugata", "Hymenophyllum_polyanthos"))
-cyath_salv_bs <- get_bs(plastome_tree, c("Plagiogyria_adnata", "Azolla_filiculoides"))
-denn_poly_bs <- get_bs(plastome_tree, c("Dennstaedtia_hirsuta", "Pseudophegopteris_aurita"))
+ferns_bs <- get_bs(plastome_tree_rooted, c("Equisetum_arvense", "Danaea_nodosa"))
+hym_gle_bs <- get_bs(plastome_tree_rooted, c("Dipteris_conjugata", "Hymenophyllum_polyanthos"))
+cyath_salv_bs <- get_bs(plastome_tree_rooted, c("Plagiogyria_adnata", "Azolla_filiculoides"))
+denn_poly_bs <- get_bs(plastome_tree_rooted, c("Dennstaedtia_hirsuta", "Pseudophegopteris_aurita"))
 
-# Mean bootstrap for consensus tree
-tibble(
-  bs = sanger_con_tree_rooted$node.label)
+# Tibble of bootstrap for consensus trees
+bs_tib <-
+tibble(bs = sanger_con_tree_rooted$node.label, dataset = "sanger") %>%
+bind_rows(tibble(bs = plastome_tree_rooted$node.label, dataset = "plastome")) %>%
+  mutate(
+    bs = na_if(bs, "Root") %>% 
+      parse_number
+    )
+
+# Percent of plastome phylogeny with 100% BS support
+plastome_bs100 <-
+bs_tib %>%
+  filter(dataset == "plastome") %>%
+  filter(!is.na(bs)) %>%
+  mutate(is_100 = if_else(bs == 100, "true", "false")) %>%
+  tabyl(is_100) %>%
+  mutate(percent = percent(percent, accuracy = 0.1)) %>%
+  split(.$is_100)
+
+# Mean BS values for printing
+bs <-
+bs_tib %>%
+  group_by(dataset) %>%
+  summarize(
+    mean = mean(bs, na.rm = TRUE),
+    sd = sd(bs, na.rm = TRUE)
+  ) %>%
+  mutate(across(c(mean, sd), ~number(., accuracy = 0.1))) %>%
+  split(.$dataset)
 
 # Format monophyly status as list for MS
 fern_monophy_summ <-
@@ -779,13 +806,20 @@ fern_nonmono_gen %>%
     error_fun = error_msg(
       "Other subfamilies besides top three don't have less than four genera each"),
     success_fun = success_logical)
+
+# Check that model for plastome and sanger was same
+assertthat::assert_that(
+  extract_iqtree_mod(sanger_iqtree_log) == 
+    extract_iqtree_mod(plastome_iqtree_log),
+  msg = "Same model not selected for plastome and sanger trees"
+)
 ```
 
-The best-scoring model according to BIC selected for the backbone phylogeny was `r extract_iqtree_mod(plastome_iqtree_log)`.
-The tree search completed after `r extract_iqtree_iter(plastome_iqtree_log)` iterations, at which point the bootstrap correlation coefficient of split occurrence frequencies was `r extract_iqtree_corr(plastome_iqtree_log)`.
+The `r extract_iqtree_mod(plastome_iqtree_log)` model was selected according to BIC for both the plastome (backbone) and Sanger phylogenies.
+The tree search completed after `r extract_iqtree_iter(plastome_iqtree_log)` and `r extract_iqtree_iter(sanger_iqtree_log)` iterations, at which point the bootstrap correlation coefficient of split occurrence frequencies was `r extract_iqtree_corr(plastome_iqtree_log)` and `r extract_iqtree_corr(sanger_iqtree_log)` for the plastome and Sanger phylogenies, respectively.
 
 Ferns are strongly supported as monophyletic (BS `r ferns_bs`; all subsequent relationships mentioned received BS >=`r percent(.98)` in the backbone phylogeny unless otherwise indicated).
-The first split within ferns separates a clade including Equisetidae and Ophioglossidae from all other species (`r figure("backbone")`).
+The first split within ferns separates a clade including Equisetidae and Ophioglossidae from all other species (Figures `r figure_num("backbone")`, `r s_figure_num("backbone_full")`).
 The next split separates Marattiales from the remaining ferns, the leptosporangiates (Polypodiidae).
 Within leptosporangiate ferns, Osmundales is sister to all other species.
 The next lineage to diverge is a clade including Hymenophyllales and Gleicheniales (BS `r hym_gle_bs`), followed by Schizaeales.
@@ -797,8 +831,8 @@ All sampled orders, suborders, families, and subfamilies were recovered as monop
 `r fern_monophy_summ$genus$No$n` genera (`r fern_monophy_summ$genus$No$p`) were non-monophyletic (`r s_table("monophy")`).
 The subfamilies with the most non-monophyletic genera were `r top_nonmono_subfam$subfamily[[1]]` (`r top_nonmono_subfam$n[[1]]`), `r top_nonmono_subfam$subfamily[[2]]` (`r top_nonmono_subfam$n[[2]]`), and `r top_nonmono_subfam$subfamily[[3]]` (`r top_nonmono_subfam$n[[3]]`); other (sub)families each had four or fewer non-monophyletic genera (`r s_table("nonmono_gen")`).
 
-Bootstrap support was generally across the tree (mean BS) and particularly high at deeper nodes.
-Relationships within some more recently diverged clades were less well-supported, including *Cyathea*, *Amauropelta*, and parts of *Dryopteris* and *Elaphoglossum* (`r s_figure("bs")`).
+Bootstrap support was generally across the tree (mean `r bs$sanger$mean` ± `r bs$sanger$sd`; Sanger phylogeny) and particularly high at deeper nodes (mean `r bs$plastome$mean` ± `r bs$plastome$sd`; `r plastome_bs100$true$percent` of nodes with 100% BS; backbone phylogeny).
+Relationships within some genera were less well-supported, including *Cyathea*, *Amauropelta*, and parts of *Dryopteris* and *Elaphoglossum* (`r s_figure("bs")`).
 
 ## Divergence times
 
@@ -944,14 +978,6 @@ og_taxa <-
   filter(outgroup == TRUE) %>%
   pull(species)
 
-plastome_tree_rooted <- phytools::reroot(
-  plastome_tree,
-  getMRCA(
-    plastome_tree,
-    c("Physcomitrium_patens", "Marchantia_polymorpha", "Anthoceros_angustus")
-  )) %>%
-  ladderize()
-
 # Make tibble of backbone tips with higher-level taxonomy
 backbone_taxonomy <-
   tibble(species = get_tips_in_ape_plot_order(plastome_tree_rooted)) %>%
@@ -1042,7 +1068,7 @@ clade_tibble <-
   select(sanger_sampling, species, major_clade) %>%
   assess_monophy(
     taxon_sampling = .,
-    tree = plastid_tree_dated,
+    tree = sanger_tree_dated,
     tax_levels = "major_clade"
   ) %>%
   get_result_monophy(1) %>%
@@ -1248,7 +1274,7 @@ ftol_geom_cladelab <- function(code_select, offset_text) {
 }
 
 a <- ggtree(
-  plastid_tree_dated, layout = "circular", right = FALSE, size = 0.1) + 
+  sanger_tree_dated, layout = "circular", right = FALSE, size = 0.1) + 
   ftol_geom_cladelab(
     clade_tibble$code[clade_tibble$code %in% c("Eq", "Op", "Ma", "Os", "Gl")], 10) +
   ftol_geom_cladelab(
@@ -1313,18 +1339,18 @@ new_tip_label <-
   pull(family)
 phy$tip.label <- new_tip_label
 # Convert BS support values to numeric
-phy$node.label <- parse_number(phy$node.label)
+# phy$node.label <- parse_number(phy$node.label)
 # Scale to total height of 100 for easy plotting
 phy <- rescale_tree(phy, 100)
 
 # Make tibble for printing BS values
-bs_tibble <- tibble(
-  # hard-code node ID: internal nodes start after tip nodes,
-  # and phy$node.label is in the same order as internal nodes
-  node = 1:Nnode(phy) + Ntip(phy), 
-  # Don't print BS = 100%
-  bootstrap = ifelse(phy$node.label == 100, "", phy$node.label))
-
+bs_tibble <- make_bs_tbl(phy) %>%
+  # only print values < 100
+  mutate(bs = case_when(
+    bs == 100 ~ "",
+    TRUE ~ as.character(bs)
+  ))
+  
 # Make tibble for labeling clades
 phy_tip <- as_tibble(phy)
 
@@ -1395,7 +1421,7 @@ set.seed(123)
 backbone_plot <- 
   ggtree(phy) %<+% bs_tibble +
   # now we can show BS values using geom_text()
-  geom_text(aes(label = bootstrap), hjust = -.25, size = 2.5) +
+  geom_text(aes(label = bs), hjust = -.25, size = 2.5) +
   # add tip labels
   geom_tiplab(aes(label = label)) +
   # highlight major clades

@@ -83,38 +83,39 @@ ftol_cache <- here::here("working/_targets")
 
 tar_load(
   c(
-    sanger_alignment_tbl,
-    sanger_sampling,
-    sanger_accessions_selection,
-    plastome_tree,
-    plastid_tree_dated,
-    fossil_calibration_tips,
-    ppgi_taxonomy,
-    monophy_by_clade,
     acc_table_long,
-    plastome_seqs_combined_filtered,
-    sanger_tree_rooted,
+    fossil_calibration_tips,
     fossil_calibrations_for_treepl,
-    sanger_tree_dated,
+    fossil_ferns_all,
+    monophy_by_clade,
+    plastome_seqs_combined_filtered,
+    plastome_tree,
+    plastome_tree_rooted,
+    ppgi_taxonomy,
+    sanger_accessions_selection,
     sanger_con_tree_rooted,
-    fossil_ferns_all),
+    sanger_sampling,
+    sanger_tree_dated,
+    sanger_tree_rooted,
+    sanger_alignment_tbl
+  ),
   store = ftol_cache
 )
 
 # Targets from MS workflow
 tar_load(
   c(
-    accepted_species,
-    gb_species_by_year,
-    ref_files,
-    other_dates,
     du_dates_all,
     family_stem_ages,
-    pteridocat_ppgi_diff_refs_out,
-    pteridocat_ppgi_diff_notes,
     fern_monophy_summ_tbl,
     fern_nonmono_gen,
-    spermato_trees
+    gb_species_by_year,
+    other_dates,
+    pteridocat_ppgi_diff_notes,
+    pteridocat_ppgi_diff_refs_out,
+    ref_files,
+    spermato_trees,
+    accepted_species
   ),
   store = here::here("_targets")
 )
@@ -422,27 +423,48 @@ Only top 20 combinations shown.
 
 \newpage
 
-```{r bs-plot}
-# Parse bootstrap values from IQTREE
-phy <- sanger_con_tree_rooted
-
-bs_values <-
-tibble(
-  label_orig = phy$node.label
-) %>%
-  mutate(label_new = case_when(
-    label_orig == "Root" ~ NaN,
-    TRUE ~ parse_number(label_orig) * 0.01
-  )) %>%
-  pull(label_new)
+```{r backbone-full-plot}
+phy <- plastome_tree_rooted
 
 # Make tibble for printing BS values
-bs_tibble <- tibble(
-  # hard-code node ID: internal nodes start after tip nodes,
-  # and phy$node.label is in the same order as internal nodes
-  node = 1:Nnode(phy) + Ntip(phy), 
-  # Don't print BS = 100%
-  bootstrap = bs_values)
+bs_tibble <- make_bs_tbl(phy) %>%
+  # only print values < 100
+  mutate(bs = case_when(
+    bs == 100 ~ "",
+    TRUE ~ as.character(bs)
+  ))
+
+# Make plot
+bb_full_plot <- 
+  ggtree(phy, size = 0.2, color = "grey10") %<+% 
+  bs_tibble +
+  # now we can show BS values using geom_text()
+  geom_text(
+    aes(label = bs), hjust = -.25, size = 1.0,
+    color = "grey50") +
+  # add tip labels
+  geom_tiplab(aes(label = label), size = 1.0)
+```
+
+```{r backbone-full-save, eval = params$doc_type == "doc"}
+ggsave(
+  plot = bb_full_plot,
+  file = (result_file(s_figure("backbone_full"), "pdf")),
+  height = 20, width = 8, units = "in",
+  limitsize = FALSE)
+```
+
+**`r s_figure("bs")`**.
+Consensus plastome (backbone) phylogeny (`r result_file(s_figure("backbone_full"), "pdf") %>% fs::path_file()`).
+Values at nodes are bootstrap support (%); only values less than 100% are shown.
+
+\newpage
+
+```{r bs-plot}
+phy <- sanger_con_tree_rooted
+
+# Make tibble for printing BS values
+bs_tibble <- make_bs_tbl(phy)
 
 # Make plot
 # optional: round version
@@ -454,7 +476,7 @@ bs_plot_round <-
     size = 0.1, color = "grey30") %<+% bs_tibble +
   # Add node points
   geom_nodepoint(
-    aes(color = bootstrap), size = 0.2) +
+    aes(color = bs), size = 0.2) +
   scale_color_viridis_c(
     "BS",
     option = "B", na.value = "transparent",
@@ -467,7 +489,7 @@ bs_plot <-
     size = 0.1, color = "grey30") %<+% bs_tibble +
   # Add node points
   geom_nodepoint(
-    aes(color = bootstrap), size = 0.1) +
+    aes(color = bs), size = 0.1) +
   scale_color_viridis_c(
     "BS",
     option = "B", na.value = "transparent",
@@ -486,7 +508,8 @@ ggsave(
 ```
 
 **`r s_figure("bs")`**.
-Consensus fern phylogeny with node labels bootstrap support (%) (`r result_file(s_figure("bs"), "pdf") %>% fs::path_file()`).
+Consensus phylogeny (Sanger dataset) with node labels showing bootstrap support (%) (`r result_file(s_figure("bs"), "pdf") %>% fs::path_file()`).
+The backbone (plastome) phylogeny was used as a constraint tree, so all clades present in the backbone phylogeny tree receive 100% bootstrap support.
 
 \newpage
 
@@ -688,14 +711,14 @@ tt_data <-
   bind_rows(angio_tt_data, poly_tt_data, li_tt_data)
 
 ltt_dataset_cols <- c(
-CC_complete = palette_okabe_ito("orange"),
-CC_conservative = palette_okabe_ito("skyblue"),
-RC_complete = palette_okabe_ito("bluishgreen"),
-RC_conservative = palette_okabe_ito("blue"),
-UC_complete = palette_okabe_ito("vermillion"),
-UC_conservative = palette_okabe_ito("reddishpurple"),
-Li_2019 = palette_okabe_ito("yellow"),
-Polypodiales = palette_okabe_ito("black")
+  CC_complete = palette_okabe_ito("orange"),
+  CC_conservative = palette_okabe_ito("skyblue"),
+  RC_complete = palette_okabe_ito("bluishgreen"),
+  RC_conservative = palette_okabe_ito("blue"),
+  UC_complete = palette_okabe_ito("vermillion"),
+  UC_conservative = palette_okabe_ito("reddishpurple"),
+  Li_2019 = palette_okabe_ito("yellow"),
+  Polypodiales = palette_okabe_ito("black")
 )
 
 raw_count <- ggplot(tt_data, aes(x = time, y = N, color = dataset)) +

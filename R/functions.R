@@ -1219,6 +1219,26 @@ make_ltt_tib <- function(phy, dataset = NULL) {
   return(res)
 }
 
+#' Make a tibble of bootstrap values and their node numbers in a phylogeny
+#'
+#' @param phy Phylogeny with bootstrap values as a number or "Root"
+#'
+#' @return Tibble of bootstrap values
+make_bs_tbl <- function(phy) {
+  bs_values = tibble(bs = phy$node.label) %>%
+    mutate(
+      bs = na_if(bs, "Root") %>% 
+        parse_number) %>%
+    pull(bs)
+  
+  tibble(
+    # hard-code node ID: internal nodes start after tip nodes,
+    # and phy$node.label is in the same order as internal nodes
+    node = 1:Nnode(phy) + Ntip(phy), 
+    bs = bs_values)
+}
+
+
 # Etc -----
 
 #' Function to get support value in BS%
@@ -1381,6 +1401,7 @@ extract_iqtree_iter <- function(iqtree_log) {
 extract_iqtree_corr <- function(iqtree_log) {
   iqtree_log[
     str_detect(iqtree_log, "Bootstrap correlation coefficient of split occurrence frequencies: ")] %>%
+    last() %>%
     str_match("Bootstrap correlation coefficient of split occurrence frequencies: ([^$]+)$") %>%
     magrittr::extract(,2)
 }
