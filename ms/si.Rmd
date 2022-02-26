@@ -96,6 +96,7 @@ tar_load(
     sanger_tree_rooted,
     fossil_calibrations_for_treepl,
     sanger_tree_dated,
+    sanger_con_tree_rooted,
     fossil_ferns_all),
   store = ftol_cache
 )
@@ -418,6 +419,74 @@ sanger_alignment_tbl %>%
 **`r s_figure("locus-upset")`**.
 Frequency of locus combinations by species, Sanger dataset.
 Only top 20 combinations shown.
+
+\newpage
+
+```{r bs-plot}
+# Parse bootstrap values from IQTREE
+phy <- sanger_con_tree_rooted
+
+bs_values <-
+tibble(
+  label_orig = phy$node.label
+) %>%
+  mutate(label_new = case_when(
+    label_orig == "Root" ~ NaN,
+    TRUE ~ parse_number(label_orig) * 0.01
+  )) %>%
+  pull(label_new)
+
+# Make tibble for printing BS values
+bs_tibble <- tibble(
+  # hard-code node ID: internal nodes start after tip nodes,
+  # and phy$node.label is in the same order as internal nodes
+  node = 1:Nnode(phy) + Ntip(phy), 
+  # Don't print BS = 100%
+  bootstrap = bs_values)
+
+# Make plot
+# optional: round version
+bs_plot_round <- 
+  ggtree(
+    phy,
+    layout = "circular",
+    branch.length = "none", 
+    size = 0.1, color = "grey30") %<+% bs_tibble +
+  # Add node points
+  geom_nodepoint(
+    aes(color = bootstrap), size = 0.2) +
+  scale_color_viridis_c(
+    "BS",
+    option = "B", na.value = "transparent",
+    breaks = 0.25*0:4, labels = percent(0.25*0:4))
+
+# Make plot
+bs_plot <- 
+  ggtree(
+    phy,
+    size = 0.1, color = "grey30") %<+% bs_tibble +
+  # Add node points
+  geom_nodepoint(
+    aes(color = bootstrap), size = 0.1) +
+  scale_color_viridis_c(
+    "BS",
+    option = "B", na.value = "transparent",
+    breaks = 0.25*0:4, labels = percent(0.25*0:4)) +
+  # Add tip labels
+  geom_tiplab(aes(label = label), size = 0.5, color = "grey30") +
+  theme(legend.position = "bottom")
+```
+
+```{r bs-save, eval = params$doc_type == "doc"}
+ggsave(
+  plot = bs_plot,
+  file = (result_file(s_figure("bs"), "pdf")),
+  height = 60, width = 8, units = "in",
+  limitsize = FALSE)
+```
+
+**`r s_figure("bs")`**.
+Consensus fern phylogeny with node labels bootstrap support (%) (`r result_file(s_figure("bs"), "pdf") %>% fs::path_file()`).
 
 \newpage
 

@@ -91,6 +91,7 @@ tar_load(
     sanger_accessions_selection,
     sanger_alignment,
     sanger_alignment_tbl,
+    sanger_con_tree_rooted,
     sanger_seqs_combined_filtered,
     sanger_seqs_rogues_removed,
     treepl_cv_results,
@@ -741,6 +742,10 @@ hym_gle_bs <- get_bs(plastome_tree, c("Dipteris_conjugata", "Hymenophyllum_polya
 cyath_salv_bs <- get_bs(plastome_tree, c("Plagiogyria_adnata", "Azolla_filiculoides"))
 denn_poly_bs <- get_bs(plastome_tree, c("Dennstaedtia_hirsuta", "Pseudophegopteris_aurita"))
 
+# Mean bootstrap for consensus tree
+tibble(
+  bs = sanger_con_tree_rooted$node.label)
+
 # Format monophyly status as list for MS
 fern_monophy_summ <-
   fern_monophy_summ_tbl %>%
@@ -792,12 +797,15 @@ All sampled orders, suborders, families, and subfamilies were recovered as monop
 `r fern_monophy_summ$genus$No$n` genera (`r fern_monophy_summ$genus$No$p`) were non-monophyletic (`r s_table("monophy")`).
 The subfamilies with the most non-monophyletic genera were `r top_nonmono_subfam$subfamily[[1]]` (`r top_nonmono_subfam$n[[1]]`), `r top_nonmono_subfam$subfamily[[2]]` (`r top_nonmono_subfam$n[[2]]`), and `r top_nonmono_subfam$subfamily[[3]]` (`r top_nonmono_subfam$n[[3]]`); other (sub)families each had four or fewer non-monophyletic genera (`r s_table("nonmono_gen")`).
 
+Bootstrap support was generally across the tree (mean BS) and particularly high at deeper nodes.
+Relationships within some more recently diverged clades were less well-supported, including *Cyathea*, *Amauropelta*, and parts of *Dryopteris* and *Elaphoglossum* (`r s_figure("bs")`).
+
 ## Divergence times
 
 We estimate the crown age of ferns to be `r crown_ages$ferns` ma.
 Ages of other major crown groups are leptosporangiates (`r crown_ages$leptos` ma), Polypodiales (`r crown_ages$polypodiales` ma), eupolypods I (`r crown_ages$eupoly_i` ma), and eupolypods II (`r crown_ages$eupoly_ii` ma).
-Except for crown ferns, these ages are all significantly older than those reported in the most recent global fern phylogeny [@Testo2016a].
-Estimated stem ages of fern families were also older than previous studies (`r figure("divtimes")`).
+Our estimates for leptosporangiates and Polypodiales are both `r ca` 50 ma older than the most recent global fern phylogeny [@Testo2016a], while other ages are similar.
+Estimated stem ages of fern families were mostly older than previous studies (`r figure("divtimes")`).
 We did not compare crown ages of families across studies because differences in crown ages in smaller clades are likely affected by species sampling.
 
 # Discussion
