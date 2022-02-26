@@ -40,6 +40,11 @@ tar_plan(
     fs::path(ftol_cache, "user/intermediates/iqtree/plastome/plastome_alignment.phy.log"), #nolint
     readr::read_lines(file = !!.x)
   ),
+  tar_file_read(
+    treepl_cv_results,
+    fs::path(ftol_cache, "user/intermediates/treepl/treepl_cv_out.txt"),
+    readr::read_lines(file = !!.x)
+  ),
   # - Targets from FTOL workflow
   plastome_metadata_renamed = tar_read(
     plastome_metadata_renamed,
