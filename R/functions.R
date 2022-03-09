@@ -827,7 +827,7 @@ get_stem_family_age <- function(
     ) %>%
     assert(is_uniq, family) %>%
     assert(not_na, everything()) %>%
-    select(family, age)
+    select(family, stem_node, age)
 }
 
 #' Filter monophyly table to ferns, add taxonomic level

@@ -61,7 +61,7 @@ knitr::read_chunk(
 ```{r load-functions, eval = params$doc_type == "manual"}
 # Load functions (only if running interactively)
 source(here::here("R/functions.R"))
-```
+``` 
 
 ```{r load-targets}
 # Targets from FTOL workflow
@@ -980,7 +980,10 @@ og_taxa <-
 
 # Make tibble of backbone tips with higher-level taxonomy
 backbone_taxonomy <-
-  tibble(species = get_tips_in_ape_plot_order(plastome_tree_rooted)) %>%
+  plastome_tree_rooted %>%
+  ladderize() %>%
+  get_tips_in_ape_plot_order() %>%
+  tibble(species = .) %>%
   # Add higher taxonomy
   left_join(sanger_sampling, by = "species") %>%
   # Add column for phylogenetic order
@@ -1203,6 +1206,35 @@ Only accessions identified to species included; environmental samples, hybrid fo
 ```{r ftol-make}
 # Coverage bar plot ----
 
+# Make tibble of backbone tips with higher-level taxonomy
+sanger_clade_exemp_taxa <-
+  sanger_tree_dated %>%
+  ladderize() %>%
+  get_tips_in_ape_plot_order() %>%
+  tibble(species = .) %>%
+  # Add higher taxonomy
+  left_join(sanger_sampling, by = "species") %>%
+  # Add column for phylogenetic order
+  mutate(phy_order = seq_len(nrow(.))) %>%
+  # Outgroup lacks family data, so call "og"
+  mutate(
+    family = case_when(
+      outgroup == TRUE ~ "og",
+      TRUE ~ family),
+    major_clade = case_when(
+      outgroup == TRUE ~ "og",
+      TRUE ~ major_clade)
+  ) %>%
+# Make exemplar set of species in backbone representing plot groups
+  # Slice to one exemplar species per major clade
+  group_by(major_clade) %>%
+  slice(1) %>%
+  ungroup() %>%
+  # Slicing arranges alphabetically, so put back in (unladderized) phylo order
+  arrange(phy_order) %>%
+  # Drop outgroup
+  filter(family != "og")
+
 # Format y-axis text: show major clade abbreviations in bold
 clade_labs_tib <-
   clade_cols_tib %>%
@@ -1218,7 +1250,7 @@ clade_labs <- clade_labs_tib$label %>%
 b <-
   coverage_by_rank %>%
   filter(rank == "major_clade") %>%
-  left_join(major_clade_exemp_taxa, by = c(name = "major_clade")) %>%
+  left_join(sanger_clade_exemp_taxa, by = c(name = "major_clade")) %>%
   arrange(phy_order) %>%
   rename(clade = name) %>%
   mutate(
