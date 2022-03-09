@@ -6,6 +6,10 @@ library(glue)
 
 source("R/functions.R")
 
+# Specify path to FTOL cache
+# FIXME: change to ftol_cache when ready
+ftol_cache <- "working/_targets"
+
 tar_plan(
   
   # Load data ----
@@ -28,13 +32,7 @@ tar_plan(
     "_targets/user/data_raw/angiosperm-time-tree-2.0-v2.0.zip",
     load_barahona_trees(zip_path = !!.x)
   ),
-  # Specify path to FTOL cache
-  # FIXME: change to ftol_cache when ready
-  tar_file(
-    ftol_cache,
-    "working/_targets"
-  ),
-  # Iqtree logs
+  # - Targets from FTOL workflow
   tar_file_read(
     plastome_iqtree_log,
     fs::path(ftol_cache, "user/intermediates/iqtree/plastome/plastome_alignment.phy.log"), #nolint
@@ -45,36 +43,40 @@ tar_plan(
     fs::path(ftol_cache, "user/intermediates/iqtree/sanger/sanger_alignment.phy.2022-02-23.log"), #nolint
     readr::read_lines(file = !!.x)
   ),
-  # treePL results
   tar_file_read(
     treepl_cv_results,
     fs::path(ftol_cache, "user/intermediates/treepl/treepl_cv_out.txt"),
     readr::read_lines(file = !!.x)
   ),
-  # - Targets from FTOL workflow
-  plastome_metadata_renamed = tar_read(
+  tar_file_read(
     plastome_metadata_renamed,
-    store = ftol_cache
+    fs::path(ftol_cache, "objects/plastome_metadata_renamed"),
+    readRDS(file = !!.x)
   ),
-  plastome_tree = tar_read(
+  tar_file_read(
     plastome_tree,
-    store = ftol_cache
+    fs::path(ftol_cache, "objects/plastome_tree"),
+    readRDS(file = !!.x)
   ),
-  sanger_tree_dated = tar_read(
+  tar_file_read(
     sanger_tree_dated,
-    store = ftol_cache
+    fs::path(ftol_cache, "objects/sanger_tree_dated"),
+    readRDS(file = !!.x)
   ),
-  ppgi_taxonomy = tar_read(
+  tar_file_read(
     ppgi_taxonomy,
-    store = ftol_cache
+    fs::path(ftol_cache, "objects/ppgi_taxonomy"),
+    readRDS(file = !!.x)
   ),
-  pteridocat = tar_read(
+  tar_file_read(
     pteridocat,
-    store = ftol_cache
+    fs::path(ftol_cache, "objects/pteridocat"),
+    readRDS(file = !!.x)
   ),
-  monophy_by_clade = tar_read(
+  tar_file_read(
     monophy_by_clade,
-    store = ftol_cache
+    fs::path(ftol_cache, "objects/monophy_by_clade"),
+    readRDS(file = !!.x)
   ),
   
   # GenBank ----
