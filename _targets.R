@@ -10,6 +10,88 @@ source("R/functions.R")
 # FIXME: change to ftol_cache when ready
 ftol_cache <- "working/_targets"
 
+# Define Rmd targets outside of main workflow
+tmp <- capture.output({
+  ms_doc_tar <- tar_render(
+    ms_doc,
+    "ms/manuscript.Rmd",
+    output_dir = "results",
+    output_format = "bookdown::word_document2",
+    params = list(doc_type = "doc")
+  )
+  ms_pdf_tar <- tar_render(
+    ms_pdf,
+    "ms/manuscript.Rmd",
+    output_dir = "results",
+    output_format = "bookdown::pdf_document2",
+    params = list(doc_type = "pdf")
+  )
+  si_doc_tar <- tar_render(
+    si_doc,
+    "ms/si.Rmd",
+    output_dir = "results",
+    output_format = "bookdown::word_document2",
+    params = list(doc_type = "doc")
+  )
+  si_pdf_tar <- tar_render(
+    si_pdf,
+    "ms/si.Rmd",
+    output_dir = "results",
+    output_format = "bookdown::pdf_document2",
+    params = list(doc_type = "pdf")
+  )
+  si_doc_2_tar <- tar_render(
+    si_doc_2,
+    "ms/si2.Rmd",
+    output_dir = "results",
+    output_format = "bookdown::word_document2",
+    params = list(doc_type = "doc")
+  )
+  si_pdf_2_tar <- tar_render(
+    si_pdf_2,
+    "ms/si2.Rmd",
+    output_dir = "results",
+    output_format = "bookdown::pdf_document2",
+    params = list(doc_type = "pdf")
+  )
+  },
+  type = "message"
+)
+
+
+# tar_render(
+#   si_doc,
+#   "ms/si.Rmd",
+#   knit_root_dir = "ms",
+#   output_dir = "results",
+#   output_format = "bookdown::word_document2",
+#   params = list(doc_type = "doc")
+# ),
+# tar_render(
+#   si_pdf,
+#   "ms/si.Rmd",
+#   output_dir = "results",
+#   output_format = "bookdown::pdf_document2",
+#   params = list(doc_type = "pdf")
+# ),
+# tar_render(
+#   si_2_doc,
+#   "ms/si2.Rmd",
+#   knit_root_dir = "ms",
+#   output_dir = "results",
+#   output_format = "bookdown::word_document2",
+#   params = list(doc_type = "doc")
+# ),
+# tar_render(
+#   si_2_pdf,
+#   "ms/si2.Rmd",
+#   knit_root_dir = "ms",
+#   output_dir = "results",
+#   output_format = "bookdown::pdf_document2",
+#   params = list(doc_type = "pdf")
+# )
+
+
 tar_plan(
   
   # Load data ----
@@ -40,12 +122,12 @@ tar_plan(
   ),
   tar_file_read(
     sanger_iqtree_log,
-    fs::path(ftol_cache, "user/intermediates/iqtree/sanger/sanger_alignment.phy.2022-02-23.log"), #nolint
-    readr::read_lines(file = !!.x)
+    fs::path(ftol_cache, "objects/sanger_ml_log"),
+    readRDS(file = !!.x)
   ),
   tar_file_read(
     treepl_cv_results,
-    fs::path(ftol_cache, "user/intermediates/treepl/treepl_cv_out.txt"),
+    fs::path(ftol_cache, "user/intermediates/treepl/con/treepl_cv_out.txt"),
     readr::read_lines(file = !!.x)
   ),
   tar_file_read(
@@ -60,7 +142,7 @@ tar_plan(
   ),
   tar_file_read(
     sanger_tree_dated,
-    fs::path(ftol_cache, "objects/sanger_tree_dated"),
+    fs::path(ftol_cache, "objects/sanger_con_tree_dated"),
     readRDS(file = !!.x)
   ),
   tar_file_read(
@@ -74,8 +156,8 @@ tar_plan(
     readRDS(file = !!.x)
   ),
   tar_file_read(
-    monophy_by_clade,
-    fs::path(ftol_cache, "objects/monophy_by_clade"),
+    con_monophy_by_clade,
+    fs::path(ftol_cache, "objects/con_monophy_by_clade"),
     readRDS(file = !!.x)
   ),
   
@@ -145,65 +227,26 @@ tar_plan(
   ),
   # Summarize fern monophyly
   # - filter to ferns, add taxonomic levels
-  fern_monophy_by_clade_tax_level = add_tax_levels_to_monophyly(
-    monophy_by_clade, ppgi_taxonomy, sanger_sampling
+  fern_con_monophy_by_clade_tax_level = add_tax_levels_to_monophyly(
+    con_monophy_by_clade, ppgi_taxonomy, sanger_sampling
   ),
   # - calculate summary table
   fern_monophy_summ_tbl = summarize_fern_monophyly(
-    fern_monophy_by_clade_tax_level, ppgi_taxonomy
+    fern_con_monophy_by_clade_tax_level, ppgi_taxonomy
   ),
   # - make table of non-monophyletic genera
   fern_nonmono_gen = make_nonmonophy_gen_tab(
-    fern_monophy_by_clade_tax_level, ppgi_taxonomy
+    fern_con_monophy_by_clade_tax_level, ppgi_taxonomy
   ),
   
   # Render manuscript ----
   # track files used for rendering MS
   tar_file(ref_files, list.files("ms", "references", full.names = TRUE)),
-  tar_render(
-    ms_doc,
-    "ms/manuscript.Rmd",
-    output_dir = "results",
-    output_format = "bookdown::word_document2",
-    params = list(doc_type = "doc")
-  ),
+  ms_doc_tar,
   # Render MS and each SI in docx (for submission) and pdf (for preprint)
-  tar_render(
-    ms_pdf,
-    "ms/manuscript.Rmd",
-    output_dir = "results",
-    output_format = "bookdown::pdf_document2",
-    params = list(doc_type = "pdf")
-  ),
-  tar_render(
-    si_doc,
-    "ms/si.Rmd",
-    knit_root_dir = "ms",
-    output_dir = "results",
-    output_format = "bookdown::word_document2",
-    params = list(doc_type = "doc")
-  ),
-  tar_render(
-    si_pdf,
-    "ms/si.Rmd",
-    output_dir = "results",
-    output_format = "bookdown::pdf_document2",
-    params = list(doc_type = "pdf")
-  ),
-  tar_render(
-    si_2_doc,
-    "ms/si2.Rmd",
-    knit_root_dir = "ms",
-    output_dir = "results",
-    output_format = "bookdown::word_document2",
-    params = list(doc_type = "doc")
-  ),
-  tar_render(
-    si_2_pdf,
-    "ms/si2.Rmd",
-    knit_root_dir = "ms",
-    output_dir = "results",
-    output_format = "bookdown::pdf_document2",
-    params = list(doc_type = "pdf")
-  )
+  ms_pdf_tar,
+  si_doc_tar,
+  si_pdf_tar,
+  si_doc_2_tar,
+  si_pdf_2_tar
 )

@@ -84,19 +84,17 @@ ftol_cache <- here::here("working/_targets")
 tar_load(
   c(
     acc_table_long,
-    fossil_calibration_tips,
-    fossil_calibrations_for_treepl,
+    con_fossil_calibration_tips,
+    con_fossil_calibrations_for_treepl,
     fossil_ferns_all,
-    monophy_by_clade,
     plastome_seqs_combined_filtered,
     plastome_tree,
     plastome_tree_rooted,
     ppgi_taxonomy,
     sanger_accessions_selection,
-    sanger_con_tree_rooted,
     sanger_sampling,
-    sanger_tree_dated,
-    sanger_tree_rooted,
+    sanger_con_tree_dated,
+    sanger_con_tree_rooted,
     sanger_alignment_tbl
   ),
   store = ftol_cache
@@ -225,8 +223,8 @@ References in "notes" column provided at end of Supplementary Materials.
 fossils_table <-
   fossil_ferns_all %>%
   inner_join(
-    unique(select(fossil_calibration_tips, n_fos)), by = "n_fos") %>%
-  verify(nrow(.) == nrow(fossil_calibration_tips)) %>%
+    unique(select(con_fossil_calibration_tips, n_fos)), by = "n_fos") %>%
+  verify(nrow(.) == nrow(con_fossil_calibration_tips)) %>%
   select(
     n_fos, minimum_age, node_calibrated, fossil_taxon, 
     lower = lower_limit_of_oldest_stratigraphic_age,
@@ -350,10 +348,10 @@ knitr::read_chunk(
 ```{r fossil-map-make}
 # Make tibble with node number and label for ggtree
 node_labs_tbl <-
-  fossil_calibrations_for_treepl %>%
+  con_fossil_calibrations_for_treepl %>%
   transmute(
     fossil_label = str_remove_all(min, "min = "),
-    node = map2_dbl(taxon_1, taxon_2, ~ape::getMRCA(sanger_tree_rooted, c(.x, .y))),
+    node = map2_dbl(taxon_1, taxon_2, ~ape::getMRCA(sanger_con_tree_rooted, c(.x, .y))),
     calibration_type = case_when(
       !is.na(min) & is.na(max) ~ "minimum",
       !is.na(min) & !is.na(max) ~ "fixed",
@@ -365,7 +363,7 @@ node_labs_tbl <-
 # Make plot
 fossil_map_plot <- 
   ggtree(
-    sanger_tree_rooted,
+    sanger_con_tree_rooted,
     branch.length = "none", size = 0.1, color = "grey30") %<+% node_labs_tbl +
   # Add node points
   geom_nodepoint(
@@ -703,7 +701,7 @@ poly_tt_data <-
   sanger_sampling %>%
   filter(order == "Polypodiales") %>%
   pull(species) %>% 
-  ape::keep.tip(sanger_tree_dated, .) %>%
+  ape::keep.tip(sanger_con_tree_dated, .) %>%
   make_ltt_tib(., "Polypodiales") 
 
 ## Combine and plot ##

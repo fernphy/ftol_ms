@@ -55,10 +55,17 @@ library(assertr)
 
 ```{r load-targets-si-2}
 # Targets from MS workflow
+
+# Specify path to FTOL cache
+# FIXME: change to ftol_cache when ready
+ftol_cache <- here::here("working/_targets")
+
 tar_load(
-  fossil_ferns_path,
-  store = here::here("_targets")
+  con_fossil_calibration_tips,
+  store = ftol_cache
 )
+
+fossil_ferns_path <- fs::path(ftol_cache, "user/data_raw/Fossils_Ferns.csv")
 ```
 
 ```{r load-captions-si2, cache = FALSE}
@@ -91,35 +98,46 @@ fs::file_delete(temp_file)
 ```
 
 ```{r prep-fossil-data}
-# Extract fossil categories (first row of fossil data)
-fossils_categories <-
-  read_csv(fossil_ferns_path, n_max = 1) %>%
-  pivot_longer(names_to = "category", values_to = "raw_names", everything()) %>%
-  mutate(
-    category = str_replace_all(category, "\\.\\.\\.[0-9]+", "skip") %>%
-      na_if("skip")) %>%
-  fill(category) %>%
-  mutate(category = str_to_title(category)) %>%
-  filter(category != "Pteridophy")
-
+# Read all fossils (including those not used in this study)
 # Get raw column names
-fossils_raw_names <-
-  read_csv(fossil_ferns_path, skip = 1)
-
+fossils_raw_names <- read_csv(fossil_ferns_path)
 # Load data with cleaned column names
-fossils_clean_names <- fossils_raw_names %>% janitor::clean_names()
+fossils_clean_names <- janitor::clean_names(fossils_raw_names)
+
+# Make tibble of fossil data categories
+raw_col_names <- colnames(fossils_raw_names)
+fossils_categories <-
+  tibble(raw_name = raw_col_names) %>%
+  mutate(
+    category = case_when(
+      raw_name %in% raw_col_names[1:4] ~ "Calibration",
+      raw_name %in% raw_col_names[5:12] ~ "Fossil Identity",
+      raw_name %in% raw_col_names[13:18] ~ "Fossil Age",
+      raw_name %in% raw_col_names[19:21] ~ "Fossil Locality",
+      raw_name %in% raw_col_names[22:24] ~ "Fossil Specimen",
+      TRUE ~ NA_character_
+    )
+  )
+
+# Get list of fossils used
+n_fos_used <-
+con_fossil_calibration_tips %>%
+  filter(!is.na(n_fos)) %>%
+  assert(is_uniq, n_fos) %>%
+  select(n_fos)
 
 # Tidy fossils in wide format
 fossils <-
   fossils_clean_names %>%
   # Filter to only those actually used in the study
-  filter(used == "X") %>%
-  select(-used) %>%
-  select(fossil_taxon, everything())
-
-# Make a tibble of column namees for formatting
+  inner_join(
+    n_fos_used, by = "n_fos"
+  ) %>%
+  verify(all(sort(.$n_fos) == sort(n_fos_used$n_fos)))
+  
+# Make a tibble of column names for formatting
 name_tbl <- tibble(
-  raw_names = colnames(fossils_raw_names),
+  raw_name = colnames(fossils_raw_names),
   var = colnames(fossils_clean_names)
 ) %>%
   right_join(
@@ -128,16 +146,17 @@ name_tbl <- tibble(
   mutate(var_order = 1:nrow(.))
 
 # Convert to long format
-fossils_long <- fossils %>%
+fossils_long <- 
+  fossils %>%
   mutate(
     across(everything(), as.character),
     fossil_taxon_header = glue("†{fossil_taxon}")) %>%
   pivot_longer(names_to = "var", values_to = "value", -fossil_taxon) %>%
   left_join(name_tbl, by = "var") %>%
   mutate(
-    text = as.character(glue::glue("{raw_names}: {value}"))
+    text = as.character(glue::glue("{raw_name}: {value}"))
   ) %>%
-  left_join(fossils_categories, by = "raw_names") %>%
+  left_join(fossils_categories, by = "raw_name") %>%
   arrange(fossil_taxon, category, var_order)
 ```
 

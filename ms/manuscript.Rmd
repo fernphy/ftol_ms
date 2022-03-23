@@ -73,11 +73,9 @@ ftol_cache <- here::here("working/_targets")
 tar_load(
   c(
     accs_exclude,
+    con_fossil_calibration_tips,
     fern_sanger_seqs_raw,
-    fossil_calibration_tips,
-    monophy_by_clade,
     plastid_calibration_dates,
-    sanger_tree_dated,
     plastome_alignment,
     plastome_alignment_tbl,
     plastome_metadata_raw_all,
@@ -91,6 +89,7 @@ tar_load(
     sanger_accessions_selection,
     sanger_alignment,
     sanger_alignment_tbl,
+    sanger_con_tree_dated,
     sanger_con_tree_rooted,
     sanger_seqs_combined_filtered,
     sanger_seqs_rogues_removed,
@@ -139,7 +138,7 @@ n_sanger_ferns <-
 
 # Count number of calibration points
 n_calibrations_ferns <-
-  fossil_calibration_tips %>%
+  con_fossil_calibration_tips %>%
   assert(is_uniq, node_calibrated) %>%
   filter(!affinities %in% c("Tracheophytes", "Euphyllophytes")) %>%
   pull(node_calibrated) %>%
@@ -147,7 +146,7 @@ n_calibrations_ferns <-
   number()
 
 n_calibrations_total <-
-  fossil_calibration_tips %>%
+  con_fossil_calibration_tips %>%
   assert(is_uniq, node_calibrated) %>%
   pull(node_calibrated) %>%
   n_distinct() %>%
@@ -745,16 +744,16 @@ denn_poly_bs <- get_bs(plastome_tree_rooted, c("Dennstaedtia_hirsuta", "Pseudoph
 
 # Tibble of bootstrap for consensus trees
 bs_tib <-
-tibble(bs = sanger_con_tree_rooted$node.label, dataset = "sanger") %>%
-bind_rows(tibble(bs = plastome_tree_rooted$node.label, dataset = "plastome")) %>%
+  tibble(bs = sanger_con_tree_rooted$node.label, dataset = "sanger") %>%
+  bind_rows(tibble(bs = plastome_tree_rooted$node.label, dataset = "plastome")) %>%
   mutate(
     bs = na_if(bs, "Root") %>% 
       parse_number
-    )
+  )
 
 # Percent of plastome phylogeny with 100% BS support
 plastome_bs100 <-
-bs_tib %>%
+  bs_tib %>%
   filter(dataset == "plastome") %>%
   filter(!is.na(bs)) %>%
   mutate(is_100 = if_else(bs == 100, "true", "false")) %>%
@@ -764,7 +763,7 @@ bs_tib %>%
 
 # Mean BS values for printing
 bs <-
-bs_tib %>%
+  bs_tib %>%
   group_by(dataset) %>%
   summarize(
     mean = mean(bs, na.rm = TRUE),
@@ -790,7 +789,7 @@ top_nonmono_subfam <-
   slice_max(n = 3, order_by = n) %>%
   assert(not_na, family, subfamily) %>%
   mutate(subfamily = fct_reorder(subfamily, n)) %>%
-  mutate(n = jntools::english2(n)) %>%
+  mutate(n = map_chr(n, jntools::english2)) %>%
   arrange(desc(subfamily))
 
 # Double check that non-monophyletic genera outside of
@@ -809,8 +808,8 @@ fern_nonmono_gen %>%
 
 # Check that model for plastome and sanger was same
 assertthat::assert_that(
-  extract_iqtree_mod(sanger_iqtree_log) == 
-    extract_iqtree_mod(plastome_iqtree_log),
+  unique(extract_iqtree_mod(sanger_iqtree_log)) == 
+    unique(extract_iqtree_mod(plastome_iqtree_log)),
   msg = "Same model not selected for plastome and sanger trees"
 )
 ```
@@ -1071,7 +1070,7 @@ clade_tibble <-
   select(sanger_sampling, species, major_clade) %>%
   assess_monophy(
     taxon_sampling = .,
-    tree = sanger_tree_dated,
+    tree = sanger_con_tree_dated,
     tax_levels = "major_clade"
   ) %>%
   get_result_monophy(1) %>%
@@ -1208,7 +1207,7 @@ Only accessions identified to species included; environmental samples, hybrid fo
 
 # Make tibble of backbone tips with higher-level taxonomy
 sanger_clade_exemp_taxa <-
-  sanger_tree_dated %>%
+  sanger_con_tree_dated %>%
   ladderize() %>%
   get_tips_in_ape_plot_order() %>%
   tibble(species = .) %>%
@@ -1225,7 +1224,7 @@ sanger_clade_exemp_taxa <-
       outgroup == TRUE ~ "og",
       TRUE ~ major_clade)
   ) %>%
-# Make exemplar set of species in backbone representing plot groups
+  # Make exemplar set of species in backbone representing plot groups
   # Slice to one exemplar species per major clade
   group_by(major_clade) %>%
   slice(1) %>%
@@ -1306,7 +1305,7 @@ ftol_geom_cladelab <- function(code_select, offset_text) {
 }
 
 a <- ggtree(
-  sanger_tree_dated, layout = "circular", right = FALSE, size = 0.1) + 
+  sanger_con_tree_dated, layout = "circular", right = FALSE, size = 0.1) + 
   ftol_geom_cladelab(
     clade_tibble$code[clade_tibble$code %in% c("Eq", "Op", "Ma", "Os", "Gl")], 10) +
   ftol_geom_cladelab(
@@ -1382,7 +1381,7 @@ bs_tibble <- make_bs_tbl(phy) %>%
     bs == 100 ~ "",
     TRUE ~ as.character(bs)
   ))
-  
+
 # Make tibble for labeling clades
 phy_tip <- as_tibble(phy)
 
