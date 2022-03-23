@@ -38,7 +38,6 @@ editor_options:
   chunk_output_type: console
 params:
   doc_type: manual
-nocite: '@*'
 ---
 
 ---
@@ -110,7 +109,7 @@ tar_load(
     gb_species_by_year,
     other_dates,
     pteridocat_ppgi_diff_notes,
-    pteridocat_ppgi_diff_refs_out,
+    pteridocat_ppgi_diff_notes_file,
     ref_files,
     spermato_trees,
     accepted_species
@@ -148,6 +147,28 @@ source(temp_file, local = TRUE)
 fs::file_delete(temp_file)
 ```
 
+```{r load-pandoc, cache = FALSE}
+# Specify bibliography and CSL files for pandoc
+bib <- c(
+  here::here("ms/si_references.yaml"),
+  here::here("ms/si_references_other.yaml"),
+  here::here("ms/si_fossils.bib"))
+csl <- here::here("ms/frontiers.csl")
+```
+
+```{r extract-table-citations}
+# Make list of references cited in pteridocat vs. ppgi differences table
+# to include in bibliography
+table_citations <- extract_citations(pteridocat_ppgi_diff_notes_file)$key %>%
+  paste0("@", .) %>%
+  paste0(collapse = ", ")
+```
+
+---
+nocite: |
+  `r table_citations`
+---
+
 ```{r genera-diff-make}
 # FIXME: need to update ppgi csv file
 # Add one missing nothogenus
@@ -181,7 +202,7 @@ pteridocat_not_in_ppgi <-
   ) %>%
   # Add notes
   left_join(
-    select(pteridocat_ppgi_diff_notes, -ref, -n_species),
+    select(pteridocat_ppgi_diff_notes, -n_species),
     by = c("diff", "genus")
   ) %>%
   assert(not_na, note)
@@ -199,12 +220,18 @@ ppgi_not_in_pteridocat <-
   ) %>%
   # Add notes
   left_join(
-    select(pteridocat_ppgi_diff_notes, -ref), by = c("diff", "genus")
+    pteridocat_ppgi_diff_notes, by = c("diff", "genus")
   ) %>%
   assert(not_na, note)
 
 genera_diff_table <- 
-  bind_rows(pteridocat_not_in_ppgi, ppgi_not_in_pteridocat)
+  bind_rows(pteridocat_not_in_ppgi, ppgi_not_in_pteridocat) %>%
+  # Format references
+  mutate(note = cite_pd(
+    note, bib = bib, csl = csl, context = pteridocat_ppgi_diff_notes_file)) %>%
+  # Check that all notes have references properly formatted
+  # pandoc leaves a '?' if not
+  assert(function(x) str_detect(x, "\\?", negate = TRUE), note)
 ```
 
 ```{r genera-diff-save, eval = params$doc_type == "doc"}
@@ -217,10 +244,11 @@ Differences in genera included as accepted in Pteridocat taxonomic database (htt
 "diff" is type of difference (Pteridocat genus not in PPGI or PPGI genus not in Pteridocat).
 "n_species" is the number of accepted species in each genus (Pteridocat) or estimated number of species (PPGI).
 References in "notes" column provided at end of Supplementary Materials.
+"World Ferns" refers to @Hassler2022, which was modified to create Pteridocat.
 
 ```{r fossils-make}
-# Filter raw fossil data to just fossils used, write out as CSV
-fossils_table <-
+# Filter raw fossil data to just fossils used
+fossils_table_raw <-
   fossil_ferns_all %>%
   inner_join(
     unique(select(con_fossil_calibration_tips, n_fos)), by = "n_fos") %>%
@@ -232,8 +260,28 @@ fossils_table <-
     stratigraphic_age, 
     country, type_locality, formation,
     organs, specimen_holotype, collection,
-    reference
+    reference_raw = reference,
+    notes_on_affinities
   )
+
+# Write out list of cited refs as "context" file
+temp_context <- fs::path_abs(tempfile(fileext = ".txt"))
+
+fossils_table_raw %>%
+  select(reference_raw, notes_on_affinities) %>%
+  pivot_longer(everything()) %>%
+  filter(!is.na(value)) %>%
+  pull(value) %>%
+  write_lines(temp_context)
+
+# Format references with pandoc
+fossils_table <-
+fossils_table_raw %>%
+  mutate(reference = cite_pd(
+    reference_raw, bib = bib, csl = csl, context = temp_context)) %>%
+  select(-reference_raw, -notes_on_affinities)
+
+fs::file_delete(temp_context)
 ```
 
 ```{r fossils-save, eval = params$doc_type == "doc"}
@@ -761,3 +809,5 @@ ggplot(tt_data, aes(x = time, y = log_n_percent, color = dataset)) +
 Lineage through time (LTT) plots for the fern order Polypodiales (black; this study) and angiosperms [colored lines\; @Li2019; @Ramirez-Barahona2020].
 Angiosperm datasets labeled with "CC", "RC", or "UC" correspond to the six analysis schemes of @Ramirez-Barahona2020.
 Log number of lineages shown as percent of total to enable comparison across trees.
+
+## References

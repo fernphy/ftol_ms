@@ -281,32 +281,31 @@ references:
   title: Adetogramma (Polypodiaceae), a new monotypic fern genus segregated from Polypodium
   type: article-journal
   volume: '78'
-- id: Christenhusz2012
+- id: Applequist2019
   accessed:
   - year: 2022
-    month: 2
+    month: 3
     day: 23
   author:
-  - family: Christenhusz
-    given: Maarten J.M.
-  - family: Schneider
-    given: Harald
-  citation-key: Christenhusz2012
+  - family: Applequist
+    given: Wendy L.
+  citation-key: Applequist2019
   container-title: TAXON
-  container-title-short: Taxon
-  DOI: 10.1002/tax.612019
-  ISSN: '00400262'
-  issue: '2'
+  container-title-short: TAXON
+  DOI: 10.1002/tax.12113
+  ISSN: 0040-0262, 1996-8175
+  issue: '4'
   issued:
-  - year: 2012
-    month: 4
+  - year: 2019
+    month: 8
   language: en
-  page: 465-466
+  page: 847-854
   source: DOI.org (Crossref)
-  title: (2054) Proposal to conserve the name *Drynaria* against *Aglaomorpha* (Polypodiaceae)
+  title: 'Report of the Nomenclature Committee for Vascular Plants: 70'
+  title-short: Report of the Nomenclature Committee for Vascular Plants
   type: article-journal
-  URL: https://onlinelibrary.wiley.com/doi/10.1002/tax.612019
-  volume: '61'
+  URL: https://onlinelibrary.wiley.com/doi/10.1002/tax.12113
+  volume: '68'
 - id: Dong2018b
   accessed:
   - year: 2021
@@ -421,6 +420,25 @@ references:
   - year: 2021
   publisher: Botanical Research Institute of Texas Press
   title: A Generic Classification of the Thelypteridaceae
+  type: book
+- id: Fraser-Jenkins2016
+  author:
+  - family: Fraser-Jenkins
+    given: C. R.
+  - family: Gandhi
+    given: Kancheepuram N.
+  - family: Kholia
+    given: B. S.
+  call-number: QK522 .F73 2016
+  citation-key: Fraser-Jenkins2016
+  event-place: Dehra Dun (India)
+  ISBN: 978-81-211-0952-9 978-81-211-0982-6
+  issued:
+  - year: 2016
+  publisher: Bishen Singh Mahendra Pal Singh
+  publisher-place: Dehra Dun (India)
+  source: Library of Congress ISBN
+  title: An annotated checklist of Indian Pteridophytes
   type: book
 - id: George2019
   accessed:
@@ -596,6 +614,33 @@ references:
   type: article-journal
   URL: https://onlinelibrary.wiley.com/doi/10.1002/tax.12063
   volume: '68'
+- id: Parris2020
+  accessed:
+  - year: 2020
+    month: 5
+    day: 26
+  author:
+  - family: Parris
+    given: Barbara S.
+  - family: Sundue
+    given: Michael A.
+  citation-key: Parris2020
+  container-title: Phytotaxa
+  container-title-short: Phytotaxa
+  DOI: 10/ggw7cf
+  ISSN: 1179-3163, 1179-3155
+  issue: '1'
+  issued:
+  - year: 2020
+    month: 3
+    day: 16
+  page: 45-54
+  source: DOI.org (Crossref)
+  title: 'The fern genus Oreogrammitis (Grammitidoideae: Polypodiaceae) re-defined'
+  title-short: The fern genus Oreogrammitis (Grammitidoideae
+  type: article-journal
+  URL: https://www.biotaxa.org/Phytotaxa/article/view/phytotaxa.436.1.4
+  volume: '436'
 - id: PteridophytePhylogenyGroupI2016
   author:
   - literal: Pteridophyte Phylogeny Group I
@@ -639,29 +684,38 @@ references:
   type: article-journal
   URL: https://academic.oup.com/botlinnean/article-lookup/doi/10.1111/j.1095-8339.2008.00825.x
   volume: '157'
-- id: SHALISKO2019
+- id: Shalisko2019
+  accessed:
+  - year: 2022
+    month: 3
+    day: 23
   author:
-  - family: SHALISKO
-    given: VIACHESLAV
-  - family: SUNDUE
-    given: MICHAEL A.
-  - family: VILLALOBOS-ARÁMBULA
-    given: ALMA ROSA
-  - family: MUÑIZ-CASTRO
-    given: MIGUEL ÁNGEL
-  - family: VÁZQUEZ-GARCÍA
-    given: J. ANTONIO
-  citation-key: SHALISKO2019
+  - family: Shalisko
+    given: Viacheslav
+  - family: Sundue
+    given: Michael A.
+  - family: Villalobos-Arámbula
+    given: Alma Rosa
+  - family: Muñiz-Castro
+    given: Miguel Ángel
+  - family: Vázquez-García
+    given: J. Antonio
+  citation-key: Shalisko2019
   container-title: Phytotaxa
+  container-title-short: Phytotaxa
   DOI: 10.11646/phytotaxa.394.3.1
-  ISSN: 1179-3155
+  ISSN: 1179-3163, 1179-3155
   issue: '3'
   issued:
   - year: 2019
+    month: 3
+    day: 1
   page: '176'
+  source: DOI.org (Crossref)
   title: Taxonomic novelties in grammitid ferns (Polypodiaceae) from the Neotropics
     and Madagascar supported by molecular data
   type: article-journal
+  URL: https://biotaxa.org/Phytotaxa/article/view/phytotaxa.394.3.1
   volume: '394'
 - id: Shang2018
   author:
@@ -689,7 +743,7 @@ references:
   ISSN: '10959513'
   issued:
   - year: 2018
-  title: 'Hiya: A new genus segregated from Hypolepis in the fern family Dennstaedtiaceae,
+  title: '*Hiya*: A new genus segregated from *Hypolepis* in the fern family Dennstaedtiaceae,
     based on phylogenetic evidence and character evolution'
   type: article-journal
 - id: Testo2019
@@ -713,29 +767,34 @@ references:
     and the recognition of two new genera in Polypodiaceae subfamily Microsoroideae
   type: article-journal
   volume: '44'
-- id: Wang2010a
+- id: Wei2018
   author:
-  - family: Wang
-    given: Li
-  - family: Wu
-    given: Zhiqiang
-  - family: Xiang
-    given: Qiao-Ping
-  - family: Heinrichs
-    given: Jochen
-  - family: Schneider
-    given: Harald
+  - family: Wei
+    given: Ran
+  - family: Ebihara
+    given: Atsushi
+  - family: Zhu
+    given: Yan Mei
+  - family: Zhao
+    given: Cun Feng
+  - family: Hennequin
+    given: Sabine
   - family: Zhang
-    given: Xian-Chun
-  citation-key: Wang2010a
-  container-title: Botanical Journal of the Linnean Society
+    given: Xian Chun
+  citation-key: Wei2018
+  container-title: Molecular Phylogenetics and Evolution
+  DOI: 10.1016/j.ympev.2017.10.019
+  ISSN: '10959513'
+  issue: '20'
   issued:
-  - year: 2010
-  page: 28-38
-  title: A molecular phylogeny and a revised classification of tribe Lepisoreae (Polypodiaceae)
-    based on an analysis of four plastid DNA regions
+  - year: 2018
+  page: 25-36
+  PMID: '29111475'
+  title: A total-evidence phylogeny of the lady fern genus Athyrium Roth (Athyriaceae)
+    with a new infrageneric classification
   type: article-journal
-  volume: '162'
+  URL: https://doi.org/10.1016/j.ympev.2017.10.019
+  volume: '119'
 - id: Wilson2016a
   accessed:
   - year: 2022
@@ -835,3 +894,67 @@ references:
   type: article-journal
   URL: https://onlinelibrary.wiley.com/doi/10.1111/cla.12408
   volume: '36'
+- id: Zhao2019
+  author:
+  - family: Zhao
+    given: Cun Feng
+  - family: Wei
+    given: Ran
+  - family: Zhang
+    given: Xian Chun
+  - family: Xiang
+    given: Qiao Ping
+  citation-key: Zhao2019
+  container-title: Cladistics-the International Journal of The Willi Hennig Society
+  container-title-short: Cladistics
+  DOI: 10.1111/cla.12403
+  ISSN: '10960031'
+  issued:
+  - year: 2019
+  page: 1-24
+  title: Backbone phylogeny of Lepisorus (Polypodiaceae) and a novel infrageneric
+    classification based on the total evidence from plastid and morphological data
+  type: article-journal
+- id: Zhou2017
+  author:
+  - family: Zhou
+    given: Xin-Mao
+  - family: Zhang
+    given: Liang
+  - family: Chen
+    given: Cheng-Wei
+  - family: Li
+    given: Chun-Xiang
+  - family: Huang
+    given: Yao-Moan
+  - family: Chen
+    given: De-Kui
+  - family: Thi
+    given: Ngan
+  - family: Cicuzza
+    given: Daniele
+  - family: Knapp
+    given: Ralf
+  - family: Tam
+    given: Thien
+  - family: Nitta
+    given: Joel H.
+  - family: Gao
+    given: Xin-Fen
+  - family: Zhang
+    given: Li-Bing
+  citation-key: Zhou2017
+  container-title: Molecular Phylogenetics and Evolution
+  DOI: 10.1016/j.ympev.2017.06.020
+  ISSN: 1055-7903
+  issued:
+  - year: 2017
+    month: 7
+    day: 1
+  page: 271-294
+  title: '<span class="nocase">A plastid phylogeny and character evolution of the
+    Old World fern genus *Pyrrosia* (Polypodiaceae) with the description of a new
+    genus: *Hovenkampia* (Polypodiaceae)</span>'
+  type: article-journal
+  URL: http://dx.doi.org/10.1016/j.ympev.2017.06.020
+  volume: '114'

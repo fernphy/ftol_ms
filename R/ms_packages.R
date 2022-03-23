@@ -18,6 +18,7 @@ library(ggrepel)
 library(ggokabeito)
 library(ggtext)
 library(janitor)
+library(rmdref)
 
 # Resolve conflicts
 conflict_prefer("filter", "dplyr")
