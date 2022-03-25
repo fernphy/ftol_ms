@@ -890,6 +890,32 @@ references:
   title: Dynamism in plastome structure observed across the phylogenetic tree of ferns
   type: article-journal
   volume: '190'
+- id: Liu2013
+  author:
+  - family: Liu
+    given: Hong-mei
+  - family: Jiang
+    given: Ri-hong
+  - family: Guo
+    given: Jian
+  - family: Hovenkamp
+    given: Peter H.
+  - family: Perrie
+    given: Leon R
+  - family: Shepherd
+    given: Lara
+  - family: Hennequin
+    given: Sabine
+  - family: Schneider
+    given: Harald
+  citation-key: Liu2013
+  issue: August
+  issued:
+  - year: 2013
+  page: 688-700
+  title: Towards a phylogenetic classification of the climbing fern genus *Arthropteris*
+  type: article-journal
+  volume: '62'
 - id: Liu2020a
   accessed:
   - year: 2022
@@ -2111,6 +2137,22 @@ references:
   type: article-journal
   URL: http://www.pnas.org/cgi/doi/10.1073/pnas.1323926111
   volume: '111'
+- id: Zhang2015
+  author:
+  - family: Zhang
+    given: Li-Bing
+  - family: Zhang
+    given: Liang
+  citation-key: Zhang2015
+  DOI: 10.12705/641.4
+  ISSN: '00400262'
+  issue: February
+  issued:
+  - year: 2015
+  page: 27-38
+  title: 'Didymochlaenaceae : A new fern family of eupolypods I ( Polypodiales )'
+  type: article-journal
+  volume: '64'
 - id: Zhang2020
   author:
   - family: Zhang

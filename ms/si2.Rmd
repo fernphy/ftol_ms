@@ -30,7 +30,7 @@ header-includes:
   - \pagestyle{fancy}  # enable header
   - \fancypagestyle{plain}{\pagestyle{fancy}} # show header on first page
   - \renewcommand{\headrulewidth}{0pt} # delete line beneath header
-  - \fancyhead[RE,RO]{Supplementary Material} # add header on right side
+  - \fancyhead[RE,RO]{Supplementary Material 2} # add header on right side
   - \fancyhead[LO,LE]{} # suppress automatic section header on left side
   - \setlength{\headheight}{13.6pt}
   - \cfoot{\thepage} # footer
@@ -53,6 +53,11 @@ library(tidyverse)
 library(assertr)
 ```
 
+```{r load-functions-si-2, eval = params$doc_type == "manual"}
+# Load functions (only if running interactively)
+source("_targets.R")
+```
+
 ```{r load-targets-si-2}
 # Targets from MS workflow
 
@@ -61,11 +66,18 @@ library(assertr)
 ftol_cache <- here::here("working/_targets")
 
 tar_load(
-  con_fossil_calibration_tips,
-  store = ftol_cache
+  c(
+    con_fossil_calibration_tips,
+    fossil_ferns_raw,
+    fossil_ferns_all),
+  store = ftol_cache,
 )
 
-fossil_ferns_path <- fs::path(ftol_cache, "user/data_raw/Fossils_Ferns.csv")
+# Targets from MS workflow
+tar_load(
+  fossil_notes,
+  store = here::here("_targets")
+)
 ```
 
 ```{r load-captions-si2, cache = FALSE}
@@ -97,15 +109,12 @@ source(temp_file, local = TRUE)
 fs::file_delete(temp_file)
 ```
 
-```{r prep-fossil-data}
-# Read all fossils (including those not used in this study)
-# Get raw column names
-fossils_raw_names <- read_csv(fossil_ferns_path)
-# Load data with cleaned column names
-fossils_clean_names <- janitor::clean_names(fossils_raw_names)
+```{r tidy-fossil-data}
+# fossil_ferns_raw is read in from Fossils_Ferns.csv directly
+# fossil_ferns_all is same, but with clean names by janitor::clean_names()
 
 # Make tibble of fossil data categories
-raw_col_names <- colnames(fossils_raw_names)
+raw_col_names <- colnames(fossil_ferns_raw)
 fossils_categories <-
   tibble(raw_name = raw_col_names) %>%
   mutate(
@@ -121,24 +130,49 @@ fossils_categories <-
 
 # Get list of fossils used
 n_fos_used <-
-con_fossil_calibration_tips %>%
+  con_fossil_calibration_tips %>%
   filter(!is.na(n_fos)) %>%
   assert(is_uniq, n_fos) %>%
   select(n_fos)
 
 # Tidy fossils in wide format
 fossils <-
-  fossils_clean_names %>%
+  fossil_ferns_all %>%
   # Filter to only those actually used in the study
   inner_join(
     n_fos_used, by = "n_fos"
   ) %>%
-  verify(all(sort(.$n_fos) == sort(n_fos_used$n_fos)))
-  
+  verify(all(sort(.$n_fos) == sort(n_fos_used$n_fos))) %>%
+  # Replace with formatted data
+  select(
+    -node_calibrated, -full_taxon_name, 
+    -affinities, -notes_on_affinities, -notes_on_age) %>%
+  left_join(fossil_notes, by = "n_fos") %>%
+  # Put column names back in proper order
+  select(all_of(colnames(fossil_ferns_all)))
+```
+
+```{r write-new-formatted, eval = FALSE}
+# If needed, write out notes for further editing (if need to add new rows)
+fossil_ferns_all %>%
+  inner_join(
+    n_fos_used, by = "n_fos"
+  ) %>%
+  anti_join(fossil_notes, by = "n_fos") %>%
+  select(n_fos,
+         node_calibrated, full_taxon_name, 
+         affinities, notes_on_affinities, notes_on_age) %>%
+  bind_rows(fossil_notes) %>%
+  assert(is_uniq, n_fos) %>%
+  arrange(n_fos) %>%
+  write_csv(here::here("_targets/user/data_raw/fossils_used_formatted.csv"))
+```
+
+```{r format-for-printing}
 # Make a tibble of column names for formatting
 name_tbl <- tibble(
-  raw_name = colnames(fossils_raw_names),
-  var = colnames(fossils_clean_names)
+  raw_name = colnames(fossil_ferns_raw),
+  var = colnames(fossil_ferns_all)
 ) %>%
   right_join(
     tibble(var = colnames(fossils)), by = "var"
@@ -150,17 +184,19 @@ fossils_long <-
   fossils %>%
   mutate(
     across(everything(), as.character),
-    fossil_taxon_header = glue("†{fossil_taxon}")) %>%
+    fossil_taxon_header = fossil_taxon) %>%
   pivot_longer(names_to = "var", values_to = "value", -fossil_taxon) %>%
   left_join(name_tbl, by = "var") %>%
   mutate(
     text = as.character(glue::glue("{raw_name}: {value}"))
   ) %>%
   left_join(fossils_categories, by = "raw_name") %>%
-  arrange(fossil_taxon, category, var_order)
+  arrange(fossil_taxon, category, var_order) %>%
+  # Drop NA entries
+  filter(!is.na(value))
 ```
 
-These data are exported from the FernCal v1.0 database (https://github.com/pteridophy/FossilFerns), which includes `r nrow(fossils_clean_names)` records of fossils to use as calibration points for molecular dating of ferns.
+These data are exported from the FernCal v1.0 database (https://github.com/fernphy/ferncal), which includes `r nrow(fossil_ferns_raw)` records of fossils to use as calibration points for molecular dating of ferns.
 
 "NFos" is the unique ID of the record in FernCal.
 

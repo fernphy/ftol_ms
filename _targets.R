@@ -58,40 +58,6 @@ tmp <- capture.output({
   type = "message"
 )
 
-
-# tar_render(
-#   si_doc,
-#   "ms/si.Rmd",
-#   knit_root_dir = "ms",
-#   output_dir = "results",
-#   output_format = "bookdown::word_document2",
-#   params = list(doc_type = "doc")
-# ),
-# tar_render(
-#   si_pdf,
-#   "ms/si.Rmd",
-#   output_dir = "results",
-#   output_format = "bookdown::pdf_document2",
-#   params = list(doc_type = "pdf")
-# ),
-# tar_render(
-#   si_2_doc,
-#   "ms/si2.Rmd",
-#   knit_root_dir = "ms",
-#   output_dir = "results",
-#   output_format = "bookdown::word_document2",
-#   params = list(doc_type = "doc")
-# ),
-# tar_render(
-#   si_2_pdf,
-#   "ms/si2.Rmd",
-#   knit_root_dir = "ms",
-#   output_dir = "results",
-#   output_format = "bookdown::pdf_document2",
-#   params = list(doc_type = "pdf")
-# )
-
-
 tar_plan(
   
   # Load data ----
@@ -106,6 +72,12 @@ tar_plan(
   tar_file_read(
     pteridocat_ppgi_diff_notes,
     "_targets/user/data_raw/pteridocat_ppgi_diff_notes.csv",
+    readr::read_csv(file = !!.x)
+  ),
+  # - Formatted fossil notes
+  tar_file_read(
+    fossil_notes,
+    "_targets/user/data_raw/fossils_used_formatted.csv",
     readr::read_csv(file = !!.x)
   ),
   # - Seed plant trees from Barahona et al 2020
