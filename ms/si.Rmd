@@ -70,7 +70,11 @@ knitr::read_chunk(
 )
 ```
 
-```{r, formatters-si}
+```{r run-formatters-si, eval = params$doc_type == "manual"}
+source_chunk("formatters-si")
+```
+
+```{r formatters-si, eval = params$doc_type != "manual"}
 ```
 
 ```{r load-targets-si}
@@ -114,7 +118,9 @@ tar_load(
     pteridocat_ppgi_diff_notes_file,
     ref_files,
     spermato_trees,
-    accepted_species
+    ts_family_stem_ages,
+    accepted_species,
+    ftol_ts_comp_mod
   ),
   store = here::here("_targets")
 )
@@ -164,6 +170,23 @@ csl <- here::here("ms/frontiers.csl")
 table_citations <- extract_citations(pteridocat_ppgi_diff_notes_file)$key %>%
   paste0("@", .) %>%
   paste0(collapse = ", ")
+```
+
+```{r plot-prep-load}
+# Load the plot prep code from the main MS
+knitr::read_chunk(
+  here::here("ms/manuscript.Rmd"),
+  labels = "plot-prep-main",
+  from = "plot-prep start",
+  to = "plot-prep end"
+)
+```
+
+```{r run-plot-prep, eval = params$doc_type == "manual"}
+source_chunk("plot-prep-main")
+```
+
+```{r plot-prep-main, eval = params$doc_type != "manual"}
 ```
 
 ---
@@ -382,20 +405,6 @@ Non-monophyletic fern genera in FTOL (`r result_file(s_table("nonmono_gen"), "cs
 Status of intruders and outliers was determined using the default cutoff level (0.5) in the R package "MonoPhy" [@Schwery2016].
 
 \newpage
-
-```{r plot-prep-load}
-# Load the plot prep code from the main MS
-knitr::read_chunk(
-  here::here("ms/manuscript.Rmd"),
-  labels = "plot-prep-main",
-  from = "plot-prep start",
-  to = "plot-prep end"
-)
-```
-
-<!-- Run the plot prep code -->
-```{r plot-prep-main}
-```
 
 ```{r fossil-map-make}
 # Make tibble with node number and label for ggtree
@@ -719,6 +728,188 @@ Period name abbreviations as follows: FIXME.
 
 \newpage
 
+```{r comp-fossils, fig.width = 7, fig.height = 9, eval = params$doc_type != "manual"}
+ts_fossil_calibration_tips %>%
+  select(minimum_age, node_calibrated) %>%
+  mutate(dataset = "ts") %>%
+  bind_rows(
+    con_fossil_calibration_tips %>%
+      select(minimum_age, node_calibrated) %>%
+      mutate(dataset = "current")
+  ) %>%
+  mutate(node_calibrated = fct_reorder(node_calibrated, minimum_age)) %>%
+  ggplot(aes(x = minimum_age, y = node_calibrated, fill = dataset)) +
+  geom_col(position = position_dodge()) +
+  scale_x_continuous("Age (millions of years)", expand = expansion(mult = c(0,0.1))) +
+  theme_bw() +
+  scale_fill_manual(
+    values = c(current = "grey30", ts = "grey80"),
+    labels = c(current = "This Study", ts = "Testo and Sundue 2016")
+  ) +
+  theme(
+    axis.title.y = element_blank(),
+    legend.title = element_blank(),
+    legend.position = "bottom"
+  )
+```
+
+**`r s_figure("comp-fossils")`**.
+Age of nodes constrained by fossils in this study vs. @Testo2016a. Wide bars indicate the node was only constrained in one study; narrow bars indicate the the node was constrained in both studies.
+
+\newpage
+
+```{r comp-stem-ages, fig.width = 7, fig.height = 9, eval = params$doc_type != "manual"}
+# Combine family stem ages into almost-long format:
+# one row per family/study combination,
+# cols for median, high, and low date
+all_family_stem_ages <-
+  bind_rows(
+    subset_ages(other_dates, "ts"),
+    transmute(
+      ts_family_stem_ages,
+      family,
+      author = "current",
+      median = age
+    )
+  ) %>%
+  left_join(
+    unique(select(sanger_sampling, family, major_clade)), by = "family") %>%
+  left_join(clade_tibble, by = "major_clade") %>%
+  # (some median dates are NA if that family wasn't included in a study)
+  assert(not_na, family, major_clade, code, author) %>%
+  # Set family as a factor ordered by current age estimate
+  left_join(ts_family_stem_ages, by = "family") %>%
+  mutate(family = fct_reorder(family, age)) %>%
+  select(-age)
+
+# Format y-axis text: show major clade in parentheses
+family_labs_tbl <-
+  all_family_stem_ages %>%
+  select(family, code) %>%
+  unique() %>%
+  mutate(label = glue("{family} ({code})"))
+
+family_labs <- family_labs_tbl$label %>%
+  set_names(., family_labs_tbl$family)
+
+# Make plot
+ggplot(all_family_stem_ages) +
+  geom_pointrange(
+    aes(
+      x = median, xmin = low, xmax = high,
+      y = family,
+      color = author, shape = author),
+    position = position_dodge(width = 0.5)) +
+  scale_shape_manual(
+    values = ages_shapes,
+    limits = ages_sampling$source, 
+    labels = ages_sampling$label) +
+  scale_color_manual(
+    values = ages_colors,
+    limits = ages_sampling$source, 
+    labels = ages_sampling$label) +
+  scale_y_discrete(labels = family_labs, expand = expansion(add = 0.7)) +
+  scale_x_reverse("Age (millions of years)", expand = c(0,0)) +
+  coord_geo(
+    dat = list("periods", "eras"),
+    pos = list("b", "b"),
+    abbrv = list(TRUE, FALSE),
+    xlim = c(500, 0),
+    fill = "transparent",
+    color = "grey20",
+    lab_color = "grey30",
+    height = unit(1, "lines"),
+    expand = TRUE,
+    size = 3) +
+  guides(shape = guide_legend(nrow = 2)) +
+  theme_bw() +
+  theme(
+    axis.title.y = element_blank(),
+    legend.title = element_blank(),
+    legend.position = "bottom"
+  )
+```
+
+**`r s_figure("comp-stem-ages")`**.
+Comparison of stem age of fern families (Ma) estimated by @Testo2016a and those estimated using methodology (treePL) and phylogeny (FTOL) of the current study with the fossil constraints of @Testo2016a.
+For @Testo2016a, error bars indicate lower and upper 95% highest posterior density levels and point indicates median
+For this study, point indicates best (most likely) estimate.
+Codes in parentheses after family names indicate major clade as in `r figure("ftol")`.
+Period name abbreviations as in `r figure("divtimes")`.
+
+\newpage
+
+```{r comp-stem-points, fig.width = 6, fig.height = 5, eval = params$doc_type != "manual"}
+# For checking that model data is same as plot data
+mod_fitted_data <-
+ftol_ts_comp_mod %>%
+  broom::augment() %>%
+  arrange(ftol)
+
+mod_fitted_data_ts <-
+ftol_ts_comp_mod %>%
+  broom::augment() %>%
+  arrange(ts)
+
+# Make dataset for plotting
+comp_plot_data <-
+all_family_stem_ages %>%
+  filter(author == "ts") %>%
+  select(family, ts = median, ts_high = high, ts_low = low) %>%
+  inner_join(
+    filter(all_family_stem_ages, author == "current") %>%
+      select(family, ftol = median),
+    by = "family"
+  ) %>%
+  # Double check that model data is same as plot data
+  arrange(ftol) %>%
+  verify(all(.$ftol == mod_fitted_data$ftol)) %>%
+  arrange(ts) %>%
+  verify(all(.$ts == mod_fitted_data_ts$ts))
+
+# Extract R2 and P-value for linear mod
+stats <- ftol_ts_comp_mod %>%
+  broom::glance() %>%
+  mutate(label = glue::glue(
+    "*R*<sup>2</sup> = {number(r.squared, accuracy = 0.01)}\n
+    {pval} = {sci_number(p.value)}"
+  )) %>%
+  pull(label)
+
+# Extract fitted line for linear mod
+fitted <-
+broom::tidy(ftol_ts_comp_mod) %>%
+  mutate(term = janitor::make_clean_names(term)) %>%
+  split(.$term)
+
+ggplot(comp_plot_data, aes(y = ts, x = ftol)) +
+  geom_errorbar(aes(ymax = ts_high, ymin = ts_low)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1, color = "grey60", lty = 2) +
+  geom_abline(
+    intercept = fitted$intercept$estimate,
+    slope = fitted$ts$estimate, color = "grey20"
+  ) +
+  theme_bw() +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.1))) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+  labs(x = "This study", y = "Testo and Sundue (2016)") +
+  annotate(
+    "richtext", x = 0, y = Inf, 
+    label.color = NA,
+    label = stats, hjust = 0, vjust = 1)
+```
+
+**`r s_figure("comp-stem-points")`**.
+Comparison of stem age of fern families estimated by @Testo2016a and those estimated using methodology (treePL) and phylogeny (FTOL) of the current study with the fossil constraints of @Testo2016a.
+All units in millions of years (Ma).
+For @Testo2016a, error bars indicate lower and upper 95% highest posterior density levels and point indicates median.
+For this study, point indicates best (most likely) estimate.
+Dashed indicates 1:1 relationship.
+Solid line indicates linear model fit.
+
+\newpage
+
 ```{r ltt, fig.width = 7, fig.height = 6, eval = params$doc_type != "manual"}
 # Make lineages through time (LTT) plot comparing Angiosperms and polypods
 
@@ -813,5 +1004,7 @@ ggplot(tt_data, aes(x = time, y = log_n_percent, color = dataset)) +
 Lineage through time (LTT) plots for the fern order Polypodiales (black; this study) and angiosperms [colored lines\; @Li2019; @Ramirez-Barahona2020].
 Angiosperm datasets labeled with "CC", "RC", or "UC" correspond to the six analysis schemes of @Ramirez-Barahona2020.
 Log number of lineages shown as percent of total to enable comparison across trees.
+
+\newpage
 
 ## References

@@ -132,6 +132,11 @@ tar_plan(
     fs::path(ftol_cache, "objects/con_monophy_by_clade"),
     readRDS(file = !!.x)
   ),
+  tar_file_read(
+    ts_sanger_tree_dated,
+    fs::path(ftol_cache, "objects/ts_sanger_tree_dated"),
+    readRDS(file = !!.x)
+  ),
   
   # GenBank ----
   # Analyze number of fern accessions and species in GenBank by type of DNA 
@@ -191,6 +196,10 @@ tar_plan(
   # - Stem age of fern families
   family_stem_ages = get_stem_family_age(
     sanger_sampling, sanger_tree_dated, ppgi_taxonomy),
+  ts_family_stem_ages = get_stem_family_age(
+    sanger_sampling, ts_sanger_tree_dated, ppgi_taxonomy),
+  # - Model comparing T&S 2016 to FTOL estimated with T&S 2016 fossils
+  ftol_ts_comp_mod = fit_stem_comp_mod(other_dates, ts_family_stem_ages),
   # - Read in Du 2021 dates
   tar_file_read(
     du_dates_all,

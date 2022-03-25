@@ -94,6 +94,36 @@ references:
     Ages, and Relationships of Taxa
   type: article-journal
   URL: https://academic.oup.com/sysbio/article-lookup/doi/10.1093/sysbio/syw066
+- id: Bouckaert2014
+  author:
+  - family: Bouckaert
+    given: Remco
+  - family: Heled
+    given: Joseph
+  - family: Kühnert
+    given: Denise
+  - family: Vaughan
+    given: Tim
+  - family: Wu
+    given: Chieh Hsi
+  - family: Xie
+    given: Dong
+  - family: Suchard
+    given: Marc A.
+  - family: Rambaut
+    given: Andrew
+  - family: Drummond
+    given: Alexei J.
+  citation-key: Bouckaert2014
+  container-title: PLoS Computational Biology
+  DOI: 10.1371/journal.pcbi.1003537
+  ISSN: '15537358'
+  issued:
+  - year: 2014
+  PMID: '24722319'
+  title: 'BEAST 2: A software platform for bayesian evolutionary analysis'
+  type: article-journal
+  volume: '10'
 - id: Breinholt2021
   accessed:
   - year: 2021
@@ -187,6 +217,63 @@ references:
     analyses'
   type: article-journal
   volume: '25'
+- id: Chen1997
+  author:
+  - family: Chen
+    given: Fen
+  - family: Deng
+    given: Shenghui
+  - family: Sun
+    given: Keqin
+  citation-key: Chen1997
+  issued:
+  - year: 1997
+  source: Google Scholar
+  title: Early Cretaceous *Athyrium* Roth from northeastern China
+  type: article-journal
+- id: Deng2002
+  author:
+  - family: Deng
+    given: Shenghui
+  citation-key: Deng2002
+  container-title: Review of Palaeobotany and Palynology
+  DOI: 10.1016/S0034-6667(01)00131-2
+  issue: 1-2
+  issued:
+  - year: 2002
+  page: 93–112
+  publisher: Elsevier
+  source: Google Scholar
+  title: Ecology of the Early Cretaceous ferns of northeast China
+  type: article-journal
+  volume: '119'
+- id: Drummond2007
+  accessed:
+  - year: 2021
+    month: 9
+    day: 15
+  author:
+  - family: Drummond
+    given: Alexei J
+  - family: Rambaut
+    given: Andrew
+  citation-key: Drummond2007
+  container-title: BMC Evolutionary Biology
+  container-title-short: BMC Evol. Biol.
+  DOI: 10/cdzfjj
+  ISSN: 1471-2148
+  issue: '1'
+  issued:
+  - year: 2007
+  language: en
+  page: '214'
+  PMID: '17996036'
+  source: DOI.org (Crossref)
+  title: 'BEAST: Bayesian evolutionary analysis by sampling trees'
+  title-short: BEAST
+  type: article-journal
+  URL: http://bmcevolbiol.biomedcentral.com/articles/10.1186/1471-2148-7-214
+  volume: '7'
 - id: Du2021
   accessed:
   - year: 2022
@@ -1380,6 +1467,32 @@ references:
   - year: 2020
   title: 'R: A language and environment for statistical computing. 4.0.2'
   type: article-journal
+- id: Regalado2018a
+  author:
+  - family: Regalado
+    given: Ledis
+  - family: Schmidt
+    given: Alexander R.
+  - family: Krings
+    given: Michael
+  - family: Bechteler
+    given: Julia
+  - family: Schneider
+    given: Harald
+  - family: Heinrichs
+    given: Jochen
+  citation-key: Regalado2018a
+  container-title: Plant Systematics and Evolution
+  DOI: 10.1007/s00606-017-1439-2
+  issue: '1'
+  issued:
+  - year: 2018
+  page: 1–13
+  publisher: Springer
+  source: Google Scholar
+  title: Fossil evidence of eupolypod ferns in the mid-Cretaceous of Myanmar
+  type: article-journal
+  volume: '304'
 - id: Rothfels2012
   author:
   - family: Rothfels
@@ -1467,6 +1580,25 @@ references:
   type: article-journal
   URL: http://www.amjbot.org/content/early/2015/07/15/ajb.1500089
   volume: '102'
+- id: Rothwell2018
+  author:
+  - family: Rothwell
+    given: Gar W.
+  - family: Millay
+    given: Michael A.
+  - family: Stockey
+    given: Ruth A.
+  citation-key: Rothwell2018
+  container-title: American Journal of Botany
+  issue: '8'
+  issued:
+  - year: 2018
+  page: 1304–1314
+  publisher: Wiley Online Library
+  source: Google Scholar
+  title: Resolving the overall pattern of marattialean fern phylogeny
+  type: article-journal
+  volume: '105'
 - id: Ruhfel2014
   author:
   - family: Ruhfel
@@ -1494,6 +1626,25 @@ references:
   type: article-journal
   URL: http://www.pubmedcentral.nih.gov/articlerender.fcgi?artid=3933183&tool=pmcentrez&rendertype=abstract
   volume: '14'
+- id: Schneider2001
+  author:
+  - family: Schneider
+    given: Harald
+  - family: Kenrick
+    given: Paul
+  citation-key: Schneider2001
+  container-title: Review of Palaeobotany and Palynology
+  DOI: 10.1016/S0034-6667(01)00048-3
+  issue: 1-2
+  issued:
+  - year: 2001
+  page: 33–41
+  publisher: Elsevier
+  source: Google Scholar
+  title: An Early Cretaceous root-climbing epiphyte (Lindsaeaceae) and its significance
+    for calibrating the diversification of polypodiaceous ferns
+  type: article-journal
+  volume: '115'
 - id: Schneider2004d
   author:
   - family: Schneider
@@ -1519,6 +1670,26 @@ references:
   type: article-journal
   URL: papers://ebd7d3df-d8f1-4be8-bcf7-4fb07ababf30/Paper/p1859
   volume: '428'
+- id: Schneider2016c
+  author:
+  - family: Schneider
+    given: Harald
+  - family: Schmidt
+    given: Alexander R.
+  - family: Heinrichs
+    given: Jochen
+  citation-key: Schneider2016c
+  container-title: Perspectives in plant ecology, evolution and systematics
+  DOI: 10.1016/j.ppees.2016.01.003
+  issued:
+  - year: 2016
+  page: 70–78
+  publisher: Elsevier
+  source: Google Scholar
+  title: Burmese amber fossils bridge the gap in the Cretaceous record of polypod
+    ferns
+  type: article-journal
+  volume: '18'
 - id: Schoch2020
   accessed:
   - year: 2022

@@ -110,6 +110,7 @@ tar_load(
     fern_monophy_summ_tbl,
     fern_nonmono_gen,
     fossil_ferns_raw,
+    ftol_ts_comp_mod,
     gb_species_by_year,
     other_dates,
     plastome_iqtree_log,
@@ -897,17 +898,32 @@ Rather, conclusive resolution apparently still awaits additional sampling and pe
 
 ## Revisiting fossil calibration points in ferns
 
+```{r calibration-stats}
+ftol_ts_comp_stats <-
+ftol_ts_comp_mod %>%
+  broom::glance()
+```
+
 We recovered older crown ages for ferns and large clades therein, as well as older stem ages for families relative to previous studies (Figures `r figure_num("divtimes")`, `r s_figure_num("du-ages")`).
 This is almost certainly due to our use of a completely revised and greatly expanded set of fossil calibration points relative to previous studies, which not only resulted in a more densely constrained tree but also a higher number of fern families with minimum fossil ages.
+Our set of fossil calibration points did not add any extremely old fossils (> 200 Ma) that would be expected to strongly push back ages across the tree [save for stem Marattiaceae, which is well-known for its extensive fossil record\; @Rothwell2018]; rather, the vast majority of newly added calibration points are younger than 150 Ma (`r s_figure("comp-fossils")`).
+
 Several recent studies exploring divergence times across a global fern phylogeny all used a similar set of 24--26 fossil calibration points [@Schuettpelz2007b; @Testo2016a] or secondary calibration points based on studies using this set [@Rothfels2015a].
 However, we found inconsistencies in the application of these fossils due to differences in taxonomic concepts between the original fossil publication and the studies in which they were used.
 Moreover, our set of calibration points more than doubles the number used by previous studies.
 It is likely that this expanded sampling has yielded older estimates for the stem age of many families, whereas previous studies tended to estimate similar ages by re-using a similar, more limited set of calibration points (Figures `r figure_num("divtimes")`, `r s_figure_num("du-ages")`).
+To test this hypothesis, we conducted additional analysis using the fossil constraints of @Testo2016a but otherwise the exact same methods (FTOL analyzed with treePL).
+The resulting stem family ages show a much closer agreement with @Testo2016a (`r r2` = `r ftol_ts_comp_stats$r.squared %>% number(accuracy = 0.01)`, `r pval` = `r ftol_ts_comp_stats$p.value %>% sci_number()`, linear model; Figures `r s_figure_num("comp-stem-ages")`, `r s_figure_num("comp-stem-points")`), indicating that our expanded set of fossil calibration points, not differences in topology or dating methodology, is responsible for the older ages observed in the current study.
 
-Notably, the scenario of fern diversification suggested by our results strongly conflicts with the hypothesis that Polypodiales diversified in the shadow of angiosperms [@Schneider2004d].
+Notably, the scenario of fern diversification suggested by our results conflicts with the hypothesis that Polypodiales diversified "in the shadow of angiosperms" [@Schneider2004d].
 Rather, we estimate that polypod diversification occurred coincidentally or even preceding the diversification of angiosperms (`r s_figure("ltt")`).
+Our estimated age of (`r crown_ages$polypodiales` ma) for crown Polypodiales is considerably older than other recent studies [@Testo2016a; @Du2021] and the fossil record, which only dates back to the Early Cretaceous [@Schneider2001; @Chen1997; @Deng2002; @Schneider2016c; @Regalado2018a].
+Molecular ages that are significantly older than the fossil record should be treated with caution; yet, our study is in agreement with others in suggesting a "long fuse" between initial appearance of Polypodiales their subsequent diversification and widespread preservation in the fossil record [@Testo2016a; @Du2021].
 
-<<FIXME: add discussion of some specific groups once we have final ages>>
+Due to the large size of our dataset, carrying out more detailed molecular dating analyses (`r eg`, Bayesian analysis) is computationally difficult with currently available methods [`r eg`, BEAST\; @Drummond2007; @Bouckaert2014].
+Here, we have prioritized computational speed and simplicity, since we anticipate re-running the pipeline on a regular basis.
+We therefore consider our dated tree as a starting point, and not the final word, for a re-evaluation of divergence times in ferns.
+Future studies should focus on utilizing our greatly expanded fern fossil dataset to conduct more thorough molecular dating analyses, possibly including alternative schemes for the age of the root and testing the effects of parameters used for setting priors.
 
 ## Plastid vs. nuclear fern trees
 
@@ -1082,6 +1098,57 @@ clade_tibble <-
   verify(all(monophyly == "Yes")) %>%
   transmute(major_clade = taxon, mrca = parse_number(mrca)) %>%
   left_join(clade_cols_tib, by = "major_clade")
+
+### Prep for stem family age plots ###
+
+# Helper function for subsetting dates to get into
+# almost-long format
+subset_ages <- function(other_dates, author_sel) {
+  other_dates %>%
+    select(family, contains(glue("{author_sel}_"))) %>%
+    rename_with(~str_remove_all(., glue("{author_sel}_"))) %>%
+    mutate(author = author_sel)
+}
+
+# Define shapes and colors for points for stem family age plots
+ages_shapes <- c(
+  current = 16, # circle
+  rothfels = 17, # triangle
+  schuettpelz = 15, # square
+  ts = 18 # diamond
+)
+
+ages_colors <- c(
+  current = palette_okabe_ito(order = "vermillion"),
+  rothfels = palette_okabe_ito(order = "bluishgreen"),
+  schuettpelz = palette_okabe_ito(order = "blue"),
+  ts = palette_okabe_ito(order = "orange")
+)
+
+# Format names of papers for printing for stem family age plots
+ages_sampling <-
+  tribble(
+    ~source, ~year, ~label,
+    "schuettpelz", 2009, "Schuettpelz & Pryer 2009",
+    "rothfels", 2015, "Rothfels et al. 2015",
+    "ts", 2016, "Testo and Sundue 2016",
+    "current", 2021, "This study",
+  ) %>%
+  mutate(source = fct_reorder(source, year))
+
+
+# Provide names of periods in captions
+# Make sure to read and check that they are all there!
+period_names <-
+  periods %>%
+  # Filter to range including Ordovician to Neogene
+  filter(min_age < 475) %>%
+  filter(min_age > 1) %>%
+  arrange(desc(min_age)) %>%
+  mutate(label = glue("{abbr} ({name})")) %>%
+  pull(label) %>%
+  paste(collapse = ", ")
+
 ### plot-prep end
 ```
 
@@ -1542,21 +1609,10 @@ Colors of major clades (orders or suborders) correspond to those used in `r figu
 `r pagebreak_pdf(params)`
 
 ```{r div-times-make}
-# Convert family ages to almost-long format
-
-# Helper function for subsetting dates to get into
-# almost-long format
-subset_ages <- function(other_dates, author_sel) {
-  other_dates %>%
-    select(family, contains(glue("{author_sel}_"))) %>%
-    rename_with(~str_remove_all(., glue("{author_sel}_"))) %>%
-    mutate(author = author_sel)
-}
-
-# Combine dates in almost-long format:
+# Combine family stem ages into almost-long format:
 # one row per family/study combination,
 # cols for median, high, and low date
-all_ages <-
+all_family_stem_ages <-
   bind_rows(
     subset_ages(other_dates, "ts"),
     subset_ages(other_dates, "rothfels"),
@@ -1579,35 +1635,9 @@ all_ages <-
   mutate(family = fct_reorder(family, age)) %>%
   select(-age)
 
-# Define shapes and colors for points
-ages_shapes <- c(
-  current = 16, # circle
-  rothfels = 17, # triangle
-  schuettpelz = 15, # square
-  ts = 18 # diamond
-)
-
-ages_colors <- c(
-  current = palette_okabe_ito(order = "vermillion"),
-  rothfels = palette_okabe_ito(order = "bluishgreen"),
-  schuettpelz = palette_okabe_ito(order = "blue"),
-  ts = palette_okabe_ito(order = "orange")
-)
-
-# Format names of papers for printing
-ages_sampling <-
-  tribble(
-    ~source, ~year, ~label,
-    "schuettpelz", 2009, "Schuettpelz & Pryer 2009",
-    "rothfels", 2015, "Rothfels et al. 2015",
-    "ts", 2016, "Testo and Sundue 2016",
-    "current", 2021, "This study",
-  ) %>%
-  mutate(source = fct_reorder(source, year))
-
 # Format y-axis text: show major clade in parentheses
 family_labs_tbl <-
-  all_ages %>%
+  all_family_stem_ages %>%
   select(family, code) %>%
   unique() %>%
   mutate(label = glue("{family} ({code})"))
@@ -1615,20 +1645,9 @@ family_labs_tbl <-
 family_labs <- family_labs_tbl$label %>%
   set_names(., family_labs_tbl$family)
 
-# Provide names of periods in caption
-# Make sure to read and check that they are all there!
-period_names <-
-  periods %>%
-  # Filter to range including Ordovician to Neogene
-  filter(min_age < 475) %>%
-  filter(min_age > 1) %>%
-  arrange(desc(min_age)) %>%
-  mutate(label = glue("{abbr} ({name})")) %>%
-  pull(label) %>%
-  paste(collapse = ", ")
-
+# Make plot
 div_times_plot <-
-  ggplot(all_ages) +
+  ggplot(all_family_stem_ages) +
   geom_pointrange(
     aes(
       x = median, xmin = low, xmax = high,

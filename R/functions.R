@@ -946,12 +946,41 @@ make_nonmonophy_gen_tab <- function(
     select(family, subfamily, everything())
 }
 
+#' Fit a model comparing stem family ages estimated from Testo and Sundue (2016)
+#' fossils using FTOL vs. the original Testo and Sundue (2016) ages
+#'
+#' @param other_dates Tibble with fern family stem ages read in from
+#' Testo and Sundue (2016)
+#' @param ts_family_stem_ages Tibble with fern family stem ages estimated 
+#' from Testo and Sundue (2016) fossils using FTOL
+#'
+#' @return Model
+#' 
+fit_stem_comp_mod <- function(other_dates, ts_family_stem_ages) {
+  
+  # Filter to Testo and Sundue 2016 dates
+  ts_dates <- 
+    other_dates %>%
+    select(family, ts = ts_median)
+  
+  # Make dataset comparing dates
+  date_comp <-
+    select(ts_family_stem_ages, family, ftol = age) %>%
+    # Only include families in common between both datasets
+    inner_join(ts_dates, by = "family")
+  
+  # Construct linear model
+  lm(ftol ~ ts, data = date_comp)
+}
+
 # Formatting ----
 
 # Abbreviations
 ie <- "*i.e.*"
 eg <- "*e.g.*"
 ca <- "*ca.*"
+r2 <- "*R*^2^"
+pval <- "*P*"
 
 ### formatters start
 # Specify custom percentage format
@@ -959,6 +988,10 @@ percent <- function(...) {scales::percent(...)}
 
 # Specify custom number format
 number <- function(...) {scales::number(big.mark = ",", ...)}
+
+# Specify custom number format for scientific notation
+sci_number <- scales::label_scientific()
+
 ### formatters end
 
 #' Convert a data.frame of counts to percentages, with automatic formatting
@@ -1030,7 +1063,7 @@ print_fossil <- function(fossil_data, fossil_select) {
   c(header, body, md_rule())
 }
 
-# Figure output ----
+# Figures ----
 
 #' Generate a path to save a results file
 #' 
@@ -1336,4 +1369,34 @@ extract_iqtree_corr <- function(iqtree_log) {
     last() %>%
     str_match("Bootstrap correlation coefficient of split occurrence frequencies: ([^$]+)$") %>%
     magrittr::extract(,2)
+}
+
+#' Source a chunk of code read in with knitr::read_chunk()
+#' 
+#' This only works if knitr::read_chunk() has already been called to load
+#' a chunk of code into the current R session.
+#'
+#' @param chunk_name Character vector of length 1; the name of the chunk
+#' to `source()`
+#'
+#' @return Nothing; the chunk will be run.
+#' 
+source_chunk <- function(chunk_name) {
+  
+  current_chunks <- knitr::knit_code$get()
+  
+  assertthat::assert_that(
+    length(current_chunks) > 0,
+    msg = "No chunks in current session"
+  )
+  assertthat::assert_that(assertthat::is.string(chunk_name))
+  assertthat::assert_that(
+    chunk_name %in% names(current_chunks),
+    msg = "No chunk of that name in current session"
+  )
+  
+  temp_script <- tempfile(fileext = ".R")
+  write_lines(current_chunks[[chunk_name]], temp_script)
+  source(temp_script)
+  fs::file_delete(temp_script)
 }
