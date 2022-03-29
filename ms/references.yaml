@@ -1056,25 +1056,6 @@ references:
   type: article-journal
   URL: http://doi.wiley.com/10.1111/jse.12180
   volume: '53'
-- id: Maurin2020
-  accessed:
-  - year: 2022
-    month: 2
-    day: 15
-  author:
-  - family: Maurin
-    given: Kévin J. L.
-  citation-key: Maurin2020
-  container-title: arXiv:2008.07054 [q-bio]
-  issued:
-  - year: 2020
-    month: 8
-    day: 18
-  source: arXiv.org
-  title: An empirical guide for producing a dated phylogeny with treePL in a maximum
-    likelihood framework
-  type: article-journal
-  URL: http://arxiv.org/abs/2008.07054
 - id: Minh2013
   author:
   - family: Minh
@@ -2386,3 +2367,36 @@ references:
   type: article-journal
   URL: http://doi.wiley.com/10.12705/665.5
   volume: '66'
+- id: Zhou2018
+  accessed:
+  - year: 2020
+    month: 10
+    day: 14
+  author:
+  - family: Zhou
+    given: Xiaofan
+  - family: Shen
+    given: Xing-Xing
+  - family: Hittinger
+    given: Chris Todd
+  - family: Rokas
+    given: Antonis
+  citation-key: Zhou2018
+  container-title: Molecular Biology and Evolution
+  container-title-short: Mol Biol Evol
+  DOI: 10/gcmj27
+  ISSN: 0737-4038
+  issue: '2'
+  issued:
+  - year: 2018
+    month: 2
+    day: 1
+  language: en
+  page: 486-503
+  publisher: Oxford Academic
+  source: academic.oup.com
+  title: Evaluating Fast Maximum Likelihood-Based Phylogenetic Programs Using Empirical
+    Phylogenomic Data Sets
+  type: article-journal
+  URL: https://academic.oup.com/mbe/article/35/2/486/4644721
+  volume: '35'

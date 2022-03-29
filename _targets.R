@@ -7,8 +7,7 @@ library(glue)
 source("R/functions.R")
 
 # Specify path to FTOL cache
-# FIXME: change to ftol_cache when ready
-ftol_cache <- "working/_targets"
+ftol_cache <- here::here("ftol_cache")
 
 # Define Rmd targets outside of main workflow
 tmp <- capture.output({
@@ -74,10 +73,10 @@ tar_plan(
     "_targets/user/data_raw/pteridocat_ppgi_diff_notes.csv",
     readr::read_csv(file = !!.x)
   ),
-  # - Formatted fossil notes
+  # - Fossil ferns metadata
   tar_file_read(
-    fossil_notes,
-    "_targets/user/data_raw/fossils_used_formatted.csv",
+    fossil_meta,
+    "_targets/user/data_raw/fern_fossils_metadata.csv",
     readr::read_csv(file = !!.x)
   ),
   # - Seed plant trees from Barahona et al 2020
@@ -91,6 +90,12 @@ tar_plan(
     plastome_iqtree_log,
     fs::path(ftol_cache, "user/intermediates/iqtree/plastome/plastome_alignment.phy.log"), #nolint
     readr::read_lines(file = !!.x)
+  ),
+  # original log file from first, single Sanger run
+  tar_file_read(
+    sanger_iqtree_log_2000, # 2000 iterations were run total
+    fs::path(ftol_cache, "user/intermediates/iqtree/sanger/sanger_alignment.phy.2022-02-23.log"), #nolint
+    readr::read_lines(file = !!.x),
   ),
   tar_file_read(
     sanger_iqtree_log,

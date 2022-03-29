@@ -82,14 +82,13 @@ source_chunk("formatters-si")
 
 # Specify path to FTOL cache
 # FIXME: change to ftol_cache when ready
-ftol_cache <- here::here("working/_targets")
+ftol_cache <- here::here("ftol_cache")
 
 tar_load(
   c(
     acc_table_long,
     con_fossil_calibration_tips,
     con_fossil_calibrations_for_treepl,
-    fossil_ferns_raw,
     fossil_ferns_all,
     plastome_seqs_combined_filtered,
     plastome_tree,
@@ -272,28 +271,15 @@ References in "notes" column provided at end of Supplementary Materials.
 "World Ferns" refers to @Hassler2022, which was modified to create Pteridocat.
 
 ```{r fossils-make}
-# Filter raw fossil data to just fossils used
-fossils_table_raw <-
-  fossil_ferns_all %>%
-  inner_join(
-    unique(select(con_fossil_calibration_tips, n_fos)), by = "n_fos") %>%
-  verify(nrow(.) == nrow(con_fossil_calibration_tips)) %>%
-  select(
-    n_fos, minimum_age, node_calibrated, fossil_taxon, 
-    lower = lower_limit_of_oldest_stratigraphic_age,
-    upper = upper_limit_of_oldest_stratigraphic_age,
-    stratigraphic_age, 
-    country, type_locality, formation,
-    organs, specimen_holotype, collection,
-    reference_raw = reference,
-    notes_on_affinities
-  )
-
 # Write out list of cited refs as "context" file
 temp_context <- fs::path_abs(tempfile(fileext = ".txt"))
 
-fossils_table_raw %>%
-  select(reference_raw, notes_on_affinities) %>%
+fossil_ferns_all %>%
+  # Filter raw fossil data to just fossils used
+  inner_join(
+    unique(select(con_fossil_calibration_tips, n_fos)), by = "n_fos") %>%
+  verify(nrow(.) == nrow(con_fossil_calibration_tips)) %>%
+  select(where(is.character)) %>%
   pivot_longer(everything()) %>%
   filter(!is.na(value)) %>%
   pull(value) %>%
@@ -301,10 +287,25 @@ fossils_table_raw %>%
 
 # Format references with pandoc
 fossils_table <-
-fossils_table_raw %>%
+  fossil_ferns_all %>%
+  # Filter raw fossil data to just fossils used
+  inner_join(
+    unique(select(con_fossil_calibration_tips, n_fos)), by = "n_fos") %>%
+  verify(nrow(.) == nrow(con_fossil_calibration_tips)) %>%
+  # Select columns
+  select(
+    n_fos, minimum_age, node_calibrated, fossil_taxon, 
+    lower = lower_limit_of_oldest_stratigraphic_age,
+    upper = upper_limit_of_oldest_stratigraphic_age,
+    stratigraphic_age, 
+    country, type_locality, formation,
+    organs, specimen_holotype, collection,
+    reference_raw = reference
+  ) %>%
+  # Format references
   mutate(reference = cite_pd(
     reference_raw, bib = bib, csl = csl, context = temp_context)) %>%
-  select(-reference_raw, -notes_on_affinities) %>%
+  select(-reference_raw) %>%
   # Make sure all references in the table have entries in the bibliography
   assert(function(x) str_detect(x, "\\?", negate = TRUE), reference)
 
@@ -513,7 +514,7 @@ ggsave(
   limitsize = FALSE)
 ```
 
-**`r s_figure("bs")`**.
+**`r s_figure("backbone_full")`**.
 Consensus plastome (backbone) phylogeny (`r result_file(s_figure("backbone_full"), "pdf") %>% fs::path_file()`).
 Values at nodes are bootstrap support (%); only values less than 100% are shown.
 
@@ -836,8 +837,6 @@ For @Testo2016a, error bars indicate lower and upper 95% highest posterior densi
 For this study, point indicates best (most likely) estimate.
 Codes in parentheses after family names indicate major clade as in `r figure("ftol")`.
 Period name abbreviations as in `r figure("divtimes")`.
-
-\newpage
 
 ```{r comp-stem-points, fig.width = 6, fig.height = 5, eval = params$doc_type != "manual"}
 # For checking that model data is same as plot data

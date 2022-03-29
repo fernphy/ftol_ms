@@ -1046,7 +1046,7 @@ print_fossil <- function(fossil_data, fossil_select) {
   # Print name of fossil as header in italics
   header <-
     data %>% 
-    filter(var == "fossil_taxon_header") %>%
+    filter(variable == "fossil_taxon_header") %>%
     pull(value) %>%
     str_replace_all("_", " ") %>%
     md_italic() %>%
