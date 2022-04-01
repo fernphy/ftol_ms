@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.1.2",
+    "Version": "4.1.3",
     "Repositories": [
       {
         "Name": "CRAN",
@@ -1036,6 +1036,13 @@
       "Repository": "CRAN",
       "Hash": "11359a5bb73622ab3f4136bf57108b64"
     },
+    "pdftools": {
+      "Package": "pdftools",
+      "Version": "3.1.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "1642aa8121ffbcf0e82fbdcd6fedd685"
+    },
     "phangorn": {
       "Package": "phangorn",
       "Version": "2.8.1",
@@ -1140,6 +1147,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "97def703420c8ab10d8f0e6c72101e02"
+    },
+    "qpdf": {
+      "Package": "qpdf",
+      "Version": "1.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "5a2907cd44279b5861ac5f813465b5c9"
     },
     "quadprog": {
       "Package": "quadprog",
