@@ -10,3 +10,5 @@ _targets
 ~*.docx
 *.log
 .DS_Store
+.aux
+.out
