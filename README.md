@@ -48,4 +48,5 @@ Testo WL, Sundue MA (2016) A 4000-species dataset provides new insight into the 
 - Code: [MIT](LICENSE)
 - Data (files in `_targets/user/data_raw`): [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/)
 - Preprint: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
-- [Roboto font](https://github.com/google/roboto/): [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0)
+- [Roboto font](https://github.com/google/roboto/): [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0)
+- [R Logo](https://www.r-project.org/logo/): [CC-BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
