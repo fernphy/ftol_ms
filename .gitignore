@@ -9,3 +9,4 @@ results
 _targets
 ~*.docx
 *.log
+.DS_Store
