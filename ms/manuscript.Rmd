@@ -1276,11 +1276,12 @@ Only accessions identified to species included; environmental samples, hybrid fo
 `r pagebreak_pdf(params)`
 
 ```{r workflow-save, eval = params$doc_type == "doc" }
-# Copy workflow image if rendering to doc
-fs::file_copy(
-  here::here("images/workflow.tiff"),
-  result_file(figure("workflow"), "tiff"),
-  overwrite = TRUE)
+# Convert workflow image to tiff for submission
+pdftools::pdf_convert(
+  pdf = here::here("images/workflow.pdf"),
+  filenames = result_file(figure("workflow"), "tiff"),
+  format = "tiff",
+  dpi = 300)
 ```
 
 ```{r workflow-print, fig.width = 7, fig.height = 5, eval = params$doc_type == "pdf", results = "show"}
@@ -1417,7 +1418,7 @@ a <- ggtree(
     width = 100, # 100 Ma
     fontsize = 2, 
     y = 5600, # Just above "top" of tree
-    label = "100 Ma", 
+    label = "100 my", 
     offset = 1000, # hack to get default scale width (lacks units) to go away
     offset.label = -10) +
   theme(legend.position = "none")
