@@ -2,6 +2,17 @@ FROM rocker/verse:4.1.3
 
 ARG DEBIAN_FRONTEND=noninteractive
 
+############################
+### Install APT packages ###
+############################
+
+# libpoppler-cpp-dev for pdftools
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    libpoppler-cpp-dev \
+  && apt-get clean
+
 ####################################
 ### Install R packages with renv ###
 ####################################
