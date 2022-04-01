@@ -26,17 +26,3 @@ references:
   - year: 2009
   title: 'Darwin Core. Biodiversity Information Standards (TDWG)'
   URL: http://www.tdwg.org/standards/450
-  
-- id: Nitta2021
-  type: webpage
-  accessed:
-  - year: 2022
-    month: 1
-    day: 1
-  author:
-  - family: Nitta
-    given: Joel H.
-  issued:
-  - year: 2021
-  title: 'taxastand: Taxonomic name standardization in R. R Package Version 0.0.0.9000'
-  URL: https://doi.org/10.5281/zenodo.5726391

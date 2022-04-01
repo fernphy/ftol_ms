@@ -81,7 +81,6 @@ source_chunk("formatters-si")
 # Targets from FTOL workflow
 
 # Specify path to FTOL cache
-# FIXME: change to ftol_cache when ready
 ftol_cache <- here::here("ftol_cache")
 
 tar_load(
@@ -211,7 +210,7 @@ accepted_species %>%
   anti_join(select(ppgi_taxonomy_mod, genus, notes), by = "genus") %>%
   verify(nrow(.) == 0, success_fun = success_logical)
 
-# Make table of Pteridocat genera not in PPGI
+# Make table of pteridocat genera not in PPGI
 pteridocat_not_in_ppgi <-
   accepted_species %>%
   count(genus, name = "n_species") %>%
@@ -220,7 +219,7 @@ pteridocat_not_in_ppgi <-
   assert(is_uniq, genus) %>%
   filter(notes != "original PPGI 2016") %>%
   transmute(
-    diff = "Pteridocat not in PPGI",
+    diff = "pteridocat not in PPGI",
     genus,
     n_species
   ) %>%
@@ -231,7 +230,7 @@ pteridocat_not_in_ppgi <-
   ) %>%
   assert(not_na, note)
 
-# Make table of PPGI genera not in Pteridocat
+# Make table of PPGI genera not in pteridocat
 ppgi_not_in_pteridocat <-
   ppgi_taxonomy_mod %>%
   filter(notes == "original PPGI 2016",
@@ -239,7 +238,7 @@ ppgi_not_in_pteridocat <-
   anti_join(accepted_species, by = "genus") %>%
   count(genus) %>%
   transmute(
-    diff = "PPGI not in Pteridocat",
+    diff = "PPGI not in pteridocat",
     genus
   ) %>%
   # Add notes
@@ -264,11 +263,11 @@ write_csv(genera_diff_table, result_file(s_table("genera_diff"), "csv"))
 ```
 
 **`r s_table("genera_diff")`**.
-Differences in genera included as accepted in Pteridocat taxonomic database (https://github.com/pteridophy/pteridocat) vs. PPGI [@PteridophytePhylogenyGroupI2016] (`r result_file(s_table("genera_diff"), "csv") %>% fs::path_file()`).
-"diff" is type of difference (Pteridocat genus not in PPGI or PPGI genus not in Pteridocat).
-"n_species" is the number of accepted species in each genus (Pteridocat) or estimated number of species (PPGI).
+Differences in genera included as accepted in "pteridocat" taxonomic database v0.0.1 (https://github.com/fernphy/pteridocat) vs. PPGI [@PteridophytePhylogenyGroupI2016] (`r result_file(s_table("genera_diff"), "csv") %>% fs::path_file()`).
+"diff" is type of difference (pteridocat genus not in PPGI or PPGI genus not in pteridocat).
+"n_species" is the number of accepted species in each genus (pteridocat) or estimated number of species (PPGI).
 References in "notes" column provided at end of Supplementary Materials.
-"World Ferns" refers to @Hassler2022, which was modified to create Pteridocat.
+"World Ferns" refers to @Hassler2022, which was modified to create pteridocat.
 
 ```{r fossils-make}
 # Write out list of cited refs as "context" file
@@ -318,8 +317,8 @@ write_csv(fossils_table, result_file(s_table("fossils"), "csv"))
 
 **`r s_table("fossils")`**.
 Fossils used as calibration points for molecular dating (`r result_file(s_table("fossils"), "csv") %>% fs::path_file()`).
-"n_fos" is the fossil ID number used in our fossil database (https://github.com/pteridophy/fossils).
-"minimum_age" (Ma) is the age used for calibration; "lower" is the lower limit of the oldest stratigraphic age for the fossil; "upper" is the upper limit of the oldest stratigraphic age for the fossil.
+"n_fos" is the fossil ID number used in the "ferncal" database v1.0.0 (https://github.com/fernphy/ferncal).
+"minimum_age" is the age used for calibration (Ma); "lower" is the lower limit of the oldest stratigraphic age for the fossil (Ma); "upper" is the upper limit of the oldest stratigraphic age for the fossil (Ma).
 For detailed notes and full references for each fossil, see Appendix S2.
 
 ```{r accs-save, eval = params$doc_type == "doc"}
@@ -330,8 +329,8 @@ write_csv(acc_table_long, result_file(s_table("accs"), "csv"))
 GenBank accessions used in this study (`r result_file(s_table("accs"), "csv") %>% fs::path_file()`).
 "species" is the species name as it appears in the phylogenetic tree.
 "seq_len" is the total number of bases excluding missing bases ("?", "N", or "-") and only includes bases belonging to loci used in this study (not the entire accession).
-"sci_name" is the scientific name in the Pteridocat taxonomic database.
-"ncbi_name" is the scientific name used in the NCBI taxonomic database.
+"sci_name" is the scientific name in the pteridocat taxonomic database.
+"ncbi_name" is the scientific name used in the NCBI taxonomic database version 2022-02-01.
 "ncbi_taxid" is the NCBI taxonomy database unique identifier.
 "outgroup_status" is "in" for ingroup taxa (ferns) and "out" for outgroup taxa.
 
@@ -453,7 +452,7 @@ ggsave(
 ```
 
 **`r s_figure("fossil_map")`**.
-Maximum likelihood fern phylongey with node labels indicating placement of fossil constraints (`r result_file(s_figure("fossil_map"), "pdf") %>% fs::path_file()`).
+Consensus phylogeny (Sanger dataset) with node labels indicating placement of fossil constraints (`r result_file(s_figure("fossil_map"), "pdf") %>% fs::path_file()`).
 Number for each constraint is age in Ma.
 
 \newpage
@@ -524,23 +523,8 @@ Values at nodes are bootstrap support (%); only values less than 100% are shown.
 phy <- sanger_con_tree_rooted
 
 # Make tibble for printing BS values
-bs_tibble <- make_bs_tbl(phy)
-
-# Make plot
-# optional: round version
-bs_plot_round <- 
-  ggtree(
-    phy,
-    layout = "circular",
-    branch.length = "none", 
-    size = 0.1, color = "grey30") %<+% bs_tibble +
-  # Add node points
-  geom_nodepoint(
-    aes(color = bs), size = 0.2) +
-  scale_color_viridis_c(
-    "BS",
-    option = "B", na.value = "transparent",
-    breaks = 0.25*0:4, labels = percent(0.25*0:4))
+bs_tibble <- make_bs_tbl(phy) %>%
+  mutate(bs = bs*0.01) # so percentages print correctly
 
 # Make plot
 bs_plot <- 
@@ -553,7 +537,8 @@ bs_plot <-
   scale_color_viridis_c(
     "BS",
     option = "B", na.value = "transparent",
-    breaks = 0.25*0:4, labels = percent(0.25*0:4)) +
+    labels = scales::percent
+    ) +
   # Add tip labels
   geom_tiplab(aes(label = label), size = 0.5, color = "grey30") +
   theme(legend.position = "bottom")
@@ -562,13 +547,14 @@ bs_plot <-
 ```{r bs-save, eval = params$doc_type == "doc"}
 ggsave(
   plot = bs_plot,
-  file = (result_file(s_figure("bs"), "pdf")),
+  file = result_file(s_figure("bs"), "pdf"),
   height = 60, width = 8, units = "in",
   limitsize = FALSE)
 ```
 
 **`r s_figure("bs")`**.
 Consensus phylogeny (Sanger dataset) with node labels showing bootstrap support (%) (`r result_file(s_figure("bs"), "pdf") %>% fs::path_file()`).
+Darker colors indicate lower support.
 The backbone (plastome) phylogeny was used as a constraint tree, so all clades present in the backbone phylogeny tree receive 100% bootstrap support.
 
 \newpage
@@ -659,7 +645,7 @@ du_ages_shapes[du_ages_shapes == 3] <- 6
 du_ages_sampling <-
   tribble(
     ~source, ~year, ~label,
-    "schuettpelz", 2009, "Schuettpelz & Pryer 2009",
+    "schuettpelz", 2009, "Schuettpelz and Pryer 2009",
     "rothfels", 2015, "Rothfels et al. 2015",
     "ts", 2016, "Testo and Sundue 2016",
     "current", 2021, "This study",
@@ -722,10 +708,10 @@ ggplot(all_ages_with_du) +
 **`r s_figure("du-ages")`**.
 Stem age of fern families (Ma) estimated by selected studies, only including families that were sampled across all studies.
 For studies that used methods with confidence intervals, error bars indicate lower and upper 95% highest posterior density levels and point indicates median [@Rothfels2015a; @Testo2016a; @Du2021].
-For other studies, point indicates best (most likely) estimate [@Schuettpelz2007b\; this study].
+For other studies, point indicates best (most likely) estimate [@Schuettpelz2009\; this study].
 @Du2021 used six different dating schemes; for details, see that paper.
 Codes in parentheses after family names indicate major clade as in `r figure("ftol")`.
-Period name abbreviations as follows: FIXME.
+Period name abbreviations as in `r figure("divtimes")`.
 
 \newpage
 
@@ -750,6 +736,7 @@ ts_fossil_calibration_tips %>%
   theme(
     axis.title.y = element_blank(),
     legend.title = element_blank(),
+    axis.text.y = element_text(size = 6),
     legend.position = "bottom"
   )
 ```
@@ -802,13 +789,19 @@ ggplot(all_family_stem_ages) +
       color = author, shape = author),
     position = position_dodge(width = 0.5)) +
   scale_shape_manual(
-    values = ages_shapes,
-    limits = ages_sampling$source, 
-    labels = ages_sampling$label) +
+    values = ages_shapes[c("ts", "current")],
+    limits = c("ts", "current"), 
+    labels = ages_sampling %>% 
+      filter(source %in% c("current", "ts")) %>%
+      arrange(source) %>%
+      pull(label)) +
   scale_color_manual(
-    values = ages_colors,
-    limits = ages_sampling$source, 
-    labels = ages_sampling$label) +
+    values = ages_colors[c("ts", "current")],
+    limits = c("ts", "current"), 
+    labels = ages_sampling %>% 
+      filter(source %in% c("current", "ts")) %>%
+      arrange(source) %>%
+      pull(label)) +
   scale_y_discrete(labels = family_labs, expand = expansion(add = 0.7)) +
   scale_x_reverse("Age (millions of years)", expand = c(0,0)) +
   coord_geo(
@@ -837,6 +830,8 @@ For @Testo2016a, error bars indicate lower and upper 95% highest posterior densi
 For this study, point indicates best (most likely) estimate.
 Codes in parentheses after family names indicate major clade as in `r figure("ftol")`.
 Period name abbreviations as in `r figure("divtimes")`.
+
+\newpage
 
 ```{r comp-stem-points, fig.width = 6, fig.height = 5, eval = params$doc_type != "manual"}
 # For checking that model data is same as plot data
@@ -1001,7 +996,7 @@ ggplot(tt_data, aes(x = time, y = log_n_percent, color = dataset)) +
 
 **`r s_figure("ltt")`**.
 Lineage through time (LTT) plots for the fern order Polypodiales (black; this study) and angiosperms [colored lines\; @Li2019; @Ramirez-Barahona2020].
-Angiosperm datasets labeled with "CC", "RC", or "UC" correspond to the six analysis schemes of @Ramirez-Barahona2020.
+Angiosperm datasets labeled with "CC", "RC", or "UC" correspond to the six analysis schemes of @Ramirez-Barahona2020; for details, see that paper.
 Log number of lineages shown as percent of total to enable comparison across trees.
 
 \newpage

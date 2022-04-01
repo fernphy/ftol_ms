@@ -24,7 +24,7 @@ references:
   citation-key: Du2021
   container-title: Cladistics
   container-title-short: Cladistics
-  DOI: 10/gpb22j
+  DOI: 10.1111/cla.12457
   ISSN: 0748-3007, 1096-0031
   issue: '5'
   issued:
@@ -35,7 +35,6 @@ references:
   source: DOI.org (Crossref)
   title: Simultaneous diversification of Polypodiales and angiosperms in the Mesozoic
   type: article-journal
-  URL: https://onlinelibrary.wiley.com/doi/10.1111/cla.12457
   volume: '37'
 - id: Li2019
   accessed:
@@ -205,18 +204,27 @@ references:
   page: 1-19
   title: The evolutionary history of ferns inferred from 25 low-copy nuclear genes
   type: article-journal
-  URL: http://www.amjbot.org/content/early/2015/07/15/ajb.1500089
   volume: '102'
-- id: Schuettpelz2007b
+- id: Schuettpelz2009
   author:
   - family: Schuettpelz
     given: Eric
-  citation-key: Schuettpelz2007b
+  - family: Pryer
+    given: Kathleen M
+  citation-key: Schuettpelz2009
+  container-title: Proceedings of the National Academy of Sciences of the United States
+    of America
+  DOI: 10.1073/pnas.0811136106
+  ISSN: 1091-6490
+  issue: '27'
   issued:
-  - year: 2007
-  title: The evolution and diversification of epiphytic ferns
+  - year: 2009
+    month: 7
+  page: 11200-11205
+  PMID: '19567832'
+  title: Evidence for a Cenozoic radiation of ferns in an angiosperm-dominated canopy
   type: article-journal
-  URL: papers://ebd7d3df-d8f1-4be8-bcf7-4fb07ababf30/Paper/p598
+  volume: '106'
 - id: Schwery2016
   accessed:
   - year: 2022
@@ -229,7 +237,7 @@ references:
     given: Brian C.
   citation-key: Schwery2016
   container-title: PeerJ Computer Science
-  DOI: 10/gg42w8
+  DOI: 10.7717/peerj-cs.56
   ISSN: 2376-5992
   issued:
   - year: 2016
@@ -238,10 +246,9 @@ references:
   language: en
   page: e56
   source: DOI.org (Crossref)
-  title: '*MonoPhy* : a simple R package to find and visualize monophyly issues'
+  title: 'MonoPhy: a simple R package to find and visualize monophyly issues'
   title-short: '*MonoPhy*'
   type: article-journal
-  URL: https://peerj.com/articles/cs-56
   volume: '2'
 - id: Testo2016a
   author:
@@ -259,7 +266,6 @@ references:
   PMID: '27621129'
   title: A 4000-species dataset provides new insight into the evolution of ferns
   type: article-journal
-  URL: http://dx.doi.org/10.1016/j.ympev.2016.09.003
   volume: '105'
 - id: Almeida2017
   author:
@@ -278,7 +284,8 @@ references:
   issued:
   - year: 2017
   page: 109-131
-  title: Adetogramma (Polypodiaceae), a new monotypic fern genus segregated from Polypodium
+  title: '*Adetogramma* (Polypodiaceae), a new monotypic fern genus segregated from
+    Polypodium'
   type: article-journal
   volume: '78'
 - id: Applequist2019
@@ -488,8 +495,7 @@ references:
     given: Harald
   citation-key: Liu2020a
   container-title: Journal of Systematics and Evolution
-  container-title-short: J. Syst. Evol.
-  DOI: 10/ghcrgh
+  DOI: 10.1111/jse.12641
   ISSN: 1674-4918, 1759-6831
   issue: '6'
   issued:
@@ -501,7 +507,6 @@ references:
   title: Evaluating the status of fern and lycophyte nothotaxa in the context of the
     Pteridophyte Phylogeny Group classification (PPG I)
   type: article-journal
-  URL: https://onlinelibrary.wiley.com/doi/10.1111/jse.12641
   volume: '58'
 - id: Liu2020c
   accessed:

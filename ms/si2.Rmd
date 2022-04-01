@@ -155,11 +155,11 @@ fossils_long <-
   filter(!is.na(value))
 ```
 
-These data are exported from the FernCal v1.0 database (https://github.com/fernphy/ferncal), which includes `r nrow(fossil_ferns_raw)` records of fossils to use as calibration points for molecular dating of ferns.
+These data are exported from the FernCal v1.0.0 database (https://github.com/fernphy/ferncal), which includes records of fossils to use as calibration points for molecular dating of ferns.
 
 "NFos" is the unique ID of the record in FernCal.
 
-Taxonomy of extant taxa follows pteridocat v1.0 database (https://github.com/pteridophy/pteridocat).
+Taxonomy of extant taxa follows pteridocat v0.0.1 database (https://github.com/fernphy/pteridocat).
 
 For a summary of these data in CSV format, see `r s_table("fossils")`.
 
