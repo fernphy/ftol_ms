@@ -1,6 +1,6 @@
 # ftol_ms
 
-Code to generate the manuscript "An open and continuously updated fern tree of life (FTOL)" Nitta et al. 2022.
+Code to generate the manuscript "An open and continuously updated fern tree of life (FTOL)" Nitta et al. 2022. https://doi.org/10.1101/2022.03.31.486640 
 
 ## Data
 
