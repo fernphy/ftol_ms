@@ -189,28 +189,17 @@ nocite: |
 ---
 
 ```{r genera-diff-make}
-# FIXME: need to update ppgi csv file
-# Add one missing nothogenus
-ppgi_taxonomy_mod <-
-  bind_rows(
-    ppgi_taxonomy,
-    tibble(
-      genus = "Phlebosia",
-      notes = "Nothogenus"
-    )
-  )
-
 # Verify that all accepted genera are accounted for
 accepted_species %>%
   count(genus, name = "n_species") %>%
-  anti_join(select(ppgi_taxonomy_mod, genus, notes), by = "genus") %>%
+  anti_join(select(ppgi_taxonomy, genus, notes), by = "genus") %>%
   verify(nrow(.) == 0, success_fun = success_logical)
 
 # Make table of pteridocat genera not in PPGI
 pteridocat_not_in_ppgi <-
   accepted_species %>%
   count(genus, name = "n_species") %>%
-  left_join(select(ppgi_taxonomy_mod, genus, notes), by = "genus") %>%
+  left_join(select(ppgi_taxonomy, genus, notes), by = "genus") %>%
   assert(not_na, notes) %>%
   assert(is_uniq, genus) %>%
   filter(notes != "original PPGI 2016") %>%
@@ -228,7 +217,7 @@ pteridocat_not_in_ppgi <-
 
 # Make table of PPGI genera not in pteridocat
 ppgi_not_in_pteridocat <-
-  ppgi_taxonomy_mod %>%
+  ppgi_taxonomy %>%
   filter(notes == "original PPGI 2016",
          class == "Polypodiopsida") %>%
   anti_join(accepted_species, by = "genus") %>%
