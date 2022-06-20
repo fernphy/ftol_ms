@@ -48,6 +48,8 @@ pteridocat not in PPGI,Spicantopsis,3,Included in Struthiopteris in @Pteridophyt
 pteridocat not in PPGI,Strophocaulon,2,"New genus established in a recently revised classification of Thelypteridaceae [@Fawcett2021]"
 pteridocat not in PPGI,Woodsimatium,1,"New nothogenus [@Liu2020a]"
 pteridocat not in PPGI,Zealandia,4,"New genus segregated from Microsorum [@Testo2019]"
+pteridocat not in PPGI,Dryopolystichum,5,"Recently placed in Lomariopsidaceae [@Chen2017]"
+pteridocat not in PPGI,Mineirella,4,"New genus segregated from Cheilanthes [@Ponce2022]"
 PPGI not in pteridocat,Aglaomorpha,50,See Drynaria above
 PPGI not in pteridocat,Allosorus,8,"Proposal to reject pending [@Applequist2019]"
 PPGI not in pteridocat,Arthromeris,8,Species treated in Selliguea or Pichisermollodes in World Ferns
@@ -65,3 +67,4 @@ PPGI not in pteridocat,Themelium,29,"Species treated in Oreogrammitis in World F
 PPGI not in pteridocat,Thysanosoria,1,Species treated in Lomariopsis in World Ferns
 PPGI not in pteridocat,Tricholepidium,1,"Species treated in Lepisorus in World Ferns, following @Zhao2019"
 PPGI not in pteridocat,Zygophlebia,11,"Species treated in Enterosora in World Ferns, following @Shalisko2019"
+PPGI not in pteridocat,Lemmaphyllum,11,"Species treated in Lepisorus in World Ferns, following @Zhao2019"
