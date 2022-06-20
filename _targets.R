@@ -58,7 +58,6 @@ tmp <- capture.output({
 )
 
 tar_plan(
-  
   # Load data ----
   # - Dates from Testo and Sundue 2016 SI
   # (includes Rothfels 2015, Schuettpelz & Pryer 2009)
@@ -123,18 +122,16 @@ tar_plan(
     readRDS(file = !!.x)
   ),
   tar_file_read(
-    ppgi_taxonomy,
+    ppgi_taxonomy_raw,
     fs::path(ftol_cache, "objects/ppgi_taxonomy"),
     readRDS(file = !!.x)
   ),
+  # FIXME: Fix ppgi to treat Dryopolystichum as Lomariopsis
+  # can remove this once https://github.com/fernphy/ftol/issues/16 is resolved
+  ppgi_taxonomy = fix_ppgi(ppgi_taxonomy_raw),
   tar_file_read(
     pteridocat,
     fs::path(ftol_cache, "objects/pteridocat"),
-    readRDS(file = !!.x)
-  ),
-  tar_file_read(
-    con_monophy_by_clade,
-    fs::path(ftol_cache, "objects/con_monophy_by_clade"),
     readRDS(file = !!.x)
   ),
   tar_file_read(
@@ -142,7 +139,11 @@ tar_plan(
     fs::path(ftol_cache, "objects/ts_sanger_tree_dated"),
     readRDS(file = !!.x)
   ),
-  
+  tar_file_read(
+    og_to_drop,
+    fs::path(ftol_cache, "objects/og_to_drop"),
+    readRDS(file = !!.x)
+  ),
   # GenBank ----
   # Analyze number of fern accessions and species in GenBank by type of DNA 
   # (plastid, mitochondrial, or nuclear)
@@ -161,7 +162,7 @@ tar_plan(
   # - Load NCBI taxonomy
   tar_file_read(
     ncbi_names,
-    fs::path(ftol_cache, "user/data_raw/taxdmp_2022-02-01.zip"),
+    "_targets/user/data_raw/taxdmp_2022-02-01.zip",
     load_ncbi_names(taxdump_zip_file = !!.x, taxid_keep = unique(gb_taxa$taxid))
   ),
   # - Count number of species and accessions in GenBank
@@ -184,9 +185,10 @@ tar_plan(
     plastome_tree, sanger_sampling, accepted_species, "total_sampling"),
   
   # Analyze monophyly and ages ----
-  # - Make Sanger sampling table
+  # - Make Sanger sampling table, not including Zygnema
   sanger_sampling = make_sanger_sampling_tbl(
-    plastome_metadata_renamed,
+    plastome_metadata_renamed = filter(
+      plastome_metadata_renamed, species != og_to_drop),
     sanger_tree = sanger_tree_dated,
     ppgi_taxonomy = ppgi_taxonomy),
   # - Crown age of various clades
@@ -200,9 +202,13 @@ tar_plan(
       ., sanger_sampling, sanger_tree_dated)),
   # - Stem age of fern families
   family_stem_ages = get_stem_family_age(
-    sanger_sampling, sanger_tree_dated, ppgi_taxonomy),
+    filter(sanger_sampling, species != og_to_drop),
+    sanger_tree_dated,
+    ppgi_taxonomy),
   ts_family_stem_ages = get_stem_family_age(
-    sanger_sampling, ts_sanger_tree_dated, ppgi_taxonomy),
+    filter(sanger_sampling, species != og_to_drop),
+    ts_sanger_tree_dated,
+    ppgi_taxonomy),
   # - Model comparing T&S 2016 to FTOL estimated with T&S 2016 fossils
   ftol_ts_comp_mod = fit_stem_comp_mod(other_dates, ts_family_stem_ages),
   # - Read in Du 2021 dates
@@ -212,6 +218,20 @@ tar_plan(
     parse_du_dates(du_2021_si_path = !!.x)
   ),
   # Summarize fern monophyly
+  # FIXME: run this here until ppgi taxonomy gets fixed
+  # then can load con_monophy_by_clade from ftol_cache
+  taxa_levels_check <- c(
+    "order", "suborder", "family", "subfamily", "genus"
+  ),
+  con_mono_test = assess_monophy(
+    taxon_sampling = sanger_sampling,
+    tree = sanger_tree_dated,
+    tax_levels = taxa_levels_check
+  ),
+  con_monophy_by_clade = map_df(
+    seq_along(taxa_levels_check),
+    ~get_result_monophy(con_mono_test, .)
+  ),
   # - filter to ferns, add taxonomic levels
   fern_con_monophy_by_clade_tax_level = add_tax_levels_to_monophyly(
     con_monophy_by_clade, ppgi_taxonomy, sanger_sampling
