@@ -1206,6 +1206,35 @@ make_bs_tbl <- function(phy) {
 
 # Etc -----
 
+# Work-around for tar_load()
+# for some reason, doesn't work with tar_load(store = ftol_cache)
+read_from_cache <- function(object, cache) {
+  readRDS(
+    fs::path(cache,
+    glue::glue("objects/{object}"))
+  )
+}
+
+#' Correct PPGI taxonomy
+#'
+#' @param ppgi_taxonomy Dataframe; PPGI taxonomy with incorrect entry for
+#' Dryopolystichum
+#'
+#' @return ppgi_taxonomy with correct data for Dryopolystichum
+fix_ppgi <- function(ppgi_taxonomy) {
+  ppgi_taxonomy %>%
+    mutate(
+      family = case_when(
+        genus == "Dryopolystichum" ~ "Lomariopsidaceae",
+        TRUE ~ family
+      ),
+      notes = case_when(
+        genus == "Dryopolystichum" ~ "Updated classification Chen et al 2017 Phytokeys",
+        TRUE ~ notes
+      )
+    )
+}
+
 #' Function to get support value in BS%
 #'
 #' @param phy an object of class "phylo".

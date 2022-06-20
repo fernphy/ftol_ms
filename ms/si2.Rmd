@@ -59,16 +59,15 @@ source("_targets.R")
 ```
 
 ```{r load-targets-si-2}
-# Targets from MS workflow
+# Targets from FTOL workflow
 
 # Specify path to FTOL cache
 ftol_cache <- here::here("ftol_cache")
 
-tar_load(
-  c(
-    con_fossil_calibration_tips,
-    fossil_ferns_raw),
-  store = ftol_cache,
+con_fossil_calibration_tips <- read_from_cache(
+  "con_fossil_calibration_tips", ftol_cache)
+fossil_ferns_raw <- read_from_cache(
+  "fossil_ferns_raw", ftol_cache
 )
 
 # Targets from MS workflow

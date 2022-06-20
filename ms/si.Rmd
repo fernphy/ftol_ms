@@ -83,25 +83,18 @@ source_chunk("formatters-si")
 # Specify path to FTOL cache
 ftol_cache <- here::here("ftol_cache")
 
-tar_load(
-  c(
-    acc_table_long,
-    con_fossil_calibration_tips,
-    con_fossil_calibrations_for_treepl,
-    fossil_ferns_all,
-    plastome_seqs_combined_filtered,
-    plastome_tree,
-    plastome_tree_rooted,
-    ppgi_taxonomy,
-    sanger_accessions_selection,
-    sanger_sampling,
-    sanger_con_tree_dated,
-    sanger_con_tree_rooted,
-    sanger_alignment_tbl,
-    ts_fossil_calibration_tips
-  ),
-  store = ftol_cache
-)
+acc_table_long <- read_from_cache("acc_table_long", ftol_cache)
+con_fossil_calibration_tips <- read_from_cache("con_fossil_calibration_tips", ftol_cache) # nolint
+con_fossil_calibrations_for_treepl <- read_from_cache("con_fossil_calibrations_for_treepl", ftol_cache) # nolint
+fossil_ferns_all <- read_from_cache("fossil_ferns_all", ftol_cache)
+plastome_seqs_combined_filtered <- read_from_cache("plastome_seqs_combined_filtered", ftol_cache) # nolint
+plastome_tree <- read_from_cache("plastome_tree", ftol_cache)
+plastome_tree_rooted <- read_from_cache("plastome_tree_rooted", ftol_cache)
+sanger_accessions_selection <- read_from_cache("sanger_accessions_selection", ftol_cache) # nolint
+sanger_con_tree_dated <- read_from_cache("sanger_con_tree_dated", ftol_cache)
+sanger_con_tree_rooted <- read_from_cache("sanger_con_tree_rooted", ftol_cache)
+sanger_alignment_tbl <- read_from_cache("sanger_alignment_tbl", ftol_cache)
+ts_fossil_calibration_tips <- read_from_cache("ts_fossil_calibration_tips", ftol_cache) # nolint
 
 # Targets from MS workflow
 tar_load(
@@ -118,7 +111,10 @@ tar_load(
     spermato_trees,
     ts_family_stem_ages,
     accepted_species,
-    ftol_ts_comp_mod
+    ftol_ts_comp_mod,
+    ppgi_taxonomy,
+    sanger_tree_dated,
+    sanger_sampling
   ),
   store = here::here("_targets")
 )
