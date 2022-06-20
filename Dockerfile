@@ -1,4 +1,4 @@
-FROM rocker/verse:4.1.3
+FROM rocker/verse:4.2.0
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -12,6 +12,9 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends \
     libpoppler-cpp-dev \
   && apt-get clean
+
+# Install languageserver for vscode
+RUN Rscript -e 'install.packages("languageserver")'
 
 ####################################
 ### Install R packages with renv ###
@@ -50,5 +53,13 @@ RUN wget https://github.com/gnames/gnparser/releases/download/v$VERSION/gnparser
   && tar xf $APP_NAME-v$VERSION-linux.tar.gz \
   && rm $APP_NAME-v$VERSION-linux.tar.gz \
   && mv "$APP_NAME" /usr/local/bin/
+
+###########################################
+### Install latex packages with tinytex ###
+###########################################
+
+COPY install_latex.R .
+
+RUN Rscript install_latex.R
 
 WORKDIR /home/rstudio/

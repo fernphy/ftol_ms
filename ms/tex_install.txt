@@ -1,0 +1,168 @@
+tlmgr: package repository https://ctan.mirrors.hoobly.com/systems/texlive/tlnet (not verified: gpg unavailable)
+[1/2, ??:??/??:??] install: amsmath [31k]
+[2/2, 00:01/00:01] install: latex-amsmath-dev [31k]
+running mktexlsr ...
+done running mktexlsr.
+running mtxrun --generate ...
+done running mtxrun --generate.
+tlmgr: package log updated: /opt/texlive/texmf-var/web2c/tlmgr.log
+tlmgr: command log updated: /opt/texlive/texmf-var/web2c/tlmgr-commands.log
+tlmgr: package repository https://ctan.mirrors.hoobly.com/systems/texlive/tlnet (not verified: gpg unavailable)
+[1/1, ??:??/??:??] install: iftex [4k]
+running mktexlsr ...
+done running mktexlsr.
+running mtxrun --generate ...
+done running mtxrun --generate.
+tlmgr: package log updated: /opt/texlive/texmf-var/web2c/tlmgr.log
+tlmgr: command log updated: /opt/texlive/texmf-var/web2c/tlmgr-commands.log
+tlmgr: package repository https://ctan.mirrors.hoobly.com/systems/texlive/tlnet (not verified: gpg unavailable)
+[1/5, ??:??/??:??] install: euenc [4k]
+[2/5, 00:01/15:09] install: fontspec [27k]
+[3/5, 00:02/03:18] install: tipa [2809k]
+[4/5, 00:05/00:05] install: unicode-math [42k]
+[5/5, 00:06/00:06] install: xunicode [26k]
+running mktexlsr ...
+done running mktexlsr.
+running mtxrun --generate ...
+done running mtxrun --generate.
+running updmap-sys ...
+done running updmap-sys.
+tlmgr: package log updated: /opt/texlive/texmf-var/web2c/tlmgr.log
+tlmgr: command log updated: /opt/texlive/texmf-var/web2c/tlmgr-commands.log
+tlmgr: package repository https://ctan.mirrors.hoobly.com/systems/texlive/tlnet (not verified: gpg unavailable)
+[1/1, ??:??/??:??] install: kvoptions [7k]
+running mktexlsr ...
+done running mktexlsr.
+running mtxrun --generate ...
+done running mtxrun --generate.
+tlmgr: package log updated: /opt/texlive/texmf-var/web2c/tlmgr.log
+tlmgr: command log updated: /opt/texlive/texmf-var/web2c/tlmgr-commands.log
+tlmgr: package repository https://ctan.mirrors.hoobly.com/systems/texlive/tlnet (not verified: gpg unavailable)
+[1/1, ??:??/??:??] install: ltxcmds [5k]
+running mktexlsr ...
+done running mktexlsr.
+running mtxrun --generate ...
+done running mtxrun --generate.
+tlmgr: package log updated: /opt/texlive/texmf-var/web2c/tlmgr.log
+tlmgr: command log updated: /opt/texlive/texmf-var/web2c/tlmgr-commands.log
+tlmgr: package repository https://ctan.mirrors.hoobly.com/systems/texlive/tlnet (not verified: gpg unavailable)
+[1/1, ??:??/??:??] install: kvsetkeys [4k]
+running mktexlsr ...
+done running mktexlsr.
+running mtxrun --generate ...
+done running mtxrun --generate.
+tlmgr: package log updated: /opt/texlive/texmf-var/web2c/tlmgr.log
+tlmgr: command log updated: /opt/texlive/texmf-var/web2c/tlmgr-commands.log
+tlmgr: package repository https://ctan.mirrors.hoobly.com/systems/texlive/tlnet (not verified: gpg unavailable)
+[1/1, ??:??/??:??] install: etoolbox [9k]
+running mktexlsr ...
+done running mktexlsr.
+running mtxrun --generate ...
+done running mtxrun --generate.
+tlmgr: package log updated: /opt/texlive/texmf-var/web2c/tlmgr.log
+tlmgr: command log updated: /opt/texlive/texmf-var/web2c/tlmgr-commands.log
+tlmgr: package repository https://ctan.mirrors.hoobly.com/systems/texlive/tlnet (not verified: gpg unavailable)
+[1/1, ??:??/??:??] install: xcolor [17k]
+running mktexlsr ...
+done running mktexlsr.
+running mtxrun --generate ...
+done running mtxrun --generate.
+tlmgr: package log updated: /opt/texlive/texmf-var/web2c/tlmgr.log
+tlmgr: command log updated: /opt/texlive/texmf-var/web2c/tlmgr-commands.log
+tlmgr: package repository https://ctan.mirrors.hoobly.com/systems/texlive/tlnet (not verified: gpg unavailable)
+[1/16, ??:??/??:??] install: auxhook [2k]
+[2/16, 00:00/00:00] install: bigintcalc [7k]
+[3/16, 00:01/00:25] install: bitset [6k]
+[4/16, 00:02/00:29] install: etexcmds [3k]
+[5/16, 00:03/00:37] install: gettitlestring [3k]
+[6/16, 00:03/00:32] install: hycolor [4k]
+[7/16, 00:04/00:35] install: hyperref [89k]
+[8/16, 00:05/00:09] install: intcalc [6k]
+[9/16, 00:06/00:10] install: kvdefinekeys [3k]
+[10/16, 00:07/00:11] install: letltxmacro [3k]
+[11/16, 00:08/00:13] install: pdfescape [5k]
+[12/16, 00:08/00:12] install: refcount [3k]
+[13/16, 00:09/00:14] install: rerunfilecheck [4k]
+[14/16, 00:10/00:15] install: stringenc [23k]
+[15/16, 00:11/00:14] install: uniquecounter [3k]
+[16/16, 00:11/00:14] install: zapfding [46k]
+running mktexlsr ...
+done running mktexlsr.
+running mtxrun --generate ...
+done running mtxrun --generate.
+running updmap-sys ...
+done running updmap-sys.
+tlmgr: package log updated: /opt/texlive/texmf-var/web2c/tlmgr.log
+tlmgr: command log updated: /opt/texlive/texmf-var/web2c/tlmgr-commands.log
+tlmgr: package repository https://ctan.mirrors.hoobly.com/systems/texlive/tlnet (not verified: gpg unavailable)
+[1/1, ??:??/??:??] install: pdftexcmds [7k]
+running mktexlsr ...
+done running mktexlsr.
+running mtxrun --generate ...
+done running mtxrun --generate.
+tlmgr: package log updated: /opt/texlive/texmf-var/web2c/tlmgr.log
+tlmgr: command log updated: /opt/texlive/texmf-var/web2c/tlmgr-commands.log
+tlmgr: package repository https://ctan.mirrors.hoobly.com/systems/texlive/tlnet (not verified: gpg unavailable)
+[1/1, ??:??/??:??] install: infwarerr [3k]
+running mktexlsr ...
+done running mktexlsr.
+running mtxrun --generate ...
+done running mtxrun --generate.
+tlmgr: package log updated: /opt/texlive/texmf-var/web2c/tlmgr.log
+tlmgr: command log updated: /opt/texlive/texmf-var/web2c/tlmgr-commands.log
+tlmgr: package repository https://ctan.mirrors.hoobly.com/systems/texlive/tlnet (not verified: gpg unavailable)
+[1/1, ??:??/??:??] install: geometry [9k]
+running mktexlsr ...
+done running mktexlsr.
+running mtxrun --generate ...
+done running mtxrun --generate.
+tlmgr: package log updated: /opt/texlive/texmf-var/web2c/tlmgr.log
+tlmgr: command log updated: /opt/texlive/texmf-var/web2c/tlmgr-commands.log
+tlmgr: package repository https://ctan.mirrors.hoobly.com/systems/texlive/tlnet (not verified: gpg unavailable)
+[1/1, ??:??/??:??] install: booktabs [3k]
+running mktexlsr ...
+done running mktexlsr.
+running mtxrun --generate ...
+done running mtxrun --generate.
+tlmgr: package log updated: /opt/texlive/texmf-var/web2c/tlmgr.log
+tlmgr: command log updated: /opt/texlive/texmf-var/web2c/tlmgr-commands.log
+tlmgr: package repository https://ctan.mirrors.hoobly.com/systems/texlive/tlnet (not verified: gpg unavailable)
+[1/1, ??:??/??:??] install: mdwtools [19k]
+running mktexlsr ...
+done running mktexlsr.
+running mtxrun --generate ...
+done running mtxrun --generate.
+tlmgr: package log updated: /opt/texlive/texmf-var/web2c/tlmgr.log
+tlmgr: command log updated: /opt/texlive/texmf-var/web2c/tlmgr-commands.log
+tlmgr: package repository https://ctan.mirrors.hoobly.com/systems/texlive/tlnet (not verified: gpg unavailable)
+[1/1, ??:??/??:??] install: float [3k]
+running mktexlsr ...
+done running mktexlsr.
+running mtxrun --generate ...
+done running mtxrun --generate.
+tlmgr: package log updated: /opt/texlive/texmf-var/web2c/tlmgr.log
+tlmgr: command log updated: /opt/texlive/texmf-var/web2c/tlmgr-commands.log
+tlmgr: package repository https://ctan.mirrors.hoobly.com/systems/texlive/tlnet (not verified: gpg unavailable)
+[1/1, ??:??/??:??] install: colortbl [4k]
+running mktexlsr ...
+done running mktexlsr.
+running mtxrun --generate ...
+done running mtxrun --generate.
+tlmgr: package log updated: /opt/texlive/texmf-var/web2c/tlmgr.log
+tlmgr: command log updated: /opt/texlive/texmf-var/web2c/tlmgr-commands.log
+tlmgr: package repository https://ctan.mirrors.hoobly.com/systems/texlive/tlnet (not verified: gpg unavailable)
+[1/1, ??:??/??:??] install: fancyhdr [6k]
+running mktexlsr ...
+done running mktexlsr.
+running mtxrun --generate ...
+done running mtxrun --generate.
+tlmgr: package log updated: /opt/texlive/texmf-var/web2c/tlmgr.log
+tlmgr: command log updated: /opt/texlive/texmf-var/web2c/tlmgr-commands.log
+tlmgr: package repository https://ctan.mirrors.hoobly.com/systems/texlive/tlnet (not verified: gpg unavailable)
+[1/1, ??:??/??:??] install: multirow [3k]
+running mktexlsr ...
+done running mktexlsr.
+running mtxrun --generate ...
+done running mtxrun --generate.
+tlmgr: package log updated: /opt/texlive/texmf-var/web2c/tlmgr.log
+tlmgr: command log updated: /opt/texlive/texmf-var/web2c/tlmgr-commands.log
