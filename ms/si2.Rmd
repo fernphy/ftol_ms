@@ -46,7 +46,8 @@ bibliography:
 ---
 
 ```{r setup-rmd, include = FALSE}
-knitr::opts_chunk$set(echo = FALSE, include = FALSE, warning = FALSE, message = FALSE, results = 'hide')
+knitr::opts_chunk$set(echo = FALSE, include = FALSE,
+  warning = FALSE, message = FALSE, results = "hide")
 library(glue)
 library(gluedown)
 library(tidyverse)
@@ -80,8 +81,7 @@ tar_load(
 ```
 
 ```{r load-captions-si2, cache = FALSE}
-# Source captions numbers from MS
-# 
+# Source captions numbers from MS.
 # So that caption numbers are in order of appearance in MS
 
 # Run inline code when purling

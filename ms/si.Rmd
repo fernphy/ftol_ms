@@ -48,7 +48,8 @@ bibliography:
 
 ```{r setup-si, include = FALSE}
 knitr::opts_chunk$set(
-  echo = FALSE, warning = FALSE, message = FALSE, results = 'hide')
+  echo = FALSE, warning = FALSE, message = FALSE, results = "hide",
+  cache = FALSE)
 # Load packages
 library(ggupset)
 library(flextable)
@@ -232,7 +233,7 @@ ppgi_not_in_pteridocat <-
   ) %>%
   assert(not_na, note)
 
-genera_diff_table <- 
+genera_diff_table <-
   bind_rows(pteridocat_not_in_ppgi, ppgi_not_in_pteridocat) %>%
   # Format references
   mutate(note = cite_pd(
