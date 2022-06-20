@@ -1080,13 +1080,13 @@ clade_cols_tib <-
   assert(is_uniq, code)
 
 # Make tibble for annotating major clades
-clade_tibble <- 
+clade_tibble <-
   # Use assess_monophy to get MRCA of each major clade
   # They should all by monophyletic anyways
   select(sanger_sampling, species, major_clade) %>%
   assess_monophy(
     taxon_sampling = .,
-    tree = sanger_con_tree_dated,
+    tree = sanger_tree_dated,
     tax_levels = "major_clade"
   ) %>%
   get_result_monophy(1) %>%
@@ -1297,7 +1297,7 @@ For details of each step, see Materials and Methods.
 
 # Make tibble of backbone tips with higher-level taxonomy
 sanger_clade_exemp_taxa <-
-  sanger_con_tree_dated %>%
+  sanger_tree_dated %>%
   ladderize() %>%
   get_tips_in_ape_plot_order() %>%
   tibble(species = .) %>%
@@ -1395,7 +1395,7 @@ ftol_geom_cladelab <- function(code_select, offset_text) {
 }
 
 a <- ggtree(
-  sanger_con_tree_dated, 
+  sanger_tree_dated, 
     layout = "fan", right = FALSE, size = 0.1, open.angle = 2) + 
   ftol_geom_cladelab(
     clade_tibble$code[clade_tibble$code %in% c("Eq", "Op", "Ma", "Os", "Gl")], 10) +
