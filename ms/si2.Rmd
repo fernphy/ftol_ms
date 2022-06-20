@@ -96,7 +96,10 @@ knitr::purl(here::here("ms/manuscript.Rmd"), output = temp_file)
 # Trim this R script down to only functions that define figure and table captions
 read_lines(temp_file) %>%
   magrittr::extract(
-    str_detect(., "^figure\\(|^table\\(|^s_figure\\(|^s_table\\(|^figure_num\\(|^table_num\\(|^s_figure_num\\(|^s_table_num\\(")
+    str_detect(
+      .,
+    "^figure\\(|^table\\(|^s_figure\\(|^s_table\\(|^figure_num\\(|^table_num\\(|^s_figure_num\\(|^s_table_num\\(" # nolint
+    )
   ) %>%
   unique %>%
   write_lines(temp_file)
@@ -115,13 +118,13 @@ fossil_meta <-
   mutate(
     category = case_when(
       variable %in% colnames(fossil_ferns_raw)[1:4] ~ "Calibration",
-      variable %in% colnames(fossil_ferns_raw)[5:12] ~ "Fossil Identity",
-      variable %in% colnames(fossil_ferns_raw)[13:18] ~ "Fossil Age",
-      variable %in% colnames(fossil_ferns_raw)[19:21] ~ "Fossil Locality",
-      variable %in% colnames(fossil_ferns_raw)[22:24] ~ "Fossil Specimen",
+      variable %in% colnames(fossil_ferns_raw)[5:13] ~ "Fossil Identity",
+      variable %in% colnames(fossil_ferns_raw)[14:19] ~ "Fossil Age",
+      variable %in% colnames(fossil_ferns_raw)[20:22] ~ "Fossil Locality",
+      variable %in% colnames(fossil_ferns_raw)[23:25] ~ "Fossil Specimen",
       TRUE ~ NA_character_
     ),
-    var_order = 1:nrow(.)
+    var_order = seq_along(variable)
   )
 
 # Get list of fossils used
@@ -141,8 +144,14 @@ fossils_long <-
   verify(all(sort(.$n_fos) == sort(n_fos_used$n_fos))) %>%
   mutate(
     across(everything(), as.character),
-    # Add fossil taxon header
-    fossil_taxon_header = fossil_taxon) %>%
+    extinct = case_when(
+      extinct == "extinct" ~ "^†^",
+      extinct == "extant" ~ "",
+      TRUE ~ NA_character_
+    )) %>%
+  assert(not_na, extinct, fossil_taxon) %>%
+  # Add fossil taxon header
+  mutate(fossil_taxon_header = glue::glue("{fossil_taxon}{extinct}")) %>%
   pivot_longer(names_to = "variable", values_to = "value", -fossil_taxon) %>%
   left_join(
     select(fossil_meta, -description), by = "variable") %>%
@@ -151,10 +160,11 @@ fossils_long <-
   ) %>%
   arrange(fossil_taxon, category, var_order) %>%
   # Drop NA entries
-  filter(!is.na(value))
+  filter(!is.na(value)) %>%
+  filter(variable != "extinct")
 ```
 
-These data are exported from the FernCal v1.0.0 database (https://github.com/fernphy/ferncal), which includes records of fossils to use as calibration points for molecular dating of ferns.
+These data are exported from the FernCal v1.0.1 database (https://github.com/fernphy/ferncal), which includes records of fossils to use as calibration points for molecular dating of ferns.
 
 "NFos" is the unique ID of the record in FernCal.
 
