@@ -139,13 +139,14 @@ references:
     month: 7
     day: 6
   language: en
-  page: 1-7
+  page: 1232–1238
   publisher: Nature Publishing Group
   source: www.nature.com
   title: The delayed and geographically heterogeneous diversification of flowering
     plant families
   type: article-journal
   URL: https://www.nature.com/articles/s41559-020-1241-3
+  volume: '4'
 - id: Rothfels2015a
   author:
   - family: Rothfels
@@ -253,9 +254,9 @@ references:
 - id: Testo2016a
   author:
   - family: Testo
-    given: Weston L.
+    given: Weston
   - family: Sundue
-    given: Michael A
+    given: Michael
   citation-key: Testo2016a
   container-title: Molecular Phylogenetics and Evolution
   DOI: 10.1016/j.ympev.2016.09.003
@@ -313,6 +314,28 @@ references:
   type: article-journal
   URL: https://onlinelibrary.wiley.com/doi/10.1002/tax.12113
   volume: '68'
+- id: Chen2017
+  author:
+  - family: Chen
+    given: Cheng-Wei
+  - family: Sundue
+    given: Michael A
+  - family: Kuo
+    given: Li-Yaung
+  - family: Teng
+    given: Wei-Chih
+  - family: Huang
+    given: Yao-Moan
+  citation-key: Chen2017
+  container-title: PhytoKeys
+  DOI: 10.3897/phytokeys.78.12040
+  ISSN: 1314-2003
+  issued:
+  - year: 2017
+  page: 83-107
+  title: Phylogenetic analyses place the monotypic Dryopolystichum within Lomariopsidaceae
+  type: article-journal
+  volume: '78'
 - id: Dong2018b
   accessed:
   - year: 2021
@@ -646,6 +669,36 @@ references:
   type: article-journal
   URL: https://www.biotaxa.org/Phytotaxa/article/view/phytotaxa.436.1.4
   volume: '436'
+- id: Ponce2022
+  accessed:
+  - year: 2022
+    month: 5
+    day: 24
+  author:
+  - family: Ponce
+    given: Marta Mónica
+  - family: Scataglini
+    given: María Amalia
+  citation-key: Ponce2022
+  container-title: Journal of Systematics and Evolution
+  container-title-short: J of Sytematics Evolution
+  DOI: 10.1111/jse.12723
+  ISSN: 1674-4918, 1759-6831
+  issue: '2'
+  issued:
+  - year: 2022
+    month: 3
+  language: en
+  page: 266-280
+  source: DOI.org (Crossref)
+  title: 'Phylogenetic position of South American *Cheilanthes* (Cheilanthoideae,
+    Pteridaceae): Advances in the generic circumscription and segregation of the new
+    genus *Mineirella*'
+  title-short: Phylogenetic position of South American *Cheilanthes* (Cheilanthoideae,
+    Pteridaceae)
+  type: article-journal
+  URL: https://onlinelibrary.wiley.com/doi/10.1111/jse.12723
+  volume: '60'
 - id: PteridophytePhylogenyGroupI2016
   author:
   - literal: Pteridophyte Phylogeny Group I
@@ -935,13 +988,13 @@ references:
   - family: Chen
     given: De-Kui
   - family: Thi
-    given: Ngan
+    given: Ngan Thi
   - family: Cicuzza
     given: Daniele
   - family: Knapp
     given: Ralf
   - family: Tam
-    given: Thien
+    given: Thien Tam
   - family: Nitta
     given: Joel H.
   - family: Gao

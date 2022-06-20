@@ -94,6 +94,80 @@ references:
     ages, and relationships of taxa
   type: article-journal
   volume: '66'
+- id: Bennett2018
+  accessed:
+  - year: 2020
+    month: 6
+    day: 19
+  author:
+  - family: Bennett
+    given: Dominic
+  - family: Hettling
+    given: Hannes
+  - family: Silvestro
+    given: Daniele
+  - family: Zizka
+    given: Alexander
+  - family: Bacon
+    given: Christine
+  - family: Faurby
+    given: Søren
+  - family: Vos
+    given: Rutger
+  - family: Antonelli
+    given: Alexandre
+  citation-key: Bennett2018
+  container-title: Life
+  container-title-short: Life
+  DOI: 10/gdqczq
+  ISSN: 2075-1729
+  issue: '2'
+  issued:
+  - year: 2018
+    month: 6
+    day: 5
+  language: en
+  page: '20'
+  source: DOI.org (Crossref)
+  title: 'phylotaR: An Automated Pipeline for Retrieving Orthologous DNA Sequences
+    from GenBank in R'
+  title-short: phylotaR
+  type: article-journal
+  URL: http://www.mdpi.com/2075-1729/8/2/20
+  volume: '8'
+- id: Bennett2018a
+  accessed:
+  - year: 2022
+    month: 6
+    day: 16
+  author:
+  - family: Bennett
+    given: Dominic
+  - family: Hettling
+    given: Hannes
+  - family: Silvestro
+    given: Daniele
+  - family: Vos
+    given: Rutger
+  - family: Antonelli
+    given: Alexandre
+  citation-key: Bennett2018a
+  container-title: Journal of Open Source Software
+  container-title-short: JOSS
+  DOI: 10.21105/joss.01102
+  ISSN: 2475-9066
+  issue: '31'
+  issued:
+  - year: 2018
+    month: 11
+    day: 27
+  page: '1102'
+  source: DOI.org (Crossref)
+  title: 'restez: Create and Query a Local Copy of GenBank in R'
+  title-short: restez
+  type: article-journal
+  URL: http://joss.theoj.org/papers/10.21105/joss.01102
+  volume: '3'
 - id: Benton2022
   accessed:
   - year: 2022
@@ -277,6 +351,71 @@ references:
   title: Ecology of the Early Cretaceous ferns of northeast China
   type: article-journal
   volume: '119'
+- id: Donoghue2021
+  accessed:
+  - year: 2022
+    month: 5
+    day: 25
+  author:
+  - family: Donoghue
+    given: Philip C.J.
+  - family: Harrison
+    given: C. Jill
+  - family: Paps
+    given: Jordi
+  - family: Schneider
+    given: Harald
+  citation-key: Donoghue2021
+  container-title: Current Biology
+  container-title-short: Current Biology
+  DOI: 10.1016/j.cub.2021.07.038
+  ISSN: 09609822
+  issue: '19'
+  issued:
+  - year: 2021
+    month: 10
+  language: en
+  page: R1281-R1298
+  source: DOI.org (Crossref)
+  title: The evolutionary emergence of land plants
+  type: article-journal
+  URL: https://linkinghub.elsevier.com/retrieve/pii/S0960982221010289
+  volume: '31'
+- id: Drori2018a
+  accessed:
+  - year: 2022
+    month: 6
+    day: 16
+  author:
+  - family: Drori
+    given: Michal
+  - family: Rice
+    given: Anna
+  - family: Einhorn
+    given: Moshe
+  - family: Chay
+    given: Ofer
+  - family: Glick
+    given: Lior
+  - family: Mayrose
+    given: Itay
+  citation-key: Drori2018a
+  container-title: Molecular Ecology Resources
+  container-title-short: Mol Ecol Resour
+  DOI: 10.1111/1755-0998.12927
+  ISSN: 1755098X
+  issue: '6'
+  issued:
+  - year: 2018
+    month: 11
+  language: en
+  page: 1492-1499
+  source: DOI.org (Crossref)
+  title: 'OneTwoTree: An online tool for phylogeny reconstruction'
+  title-short: OneTwoTree
+  type: article-journal
+  URL: https://onlinelibrary.wiley.com/doi/10.1111/1755-0998.12927
+  volume: '18'
 - id: Drummond2007
   accessed:
   - year: 2021
@@ -340,6 +479,38 @@ references:
   title: Simultaneous diversification of Polypodiales and angiosperms in the Mesozoic
   type: article-journal
   volume: '37'
+- id: Du2022
+  accessed:
+  - year: 2022
+    month: 5
+    day: 25
+  author:
+  - family: Du
+    given: Xin-Yu
+  - family: Kuo
+    given: Li-Yaung
+  - family: Zuo
+    given: Zheng-Yu
+  - family: Li
+    given: De-Zhu
+  - family: Lu
+    given: Jin-Mei
+  citation-key: Du2022
+  container-title: Frontiers in Plant Science
+  container-title-short: Front. Plant Sci.
+  DOI: 10.3389/fpls.2022.862772
+  ISSN: 1664-462X
+  issued:
+  - year: 2022
+    month: 5
+    day: 2
+  page: '862772'
+  source: DOI.org (Crossref)
+  title: Structural Variation of Plastomes Provides Key Insight Into the Deep Phylogeny
+    of Ferns
+  type: article-journal
+  URL: https://www.frontiersin.org/articles/10.3389/fpls.2022.862772/full
+  volume: '13'
 - id: Eiserhardt2018
   author:
   - family: Eiserhardt
@@ -1122,7 +1293,7 @@ references:
   author:
   - family: Nitta
     given: Joel H.
-  - family: Watkins
+  - family: Watkins Jr.
     given: James E.
   - family: Holbrook
     given: N. Michele
@@ -1135,6 +1306,7 @@ references:
   container-title-short: J Plant Res
   DOI: 10.1007/s10265-021-01318-z
   ISSN: 0918-9440, 1618-0860
+  issue: '5'
   issued:
   - year: 2021
     month: 6
@@ -1146,6 +1318,21 @@ references:
     in filmy ferns (Hymenophyllaceae)</span>
   type: article-journal
   volume: '134'
+- id: OneThousandPlantTranscriptomesInitiative2019
+  author:
+  - literal: One Thousand Plant Transcriptomes Initiative
+  citation-key: OneThousandPlantTranscriptomesInitiative2019
+  container-title: Nature
+  DOI: 10.1038/s41586-019-1693-2
+  ISSN: 1476-4687
+  issue: November 2017
+  issued:
+  - year: 2019
+  PMID: '31645766'
+  title: One thousand plant transcriptomes and the phylogenomics of green plants.
+  type: article-journal
+  URL: http://www.ncbi.nlm.nih.gov/pubmed/31645766
+  volume: '574'
 - id: Page2008
   accessed:
   - year: 2022
@@ -1172,6 +1359,66 @@ references:
   title-short: Biodiversity informatics
   type: article-journal
   volume: '9'
+- id: Patel2019
+  accessed:
+  - year: 2022
+    month: 5
+    day: 2
+  author:
+  - family: Patel
+    given: Nikisha
+  - family: Fawcett
+    given: Susan
+  - family: Sundue
+    given: Michael
+  - family: Budke
+    given: Jessica M.
+  citation-key: Patel2019
+  container-title: International Journal of Plant Sciences
+  container-title-short: International Journal of Plant Sciences
+  DOI: 10.1086/705588
+  ISSN: 1058-5893, 1537-5315
+  issue: '9'
+  issued:
+  - year: 2019
+    month: 11
+  language: en
+  page: 1016-1035
+  source: DOI.org (Crossref)
+  title: Evolution of Perine Morphology in the Thelypteridaceae
+  type: article-journal
+  URL: https://www.journals.uchicago.edu/doi/10.1086/705588
+  volume: '180'
+- id: Pearse2013
+  accessed:
+  - year: 2022
+    month: 6
+    day: 16
+  author:
+  - family: Pearse
+    given: William D.
+  - family: Purvis
+    given: Andy
+  citation-key: Pearse2013
+  container-title: Methods in Ecology and Evolution
+  container-title-short: Methods Ecol Evol
+  DOI: 10.1111/2041-210X.12055
+  editor:
+  - family: Paradis
+    given: Emmanuel
+  ISSN: 2041210X
+  issue: '7'
+  issued:
+  - year: 2013
+    month: 7
+  language: en
+  page: 692-698
+  source: DOI.org (Crossref)
+  title: 'phyloGenerator: an automated phylogeny generation tool for ecologists'
+  title-short: phyloGenerator
+  type: article-journal
+  URL: https://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12055
+  volume: '4'
 - id: Portik2020
   accessed:
   - year: 2021
@@ -1603,6 +1850,30 @@ references:
     from 360 plastid genomes
   type: article-journal
   volume: '14'
+- id: Sauquet2013
+  accessed:
+  - year: 2022
+    month: 2
+    day: 25
+  author:
+  - family: Sauquet
+    given: Hervé
+  citation-key: Sauquet2013
+  container-title: Comptes Rendus Palevol
+  container-title-short: Comptes Rendus Palevol
+  DOI: 10.1016/j.crpv.2013.07.003
+  ISSN: '16310683'
+  issue: '6'
+  issued:
+  - year: 2013
+    month: 8
+  language: en
+  page: 355-367
+  source: DOI.org (Crossref)
+  title: A practical guide to molecular dating
+  type: article-journal
+  URL: https://linkinghub.elsevier.com/retrieve/pii/S1631068313001097
+  volume: '12'
 - id: Schneider2001
   author:
   - family: Schneider
@@ -1897,6 +2168,46 @@ references:
   title: Large scale phylogenomic analysis resolves a backbone phylogeny in ferns
   type: article-journal
   volume: '7'
+- id: Shu2022
+  accessed:
+  - year: 2022
+    month: 6
+    day: 13
+  author:
+  - family: Shu
+    given: Jiang-Ping
+  - family: Wang
+    given: Hao
+  - family: Shen
+    given: Hui
+  - family: Wang
+    given: Rui-Jiang
+  - family: Fu
+    given: Qiang
+  - family: Wang
+    given: Yong-Dong
+  - family: Jiao
+    given: Yuan-Nian
+  - family: Yan
+    given: Yue-Hong
+  citation-key: Shu2022
+  container-title: Plants
+  DOI: 10.3390/plants11121529
+  ISSN: 2223-7747
+  issue: '12'
+  issued:
+  - year: 2022
+    month: 1
+  language: en
+  number: '12'
+  page: '1529'
+  publisher: Multidisciplinary Digital Publishing Institute
+  source: www.mdpi.com
+  title: Phylogenomic Analysis Reconstructed the Order Matoniales from Paleopolyploidy
+    Veil
+  type: article-journal
+  URL: https://www.mdpi.com/2223-7747/11/12/1529
+  volume: '11'
 - id: Smith2009b
   author:
   - family: Smith
@@ -1937,6 +2248,32 @@ references:
     phylogenies'
   type: article-journal
   volume: '28'
+- id: Smith2018
+  accessed:
+  - year: 2020
+    month: 6
+    day: 4
+  author:
+  - family: Smith
+    given: Stephen A.
+  - family: Brown
+    given: Joseph W.
+  citation-key: Smith2018
+  container-title: American Journal of Botany
+  container-title-short: Am J Bot
+  DOI: 10/gdhrc4
+  ISSN: 00029122
+  issue: '3'
+  issued:
+  - year: 2018
+    month: 3
+  language: en
+  page: 302-314
+  source: DOI.org (Crossref)
+  title: Constructing a broadly inclusive seed plant phylogeny
+  type: article-journal
+  URL: http://doi.wiley.com/10.1002/ajb2.1019
+  volume: '105'
 - id: Smith2019
   accessed:
   - year: 2022
@@ -1966,6 +2303,36 @@ references:
     : A python tool for phylogenetic dataset construction'
   title-short: 'Py '
   type: article-journal
+  volume: '10'
+- id: Smith2019a
+  accessed:
+  - year: 2022
+    month: 6
+    day: 16
+  author:
+  - family: Smith
+    given: Stephen A.
+  - family: Walker
+    given: Joseph F.
+  citation-key: Smith2019a
+  container-title: Methods in Ecology and Evolution
+  container-title-short: Methods Ecol Evol
+  DOI: 10.1111/2041-210X.13096
+  editor:
+  - family: Cooper
+    given: Natalie
+  ISSN: 2041-210X, 2041-210X
+  issue: '1'
+  issued:
+  - year: 2019
+    month: 1
+  language: en
+  page: 104-108
+  source: DOI.org (Crossref)
+  title: 'PyPHLAWD: A python tool for phylogenetic dataset construction'
+  title-short: 'Py '
+  type: article-journal
+  URL: https://onlinelibrary.wiley.com/doi/10.1111/2041-210X.13096
   volume: '10'
 - id: Sundue2013
   author:
@@ -2018,9 +2385,9 @@ references:
 - id: Testo2016a
   author:
   - family: Testo
-    given: Weston L.
+    given: Weston
   - family: Sundue
-    given: Michael A
+    given: Michael
   citation-key: Testo2016a
   container-title: Molecular Phylogenetics and Evolution
   DOI: 10.1016/j.ympev.2016.09.003
@@ -2277,6 +2644,37 @@ references:
     plants
   type: article-journal
   volume: '111'
+- id: Xu2015
+  accessed:
+  - year: 2022
+    month: 6
+    day: 16
+  author:
+  - family: Xu
+    given: Xiaoting
+  - family: Dimitrov
+    given: Dimitar
+  - family: Rahbek
+    given: Carsten
+  - family: Wang
+    given: Zhiheng
+  citation-key: Xu2015
+  container-title: Ecography
+  container-title-short: Ecography
+  DOI: 10.1111/ecog.01055
+  ISSN: 09067590
+  issue: '4'
+  issued:
+  - year: 2015
+    month: 4
+  language: en
+  page: 426-430
+  source: DOI.org (Crossref)
+  title: 'NCBIminer: sequences harvest from Genbank'
+  title-short: NCBIminer
+  type: article-journal
+  URL: https://onlinelibrary.wiley.com/doi/10.1111/ecog.01055
+  volume: '38'
 - id: Zhang2015
   author:
   - family: Zhang
