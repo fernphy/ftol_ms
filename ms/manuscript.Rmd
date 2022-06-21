@@ -238,7 +238,7 @@ The "plants" division of GenBank release 249 (cutoff date 2022-04-15) was downlo
 GenBank accession numbers corresponding to sequences potentially matching each locus were obtained by querying the GenBank with terms including the locus name (`r eg`, "rbcL"), "Polypodiopsida[ORGN]", and a date cuteoff matching the current GenBank release.
 Names including the terms "aff." or "cf.", hybrid formulas, and environmental DNA samples were excluded.
 Sequences were then pulled from the local database in FASTA format by GenBank accession number.
-There is no formal definition of genomic vs. Sanger sequences in GenBank, so we used an empirical sequence length cutoff to distinguish between Sanger (≤ `r number(7000)` bp) and plastome (> `r number(7000)` bp) accessions with the "[SLEN]" term.
+There is no formal definition of genomic vs. Sanger sequences in GenBank, so we used an empirical sequence length cutoff to distinguish between Sanger (≤ `r number(7000)` bp) and plastome (> `r number(7000)` bp) accessions with the "[SLEN]" term (**`r s_figure("seqlen")`**.).
 
 There is a lack of consensus on sequence annotation in GenBank; the same locus may be annotated using different names, or not annotated at all.
 To avoid missing sequences due to differences in annotation format, we used the "Reference_Blast_Extract.py" script of superCRUNCH [@Portik2020] to extract target loci from GenBank FASTA files.

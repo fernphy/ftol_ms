@@ -392,6 +392,38 @@ Status of intruders and outliers was determined using the default cutoff level (
 
 \newpage
 
+```{r seqlen, fig.width = 7, fig.height = 4, eval = params$doc_type != "manual"}
+fern_slen_tib <- read_from_cache(
+  "fern_slen_tib", here::here("_supp_store")) %>%
+  # Add column for plastome or not
+  mutate(
+    plastome = if_else(
+      str_detect(def, "complete genome"),
+      "A. 'complete genome'",
+      "B. other"
+    ),
+    plastome = factor(plastome, levels = c("A. 'complete genome'", "B. other"))
+  )
+
+ggplot(fern_slen_tib, aes(slen)) +
+  geom_vline(xintercept = 7000, color = "red") +
+  geom_histogram(bins = 100) +
+  scale_x_log10() +
+  scale_y_continuous(expand = expansion(mult = c(0, .05))) +
+  labs(x = "Sequence length (bp)", y = "Count (num. accessions)") +
+  facet_wrap(vars(plastome))
+```
+
+**`r s_figure("seqlen")`**.
+Histogram of sequence lengths (bp; log-scale) of fern accessions in GenBank release v249.
+Fern accessions obtained by querying GenBank for “Polypodiopsida[ORGN]” with length 10--200,000 bp.
+**A.** Sequences with the term 'complete genome' in their description (`r eg`, "Angiopteris evecta chloroplast, complete genome").
+**B.** Other sequences (those without 'complete genome' in their description).
+Vertical red line at 7,000 bp indicates empirical length cutoff used to differentiate between between Sanger (≤ 7,000 bp) and plastome (> 7,000 bp) accessions.
+Note that "other" includes some whole plastome accessions that cannot be distinguished based on description alone (e.g., "UNVERIFIED: Nephrolepis biserrata plastid sequence"); these are mostly above 7,000 bp.
+
+\newpage
+
 ```{r fossil-map-make}
 # Make tibble with node number and label for ggtree
 node_labs_tbl <-
@@ -480,7 +512,7 @@ bs_tibble <- make_bs_tbl(phy) %>%
   ))
 
 # Make plot
-bb_full_plot <- 
+bb_full_plot <-
   ggtree(phy, size = 0.2, color = "grey10") %<+% 
   bs_tibble +
   # now we can show BS values using geom_text()
