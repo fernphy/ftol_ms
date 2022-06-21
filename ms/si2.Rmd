@@ -179,7 +179,7 @@ These data are exported from the FernCal v1.0.1 database (https://github.com/fer
 
 "NFos" is the unique ID of the record in FernCal.
 
-Taxonomy of extant taxa follows pteridocat v0.0.1 database (https://github.com/fernphy/pteridocat).
+Taxonomy of extant taxa follows pteridocat v0.1.0 database (https://github.com/fernphy/pteridocat).
 
 For a summary of these data in CSV format, see `r s_table("fossils")`.
 

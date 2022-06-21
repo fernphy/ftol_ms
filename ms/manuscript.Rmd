@@ -234,11 +234,11 @@ Here, "locus" refers to an individual gene, intergenic spacer, or a unit compris
 
 ## Dataset construction
 
-The "plants" division of GenBank release 249 (cutoff date 2022-04-15) was downloaded from the NCBI FTP server and a local database including only ferns and outgroups (selected seed plants, lycophytes, bryophytes, and algae) created using the restez R package [@Bennett2018a].
+The "plants" division of GenBank release 249 (cutoff date 2022-04-15) was downloaded from the NCBI FTP server (https://ftp.ncbi.nlm.nih.gov/genbank/) and a local database including only ferns and outgroups (selected seed plants, lycophytes, bryophytes, and algae) created using the restez R package [@Bennett2018a].
 GenBank accession numbers corresponding to sequences potentially matching each locus were obtained by querying the GenBank with terms including the locus name (`r eg`, "rbcL"), "Polypodiopsida[ORGN]", and a date cuteoff matching the current GenBank release.
 Names including the terms "aff." or "cf.", hybrid formulas, and environmental DNA samples were excluded.
 Sequences were then pulled from the local database in FASTA format by GenBank accession number.
-There is no formal definition of genomic vs. Sanger sequences in GenBank, so we used an empirical sequence length cutoff to distinguish between Sanger (≤ `r number(7000)` bp) and plastome (> `r number(7000)` bp) accessions with the "[SLEN]" term (**`r s_figure("seqlen")`**.).
+There is no formal definition of genomic vs. Sanger sequences in GenBank, so we used an empirical sequence length cutoff to distinguish between Sanger (≤ `r number(7000)` bp) and plastome (> `r number(7000)` bp) accessions with the "[SLEN]" term (`r s_figure("seqlen")`).
 
 There is a lack of consensus on sequence annotation in GenBank; the same locus may be annotated using different names, or not annotated at all.
 To avoid missing sequences due to differences in annotation format, we used the "Reference_Blast_Extract.py" script of superCRUNCH [@Portik2020] to extract target loci from GenBank FASTA files.
@@ -278,10 +278,10 @@ Another potential issue with GenBank sequences is the presence of misidentified 
 We removed putative rogues from Sanger sequences as follows.
 First, we constructed a BLAST library including all extracted Sanger sequences.
 Next, we conducted one BLAST search for each Sanger sequence against the library (all-by-all BLAST).
-We compared the families (following PPG I) of the matching sequences to each query; in the case the top three best matches belonged to a different family than the query, , that query was considered a rogue and excluded from further analysis.
+We compared the families (following PPG I) of the matching sequences to each query; in the case the top three best matches belonged to a different family than the query, that query was considered a rogue and excluded from further analysis.
 For Cyatheales and Saccolomatineae, which include several closely related small families, we used the order and sub-order level, respectively, instead of family to avoid false positives.
 Species belonging to monotypic families were not considered for this filtering.
-While this method cannot account for rogues at finer taxonomic levels, it is an efficient approach for removing obviously erroneous sequences.
+While this method cannot account for rogues at finer taxonomic levels, it is an efficient approach for removing clearly erroneous sequences.
 We inspected all accessions flagged this way as rogues before excluding them.
 In cases where the family mismatch was due to incorrect taxonomy (`r eg`, the species name in GenBank matches the correct family but the name used in the taxonomic database does not), we updated the taxonomic database accordingly.
 
@@ -683,7 +683,7 @@ bb_with_all_loci <-
   split(.$all_loci_sampled)
 ``` 
 
-Taxon sampling for FTOL v1.0.0 includes `r total_sampling$species$coverage` species (`r total_sampling$species$coverage_p`), `r total_sampling$genus$coverage` genera (`r total_sampling$genus$coverage_p`), `r total_sampling$family$coverage` families, and `r total_sampling$order$coverage` orders of ferns (all coverage values are relative to the number of accepted species in Pteridocat v1.0.0).
+Taxon sampling for FTOL v1.1.0 includes `r total_sampling$species$coverage` species (`r total_sampling$species$coverage_p`), `r total_sampling$genus$coverage` genera (`r total_sampling$genus$coverage_p`), `r total_sampling$family$coverage` families, and `r total_sampling$order$coverage` orders of ferns (all coverage values are relative to the number of accepted species in pteridocat v0.1.0).
 Coverage varied by major clade from `r tax_coverage %>% first %>% extract2("coverage")` (`r tax_coverage %>% first %>% extract2("clade")`) to `r tax_coverage %>% last %>% extract2("coverage")` (`r tax_coverage %>% last %>% extract2("clade")`) (`r figure("ftol")`). Taxon sampling for the backbone phylogeny (derived from plastome loci) includes `r bb_total_sampling$species$n` species (`r bb_total_sampling$species$coverage_p`), `r bb_total_sampling$genus$coverage` genera (`r bb_total_sampling$genus$coverage_p`), `r bb_total_sampling$family$coverage` families (`r bb_total_sampling$family$coverage_p`), and `r bb_total_sampling$order$coverage` orders of ferns.
 
 The number of fern species sampled per locus in the Sanger dataset ranged from `r first(locus_total)$n` (*`r first(locus_total)$locus`*) to `r last(locus_total)$n`  (*`r last(locus_total)$locus`*).
@@ -899,14 +899,14 @@ assertthat::assert_that(
 
 The `r extract_iqtree_mod(plastome_iqtree_log)` model was selected according to BIC for both the plastome (backbone) and Sanger analyses.
 `r str_to_sentence(n_converge)` of the ten runs converged (correlation coefficient of split occurrence frequencies >0.99), but the run with the highest log-likelihood, from which the final tree was selected, did not converge (correlation coefficient 0.976 after `r number(1000)` iterations).
-The consensus tree had higher log-likelihood (`r best_con_score`) than the ML tree (`r best_ml_score`), so we only present the topology and divergence times estimated from the consensus tree.
+The consensus tree had higher log-likelihood (`r number(best_con_score)`) than the ML tree (`r number(best_ml_score)`), so we only present the topology and divergence times estimated from the consensus tree.
 
 Ferns are strongly supported as monophyletic (BS `r ferns_bs`; all subsequent relationships mentioned received BS ≥ `r percent(.98)` in the backbone phylogeny unless otherwise indicated).
 The first split within ferns separates a clade including Equisetidae and Ophioglossidae from all other species (Figures `r figure_num("backbone")`, `r s_figure_num("backbone_full")`).
 The next split separates Marattiales from the remaining ferns, the leptosporangiates (Polypodiidae).
 Within leptosporangiate ferns, Osmundales is sister to all other species.
 The next lineage to diverge is a clade including Hymenophyllales and Gleicheniales (BS `r hym_gle_bs`), followed by Schizaeales.
-Salviniales was recovered as sister to Cyatheales but without strong support (BS `r cyath_salv_bs`), which are in turn sister to Polypodiales. 
+Salviniales was recovered as sister to Cyatheales, which are in turn sister to Polypodiales. 
 The first split within Polypodiales separates a clade including Saccolomatineae and Lindsaeineae from the remainder of species, followed by the subsequent divergences of Pteridineae, then Dennstaedtiineae, which is sister to the eupolypods with moderate support (BS `r denn_poly_bs`).
 There are two major clades within eupolypods, Polypodiineae (eupolypods I) and Aspleniineae (eupolypods II).
 
@@ -921,9 +921,9 @@ Relationships within some genera were less well-supported, including *Cyathea*, 
 
 We estimate the crown age of ferns to be `r crown_ages$ferns` million years (Ma) old.
 Ages of other major crown groups are: leptosporangiates (`r crown_ages$leptos` Ma), Polypodiales (`r crown_ages$polypodiales` Ma), eupolypods I (`r crown_ages$eupoly_i` Ma), and eupolypods II (`r crown_ages$eupoly_ii` Ma).
-Our estimates for leptosporangiates and Polypodiales are both `r ca` 50 Ma older than the most recent global fern phylogeny [@Testo2016a], while other ages are similar.
+Our estimates for leptosporangiates and Polypodiales are both `r ca` 30--40 Ma older than the most recent global fern phylogeny [@Testo2016a], while other ages are similar (eupolypods I) or slightly younger (eupolypods II).
 Estimated stem ages of fern families were mostly older than previous studies (`r figure("divtimes")`).
-We did not compare crown ages of families across studies because differences in crown ages in smaller clades are likely affected by species sampling.
+We did not compare crown ages of families across studies because differences in crown ages of smaller clades are likely affected by species sampling.
 
 # Discussion
 
@@ -997,7 +997,7 @@ Our set of fossil calibration points did not add any extremely old fossils (> 20
 
 Several recent studies exploring divergence times across a global fern phylogeny all used a similar set of 24--26 fossil calibration points [@Schuettpelz2009; @Testo2016a] or secondary calibration points based on studies using this set [@Rothfels2015a].
 However, there were a few inconsistencies in the application of these fossils due to differences in taxonomic concepts between the original fossil publication and the studies in which they were used.
-More importantly, our set of calibration points more than doubles the number used by previous studies and it is likely that this expanded dataset is responsible for the older stem age estimates for many families (Figures `r figure_num("divtimes")`, `r s_figure_num("du-ages")`).
+More importantly, our set of calibration points approximately doubles the number used by previous studies and it is likely that this expanded dataset is responsible for the older stem age estimates for many families (Figures `r figure_num("divtimes")`, `r s_figure_num("du-ages")`).
 To test this hypothesis, we conducted an additional analysis using the fossil constraints of @Testo2016a but otherwise the same methods (FTOL analyzed with treePL).
 The resulting stem family ages show a much closer agreement with those of @Testo2016a (`r r2` = `r ftol_ts_comp_stats$r.squared %>% number(accuracy = 0.01)`, `r pval` = `r ftol_ts_comp_stats$p.value %>% sci_number()`, linear model; Figures `r s_figure_num("comp-stem-ages")`, `r s_figure_num("comp-stem-points")`), indicating that our expanded set of fossil calibration points, not differences in topology or dating methodology, is the primarily contributor to the older ages observed in the current study.
 
@@ -1035,7 +1035,7 @@ In particular, superSMART [@Antonelli2016] and pyPHLAWD [@Smith2019a] are recent
 However, although we make use of some of the functionality of these tools [`r eg`, restez for generating a local copy of GenBank\; superCRUNCH for identifying orthologous sequences\; @Bennett2018a; @Portik2020], our pipeline is mostly custom-built for ferns.
 We chose this approach because it allowed us to implement various steps specific to ferns that would not be possible using a fully automated, taxon-agnostic pipeline like superSMART or pyPHLAWD, which we believe ultimately results in a higher-quality fern phylogeny.
 For example, we integrate our phylogeny with a custom taxonomy for ferns (pteridocat), tailor alignment strategies to locus and taxon (fern-wide alignment for coding loci, nested alignment within families for non-coding loci), inspect intermediate results and modify input based on expert taxonomic knowledge (curation of sample inclusion and exclusion lists), and employ a custom set of criteria for selecting and concatenating sequences within species.
-While we have not sought to make our workflow available as a general tool due to its high degree of specialization, some of the methods employed here could be used in other studies, such as use of a backbone phylogeny based on next-generation data to constrain a tree built with Sanger data.
+While we have not sought to make our workflow available as a general tool due to its high degree of specialization, some of the methods employed here could be adapted and implemented in other phylogeny pipelines.
 
 ## Accesibility and usage of FTOL
 
@@ -1063,8 +1063,8 @@ We envision that FTOL will be integrated with the next iteration of the Pteridop
 Furthermore, FTOL will not only grow in size with time, but also become more refined.
 We are aware that our methodology cannot produce a "perfect" tree, nor is that our goal.
 Indeed, we anticipate that there will almost always be tips in the tree that need correction, either because they get overlooked (`r eg`, placement of species within genera, which we did not have the resources to inspect) or because an updated taxonomic treatment is not yet available (`r eg`, cheilanthoid ferns).
-One example of progressive refinement is Thelypteridaceae, which had the highest rate of non-monophyletic genera in the previous version of FTOL (v1.0.0).
-After implementing a manual inclusion list for Thelypteridaceae and consulting with a taxonomic expert on this family (Susan Fawcett), the number of non-monophyletic genera dropped to __ in v1.0.1.
+One example of progressive refinement is Thelypteridaceae, which had the highest number of non-monophyletic genera (16) in the previous version of FTOL (v1.0.0).
+After implementing a manual inclusion list for Thelypteridaceae and consulting with a taxonomic expert on this family (Susan Fawcett), the number of non-monophyletic genera dropped to `r top_nonmono_subfam %>% filter(family == "Thelypteridaceae") %>% pull(n)`.
 While manual inclusion lists are not an ideal long-term solution because they cannot grow with GenBank, this case demonstrates that such lists are a reasonable option for taxonomically difficult groups, and more importantly, the improvement that results from input from taxonomic experts.
 Another example of the advantage of a continuously updated tree is the publication of 42 additional fern plastome samples while this paper was in revision [@Du2022].
 While we were unable to integrate these data into the current version of FTOL, they will be automatically added when the next version of GenBank data are released, and we expected the next version of FTOL will reflect this new knowledge.
@@ -1365,7 +1365,7 @@ genbank_plot
 ```
 
 **`r figure("genbank")`**.
-Number of fern species in GenBank by year and genomic compartment.
+Number of fern species in GenBank by year and genomic compartment, 1990--2021.
 Points indicate number of species sampled in selected studies of global fern phylogeny [@Hasebe1995; @Schuettpelz2007; @Lehtonen2011; @Testo2016a\; this study].
 @Schuettpelz2007 did not attempt exhaustive sampling but rather proportional sampling according to lineage size.
 The relatively small increase in number of species in 2021 may be due to accessions that are still embargoed at the time of writing.
