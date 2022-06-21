@@ -96,6 +96,9 @@ sanger_con_tree_dated <- read_from_cache("sanger_con_tree_dated", ftol_cache)
 sanger_con_tree_rooted <- read_from_cache("sanger_con_tree_rooted", ftol_cache)
 sanger_alignment_tbl <- read_from_cache("sanger_alignment_tbl", ftol_cache)
 ts_fossil_calibration_tips <- read_from_cache("ts_fossil_calibration_tips", ftol_cache) # nolint
+sanger_seqs_rogues_inspected <- read_from_cache(
+  "sanger_seqs_rogues_inspected", ftol_cache
+)
 
 # Targets from MS workflow
 tar_load(
@@ -282,7 +285,7 @@ fossils_table <-
     n_fos, minimum_age, node_calibrated, fossil_taxon, 
     lower = lower_limit_of_oldest_stratigraphic_age,
     upper = upper_limit_of_oldest_stratigraphic_age,
-    stratigraphic_age, 
+    stratigraphic_age,
     country, type_locality, formation,
     organs, specimen_holotype, collection,
     reference_raw = reference
@@ -317,6 +320,28 @@ Fossils used as calibration points for molecular dating (`r result_file(s_table(
 "n_fos" is the fossil ID number used in the "ferncal" database v1.0.0 (https://github.com/fernphy/ferncal).
 "minimum_age" is the age used for calibration (Ma); "lower" is the lower limit of the oldest stratigraphic age for the fossil (Ma); "upper" is the upper limit of the oldest stratigraphic age for the fossil (Ma).
 For detailed notes and full references for each fossil, see Appendix S2.
+
+```{r rogues-make}
+rogues_table <-
+  sanger_seqs_rogues_inspected %>%
+  # FIXME: manually correct one species
+  # should delete this after correcting
+  # https://github.com/fernphy/ftol/issues/16
+  filter(species != "Dryopolystichum_phaeostigma") %>%
+  arrange(species, target) %>%
+  rename(locus = target)
+```
+
+```{r rogues-save, eval = params$doc_type == "doc"}
+# Save if rendering to doc
+write_csv(rogues_table, result_file(s_table("rogues"), "csv"))
+```
+
+**`r s_table("rogues")`**.
+GenBank accessions identified as rogues by all-by-all BLAST.
+"q_family" is the family of the GenBank query (accession).
+"s_family" is the family of the top three best matches (only cases where the top three matches all belong to the same family included).
+All accessions in this table were excluded from further analysis.
 
 ```{r accs-save, eval = params$doc_type == "doc"}
 write_csv(acc_table_long, result_file(s_table("accs"), "csv"))

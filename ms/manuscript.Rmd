@@ -549,7 +549,7 @@ The initial GenBank query for the seven Sanger loci resulted in `r n_accs_query`
 Extraction of target loci with superCRUNCH recovered `r n_accs_extract` accessions.
 Manual inspection of the initial tree resulted in a list of `r n_accs_exclude` rogues to be excluded.
 After excluding these and accessions with names that could not be resolved to an accepted name in the taxonomic database, `r n_accs_first_filter` accessions were retained.
-After further excluding rogues identified by the all-by-all BLAST search, `r n_accs_second_filter` accessions were retained.
+After further excluding rogues identified by the all-by-all BLAST search `r s_table("rogues")`, `r n_accs_second_filter` accessions were retained.
 The final selection of Sanger loci (one set of concatenated accessions per species or one accession per species if conditions for concatenation were not met) after excluding species in the plastome dataset included `r n_accs_raw_final` accessions (`r n_accs_final` sequences when counting distinct loci within each accession separately; `r s_table("accs")`) representing `r n_species_sanger` species.
 The most frequent method for joining accessions across loci was by `r last(join_by_count)$join_by` (`r last(join_by_count)$n` species; `r last(join_by_count)$percent`); `r join_by_count$unjoined$n` species (`r join_by_count$unjoined$percent`) had accessions that could not be joined or only included one of the seven loci (`r s_table("join_by")`).
 
