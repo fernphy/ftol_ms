@@ -741,6 +741,83 @@ The plastome DNA alignment was `r number(ncol(plastome_alignment))` bp with `r p
 
 ## Phylogeny
 
+```{r phylogeny-stats-log}
+sanger_log_files <- fs::dir_ls(
+ here::here("ftol_cache/user/intermediates/iqtree/"),
+ recurse = TRUE,
+ regexp = "sanger_[0-9]+/sanger_alignment.phy.log"
+ )
+
+rename_sanger <- function(x) {
+  names(x) <- str_match(names(x), "sanger_[0-9]") %>%
+    magrittr::extract(,1)
+  x
+}
+
+sanger_ml_log_rep <- sanger_log_files %>%
+  map(read_lines) %>%
+  unlist()
+
+ml_scores <- sanger_ml_log_rep[
+  str_detect(sanger_ml_log_rep, "BEST SCORE FOUND")] %>%
+  rename_sanger() %>%
+  map_dbl(parse_number)
+
+con_scores <- sanger_ml_log_rep[
+  str_detect(sanger_ml_log_rep, "Log-likelihood of consensus tree")] %>%
+  rename_sanger() %>%
+  map_chr(~str_remove_all(., "Log-likelihood of consensus tree: ")) %>%
+  map_dbl(parse_number)
+combined_scores <- ml_scores + con_scores
+
+assertthat::assert_that(
+  !any(is.na(ml_scores))
+)
+assertthat::assert_that(
+  !any(is.na(con_scores))
+)
+assertthat::assert_that(
+  length(ml_scores) == length(con_scores),
+  msg = "Length of ML and consensus scores don't match"
+)
+
+best_index <- which(combined_scores == max(combined_scores))
+best_ml_score <- ml_scores[best_index]
+best_con_score <- con_scores[best_index]
+
+assertthat::assert_that(
+  best_ml_score < best_con_score,
+  msg = "Best ML score not less than best consensus score"
+)
+
+# check model selected
+sanger_models <- sanger_log_files %>%
+  map(read_lines) %>%
+  map(extract_iqtree_mod) %>%
+  map(unique) %>%
+  rename_sanger()
+
+assertthat::assert_that(
+  length(unique(sanger_models)) == 1,
+  msg = "More than one sanger model selected"
+)
+assertthat::assert_that(
+  extract_iqtree_mod(plastome_iqtree_log) == unique(sanger_models),
+  msg = "Model selected for plastome and sanger don't match"
+)
+
+# check number of runs converged
+no_converge <- sanger_ml_log_rep[
+  str_detect(sanger_ml_log_rep, "bootstrap analysis did not converge")] %>%
+  rename_sanger()
+n_converge <- length(sanger_log_files) - length(no_converge) %>%
+  english::english()
+
+assertthat::assert_that(
+  names(best_index) %in% names(no_converge),
+  msg = "Best scoring tree *did* converge")
+```
+
 ```{r phylogeny-stats}
 # Bootstrap values for selected clades
 ferns_bs <- get_bs(plastome_tree_rooted, c("Equisetum_arvense", "Danaea_nodosa"))
@@ -821,8 +898,8 @@ assertthat::assert_that(
 ```
 
 The `r extract_iqtree_mod(plastome_iqtree_log)` model was selected according to BIC for both the plastome (backbone) and Sanger analyses.
-Two of the ten runs converged (correlation coefficient of split occurrence frequencies >0.99), but the run with the highest log-likelihood, from which the final tree was selected, did not converge (correlation coefficient 0.977 after 1,000 iterations).
-The consensus tree had higher log-likelihood (-1183776.726) than the ML tree (-1183911.595), so we only present the topology and divergence times estimated from the consensus tree.
+`r str_to_sentence(n_converge)` of the ten runs converged (correlation coefficient of split occurrence frequencies >0.99), but the run with the highest log-likelihood, from which the final tree was selected, did not converge (correlation coefficient 0.976 after `r number(1000)` iterations).
+The consensus tree had higher log-likelihood (`r best_con_score`) than the ML tree (`r best_ml_score`), so we only present the topology and divergence times estimated from the consensus tree.
 
 Ferns are strongly supported as monophyletic (BS `r ferns_bs`; all subsequent relationships mentioned received BS ≥ `r percent(.98)` in the backbone phylogeny unless otherwise indicated).
 The first split within ferns separates a clade including Equisetidae and Ophioglossidae from all other species (Figures `r figure_num("backbone")`, `r s_figure_num("backbone_full")`).
