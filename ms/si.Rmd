@@ -287,6 +287,17 @@ fossils_table <-
     organs, specimen_holotype, collection,
     reference_raw = reference
   ) %>%
+  # Fix some spelling errors, missing data
+  mutate(
+    formation = case_when(
+      formation == "Dominicam amber deposti" ~ "Dominican amber deposit",
+      TRUE ~ formation
+    ),
+    type_locality =  case_when(
+      n_fos == 33 ~ "Burdigalian amber bearing strata of Dominican Republic",
+      TRUE ~ type_locality
+    )
+  ) %>%
   # Format references
   mutate(reference = cite_pd(
     reference_raw, bib = bib, csl = csl, context = temp_context)) %>%

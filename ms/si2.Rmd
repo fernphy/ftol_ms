@@ -137,6 +137,17 @@ n_fos_used <-
 # Tidy fossils in wide format
 fossils_long <-
   fossil_ferns_raw %>%
+  # Fix some spelling errors, missing data
+  mutate(
+    formation = case_when(
+      formation == "Dominicam amber deposti" ~ "Dominican amber deposit",
+      TRUE ~ formation
+    ),
+    type_locality =  case_when(
+      n_fos == 33 ~ "Burdigalian amber bearing strata of Dominican Republic",
+      TRUE ~ type_locality
+    )
+  ) %>%
   # Filter to only those actually used in the study
   inner_join(
     n_fos_used, by = "n_fos"
