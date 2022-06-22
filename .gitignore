@@ -13,3 +13,4 @@ _targets
 .aux
 .out
 _supp_store
+ftol_data
