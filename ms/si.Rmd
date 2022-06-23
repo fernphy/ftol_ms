@@ -432,7 +432,7 @@ Status of intruders and outliers was determined using the default cutoff level (
 
 \newpage
 
-```{r seqlen, fig.width = 7, fig.height = 4, eval = params$doc_type != "manual"}
+```{r seqlen-plot, fig.width = 7, fig.height = 4, eval = params$doc_type != "manual"}
 fern_slen_tib <- read_from_cache(
   "fern_slen_tib", here::here("_supp_store")) %>%
   # Add column for plastome or not
@@ -464,7 +464,7 @@ Note that "other" includes some whole plastome accessions that cannot be disting
 
 \newpage
 
-```{r fossil-map-make}
+```{r fossil-map-plot-make}
 # Make tibble with node number and label for ggtree
 node_labs_tbl <-
   con_fossil_calibrations_for_treepl %>%
@@ -500,25 +500,27 @@ fossil_map_plot <-
   geom_text(
     aes(label = fossil_label), hjust = 0, size = 1.0, color = "grey20") +
   # Add tip labels
-  geom_tiplab(aes(label = label), size = 0.5, color = "grey30") +
+  geom_tiplab(
+    aes(label = label), size = 0.5, color = "grey30", offset = -0.25) +
   theme(legend.position = "bottom")
 ```
 
-```{r fossil-map-save, eval = params$doc_type == "doc"}
+```{r fossil-map-plot-save, eval = params$doc_type == "doc"}
 ggsave(
   plot = fossil_map_plot,
   file = (result_file(s_figure("fossil_map"), "pdf")),
-  height = 60, width = 8, units = "in",
+  height = 70, width = 8, units = "in",
   limitsize = FALSE)
 ```
 
 **`r s_figure("fossil_map")`**.
 Consensus phylogeny (Sanger dataset) with node labels indicating placement of fossil constraints (`r result_file(s_figure("fossil_map"), "pdf") %>% fs::path_file()`).
 Number for each constraint is age in Ma.
+Outgroup taxon *Zygnema circumcarinatum* (algae) pruned prior to dating analysis and not shown.
 
 \newpage
 
-```{r locus-upset, fig.width = 7, fig.height = 5, eval = params$doc_type != "manual"}
+```{r locus-upset-plot, fig.width = 7, fig.height = 5, eval = params$doc_type != "manual"}
 # Make tibble with one row per locus per species
 sanger_alignment_tbl %>%
   mutate(taxon = map(align_trimmed, rownames)) %>%
@@ -543,8 +545,8 @@ Only top 20 combinations shown.
 
 \newpage
 
-```{r bs-plot}
-phy <- sanger_con_tree_rooted
+```{r bs-plot-make}
+phy <- sanger_con_tree_rooted_pruned
 
 # Make tibble for printing BS values
 bs_tibble <- make_bs_tbl(phy) %>%
@@ -554,25 +556,28 @@ bs_tibble <- make_bs_tbl(phy) %>%
 bs_plot <- 
   ggtree(
     phy,
-    size = 0.1, color = "grey30") %<+% bs_tibble +
+    size = 0.07, color = "grey30") %<+% bs_tibble +
   # Add node points
   geom_nodepoint(
-    aes(color = bs), size = 0.1) +
+    aes(
+      color = bs), size = 0.1, alpha = 0.9,
+      shape = 16, fill = "transparent") +
   scale_color_viridis_c(
     "BS",
     option = "B", na.value = "transparent",
     labels = scales::percent
     ) +
   # Add tip labels
-  geom_tiplab(aes(label = label), size = 0.5, color = "grey30") +
+  geom_tiplab(
+    aes(label = label), size = 0.5, color = "grey30", offset = -0.005) +
   theme(legend.position = "bottom")
 ```
 
-```{r bs-save, eval = params$doc_type == "doc"}
+```{r bs-plot-save, eval = params$doc_type == "doc"}
 ggsave(
   plot = bs_plot,
   file = result_file(s_figure("bs"), "pdf"),
-  height = 60, width = 8, units = "in",
+  height = 70, width = 8, units = "in",
   limitsize = FALSE)
 ```
 
@@ -580,11 +585,13 @@ ggsave(
 Consensus phylogeny (Sanger dataset) with node labels showing bootstrap support (%) (`r result_file(s_figure("bs"), "pdf") %>% fs::path_file()`).
 Darker colors indicate lower support.
 The backbone (plastome) phylogeny was used as a constraint tree, so all clades present in the backbone phylogeny tree receive 100% bootstrap support.
+Outgroup taxon *Zygnema circumcarinatum* (algae) not shown.
 
 \newpage
 
-```{r backbone-full-plot}
-phy <- plastome_tree_rooted
+```{r backbone-full-plot-make}
+# Don't show Zygnema in plot
+phy <- ape::drop.tip(plastome_tree_rooted, "Zygnema_circumcarinatum")
 
 # Make tibble for printing BS values
 bs_tibble <- make_bs_tbl(phy) %>%
@@ -603,10 +610,10 @@ bb_full_plot <-
     aes(label = bs), hjust = -.25, size = 1.0,
     color = "grey50") +
   # add tip labels
-  geom_tiplab(aes(label = label), size = 1.0)
+  geom_tiplab(aes(label = label), size = 1.0, offset = -0.005)
 ```
 
-```{r backbone-full-save, eval = params$doc_type == "doc"}
+```{r backbone-full-plot-save, eval = params$doc_type == "doc"}
 ggsave(
   plot = bb_full_plot,
   file = (result_file(s_figure("backbone_full"), "pdf")),
@@ -617,10 +624,11 @@ ggsave(
 **`r s_figure("backbone_full")`**.
 Consensus plastome (backbone) phylogeny (`r result_file(s_figure("backbone_full"), "pdf") %>% fs::path_file()`).
 Values at nodes are bootstrap support (%); only values less than 100% are shown.
+Outgroup taxon *Zygnema circumcarinatum* (algae) not shown.
 
 \newpage
 
-```{r du-ages, fig.width = 7, fig.height = 5, eval = params$doc_type != "manual"}
+```{r du-ages-plot, fig.width = 7, fig.height = 5, eval = params$doc_type != "manual"}
 # Helper function for subsetting dates to get into
 # almost-long format
 subset_ages <- function(other_dates, author_sel) {
@@ -776,7 +784,7 @@ Period name abbreviations as in `r figure("divtimes")`.
 
 \newpage
 
-```{r comp-fossils, fig.width = 7, fig.height = 9, eval = params$doc_type != "manual"}
+```{r comp-fossils-plot, fig.width = 7, fig.height = 9, eval = params$doc_type != "manual"}
 ts_fossil_calibration_tips %>%
   select(minimum_age, node_calibrated) %>%
   mutate(dataset = "ts") %>%
@@ -803,11 +811,12 @@ ts_fossil_calibration_tips %>%
 ```
 
 **`r s_figure("comp-fossils")`**.
-Age of nodes constrained by fossils in this study vs. @Testo2016a. Wide bars indicate the node was only constrained in one study; narrow bars indicate the the node was constrained in both studies.
+Age of nodes constrained by fossils in this study vs. @Testo2016a.
+Wide bars indicate the node was only constrained in one study; narrow bars indicate the the node was constrained in both studies.
 
 \newpage
 
-```{r comp-stem-ages, fig.width = 7, fig.height = 9, eval = params$doc_type != "manual"}
+```{r comp-stem-ages-plot, fig.width = 7, fig.height = 9, eval = params$doc_type != "manual"}
 # Combine family stem ages into almost-long format:
 # one row per family/study combination,
 # cols for median, high, and low date
@@ -894,7 +903,7 @@ Period name abbreviations as in `r figure("divtimes")`.
 
 \newpage
 
-```{r ts-fossil-map-make}
+```{r ts-fossil-map-plot-make}
 # Make tibble with node number and label for ggtree
 ts_node_labs_tbl <-
   ts_fossil_calibrations_for_treepl %>%
@@ -912,7 +921,7 @@ ts_node_labs_tbl <-
   assert(not_na, calibration_type)
 
 # Make plot
-fossil_map_plot <-
+ts_fossil_map_plot <-
   ggtree(
     sanger_con_tree_rooted_pruned,
     branch.length = "none",
@@ -929,27 +938,31 @@ fossil_map_plot <-
   ) +
   # Add node labels
   geom_text(
-    aes(label = fossil_label), hjust = 0, size = 1.0, color = "grey20") +
+    aes(label = fossil_label),
+    hjust = 0, size = 1.0, color = "grey20") +
   # Add tip labels
-  geom_tiplab(aes(label = label), size = 0.5, color = "grey30") +
+  geom_tiplab(aes(label = label),
+  size = 0.5, color = "grey30", offset = -0.25) +
+  xlim(0, 66.1) +
   theme(legend.position = "bottom")
 ```
 
-```{r ts-fossil-map-save, eval = params$doc_type == "doc"}
+```{r ts-fossil-map-plot-save, eval = params$doc_type == "doc"}
 ggsave(
-  plot = fossil_map_plot,
+  plot = ts_fossil_map_plot,
   file = (result_file(s_figure("ts_fossil_map"), "pdf")),
-  height = 60, width = 8, units = "in",
+  height = 70, width = 8, units = "in",
   limitsize = FALSE)
 ```
 
 **`r s_figure("ts_fossil_map")`**.
 Consensus phylogeny (Sanger dataset) with node labels indicating placement of fossil constraints of @Testo2016a.
 Number for each constraint is age in Ma.
+Outgroup taxon *Zygnema circumcarinatum* (algae) pruned prior to dating analysis and not shown.
 
 \newpage
 
-```{r comp-stem-points, fig.width = 6, fig.height = 5, eval = params$doc_type != "manual"}
+```{r comp-stem-points-plot, fig.width = 6, fig.height = 5, eval = params$doc_type != "manual"}
 # For checking that model data is same as plot data
 mod_fitted_data <-
 ftol_ts_comp_mod %>%
@@ -1020,7 +1033,7 @@ Solid line indicates linear model fit.
 
 \newpage
 
-```{r ltt, fig.width = 7, fig.height = 6, eval = params$doc_type != "manual"}
+```{r ltt-plot, fig.width = 7, fig.height = 6, eval = params$doc_type != "manual"}
 # Make lineages through time (LTT) plot comparing Angiosperms and polypods
 
 ## Angiosperms ##
