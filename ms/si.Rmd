@@ -545,6 +545,45 @@ Only top 20 combinations shown.
 
 \newpage
 
+```{r backbone-full-plot-make}
+# Don't show Zygnema in plot
+phy <- ape::drop.tip(plastome_tree_rooted, "Zygnema_circumcarinatum")
+
+# Make tibble for printing BS values
+bs_tibble <- make_bs_tbl(phy) %>%
+  # only print values < 100
+  mutate(bs = case_when(
+    bs == 100 ~ "",
+    TRUE ~ as.character(bs)
+  ))
+
+# Make plot
+bb_full_plot <-
+  ggtree(phy, size = 0.2, color = "grey10") %<+% 
+  bs_tibble +
+  # now we can show BS values using geom_text()
+  geom_text(
+    aes(label = bs), hjust = -.25, size = 1.0,
+    color = "grey50") +
+  # add tip labels
+  geom_tiplab(aes(label = label), size = 1.0, offset = -0.005)
+```
+
+```{r backbone-full-plot-save, eval = params$doc_type == "doc"}
+ggsave(
+  plot = bb_full_plot,
+  file = (result_file(s_figure("backbone_full"), "pdf")),
+  height = 20, width = 10, units = "in",
+  limitsize = FALSE)
+```
+
+**`r s_figure("backbone_full")`**.
+Consensus plastome (backbone) phylogeny (`r result_file(s_figure("backbone_full"), "pdf") %>% fs::path_file()`).
+Values at nodes are bootstrap support (%); only values less than 100% are shown.
+Outgroup taxon *Zygnema circumcarinatum* (algae) not shown.
+
+\newpage
+
 ```{r bs-plot-make}
 phy <- sanger_con_tree_rooted_pruned
 
@@ -585,45 +624,6 @@ ggsave(
 Consensus phylogeny (Sanger dataset) with node labels showing bootstrap support (%) (`r result_file(s_figure("bs"), "pdf") %>% fs::path_file()`).
 Darker colors indicate lower support.
 The backbone (plastome) phylogeny was used as a constraint tree, so all clades present in the backbone phylogeny tree receive 100% bootstrap support.
-Outgroup taxon *Zygnema circumcarinatum* (algae) not shown.
-
-\newpage
-
-```{r backbone-full-plot-make}
-# Don't show Zygnema in plot
-phy <- ape::drop.tip(plastome_tree_rooted, "Zygnema_circumcarinatum")
-
-# Make tibble for printing BS values
-bs_tibble <- make_bs_tbl(phy) %>%
-  # only print values < 100
-  mutate(bs = case_when(
-    bs == 100 ~ "",
-    TRUE ~ as.character(bs)
-  ))
-
-# Make plot
-bb_full_plot <-
-  ggtree(phy, size = 0.2, color = "grey10") %<+% 
-  bs_tibble +
-  # now we can show BS values using geom_text()
-  geom_text(
-    aes(label = bs), hjust = -.25, size = 1.0,
-    color = "grey50") +
-  # add tip labels
-  geom_tiplab(aes(label = label), size = 1.0, offset = -0.005)
-```
-
-```{r backbone-full-plot-save, eval = params$doc_type == "doc"}
-ggsave(
-  plot = bb_full_plot,
-  file = (result_file(s_figure("backbone_full"), "pdf")),
-  height = 20, width = 10, units = "in",
-  limitsize = FALSE)
-```
-
-**`r s_figure("backbone_full")`**.
-Consensus plastome (backbone) phylogeny (`r result_file(s_figure("backbone_full"), "pdf") %>% fs::path_file()`).
-Values at nodes are bootstrap support (%); only values less than 100% are shown.
 Outgroup taxon *Zygnema circumcarinatum* (algae) not shown.
 
 \newpage
@@ -816,6 +816,65 @@ Wide bars indicate the node was only constrained in one study; narrow bars indic
 
 \newpage
 
+```{r ts-fossil-map-plot-make}
+# Make tibble with node number and label for ggtree
+ts_node_labs_tbl <-
+  ts_fossil_calibrations_for_treepl %>%
+  transmute(
+    fossil_label = str_remove_all(min, "min = "),
+    node = map2_dbl(
+      taxon_1, taxon_2,
+      ~ape::getMRCA(sanger_con_tree_rooted_pruned, c(.x, .y))),
+    calibration_type = case_when(
+      !is.na(min) & is.na(max) ~ "minimum",
+      !is.na(min) & !is.na(max) ~ "fixed",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  assert(not_na, calibration_type)
+
+# Make plot
+ts_fossil_map_plot <-
+  ggtree(
+    sanger_con_tree_rooted_pruned,
+    branch.length = "none",
+    size = 0.1, color = "grey30") %<+% ts_node_labs_tbl +
+  # Add node points
+  geom_nodepoint(
+    aes(color = calibration_type), size = 0.6) +
+  scale_color_manual(
+    "Calibration type",
+    values = c(
+      minimum = palette_okabe_ito("vermillion"),
+      fixed = palette_okabe_ito("skyblue")),
+    na.value = "transparent"
+  ) +
+  # Add node labels
+  geom_text(
+    aes(label = fossil_label),
+    hjust = 0, size = 1.0, color = "grey20") +
+  # Add tip labels
+  geom_tiplab(aes(label = label),
+  size = 0.5, color = "grey30", offset = -0.25) +
+  xlim(0, 66.1) +
+  theme(legend.position = "bottom")
+```
+
+```{r ts-fossil-map-plot-save, eval = params$doc_type == "doc"}
+ggsave(
+  plot = ts_fossil_map_plot,
+  file = (result_file(s_figure("ts_fossil_map"), "pdf")),
+  height = 70, width = 8, units = "in",
+  limitsize = FALSE)
+```
+
+**`r s_figure("ts_fossil_map")`**.
+Consensus phylogeny (Sanger dataset) with node labels indicating placement of fossil constraints of @Testo2016a.
+Number for each constraint is age in Ma.
+Outgroup taxon *Zygnema circumcarinatum* (algae) pruned prior to dating analysis and not shown.
+
+\newpage
+
 ```{r comp-stem-ages-plot, fig.width = 7, fig.height = 9, eval = params$doc_type != "manual"}
 # Combine family stem ages into almost-long format:
 # one row per family/study combination,
@@ -900,65 +959,6 @@ For @Testo2016a, error bars indicate lower and upper 95% highest posterior densi
 For this study, point indicates best (most likely) estimate.
 Codes in parentheses after family names indicate major clade as in `r figure("ftol")`.
 Period name abbreviations as in `r figure("divtimes")`.
-
-\newpage
-
-```{r ts-fossil-map-plot-make}
-# Make tibble with node number and label for ggtree
-ts_node_labs_tbl <-
-  ts_fossil_calibrations_for_treepl %>%
-  transmute(
-    fossil_label = str_remove_all(min, "min = "),
-    node = map2_dbl(
-      taxon_1, taxon_2,
-      ~ape::getMRCA(sanger_con_tree_rooted_pruned, c(.x, .y))),
-    calibration_type = case_when(
-      !is.na(min) & is.na(max) ~ "minimum",
-      !is.na(min) & !is.na(max) ~ "fixed",
-      TRUE ~ NA_character_
-    )
-  ) %>%
-  assert(not_na, calibration_type)
-
-# Make plot
-ts_fossil_map_plot <-
-  ggtree(
-    sanger_con_tree_rooted_pruned,
-    branch.length = "none",
-    size = 0.1, color = "grey30") %<+% ts_node_labs_tbl +
-  # Add node points
-  geom_nodepoint(
-    aes(color = calibration_type), size = 0.6) +
-  scale_color_manual(
-    "Calibration type",
-    values = c(
-      minimum = palette_okabe_ito("vermillion"),
-      fixed = palette_okabe_ito("skyblue")),
-    na.value = "transparent"
-  ) +
-  # Add node labels
-  geom_text(
-    aes(label = fossil_label),
-    hjust = 0, size = 1.0, color = "grey20") +
-  # Add tip labels
-  geom_tiplab(aes(label = label),
-  size = 0.5, color = "grey30", offset = -0.25) +
-  xlim(0, 66.1) +
-  theme(legend.position = "bottom")
-```
-
-```{r ts-fossil-map-plot-save, eval = params$doc_type == "doc"}
-ggsave(
-  plot = ts_fossil_map_plot,
-  file = (result_file(s_figure("ts_fossil_map"), "pdf")),
-  height = 70, width = 8, units = "in",
-  limitsize = FALSE)
-```
-
-**`r s_figure("ts_fossil_map")`**.
-Consensus phylogeny (Sanger dataset) with node labels indicating placement of fossil constraints of @Testo2016a.
-Number for each constraint is age in Ma.
-Outgroup taxon *Zygnema circumcarinatum* (algae) pruned prior to dating analysis and not shown.
 
 \newpage
 
