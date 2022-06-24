@@ -256,7 +256,7 @@ write_csv(genera_diff_table, result_file(s_table("genera_diff"), "csv"))
 ```
 
 **`r s_table("genera_diff")`**.
-Differences in genera included as accepted in "pteridocat" taxonomic database v0.0.1 (https://github.com/fernphy/pteridocat) vs. PPGI [@PteridophytePhylogenyGroupI2016] (`r result_file(s_table("genera_diff"), "csv") %>% fs::path_file()`).
+Differences in genera included as accepted in "pteridocat" taxonomic database v1.0.0 (https://github.com/fernphy/pteridocat) vs. PPGI [@PteridophytePhylogenyGroupI2016] (`r result_file(s_table("genera_diff"), "csv") %>% fs::path_file()`).
 "diff" is type of difference (pteridocat genus not in PPGI or PPGI genus not in pteridocat).
 "n_species" is the number of accepted species in each genus (pteridocat) or estimated number of species (PPGI).
 References in "notes" column provided at end of Supplementary Materials.
@@ -321,7 +321,7 @@ write_csv(fossils_table, result_file(s_table("fossils"), "csv"))
 
 **`r s_table("fossils")`**.
 Fossils used as calibration points for molecular dating (`r result_file(s_table("fossils"), "csv") %>% fs::path_file()`).
-"n_fos" is the fossil ID number used in the "ferncal" database v1.0.0 (https://github.com/fernphy/ferncal).
+"n_fos" is the fossil ID number used in the "ferncal" database v1.0.1 (https://github.com/fernphy/ferncal).
 "minimum_age" is the age used for calibration (Ma); "lower" is the lower limit of the oldest stratigraphic age for the fossil (Ma); "upper" is the upper limit of the oldest stratigraphic age for the fossil (Ma).
 For detailed notes and full references for each fossil, see Appendix S2.
 
@@ -356,9 +356,9 @@ GenBank accessions used in this study (`r result_file(s_table("accs"), "csv") %>
 "species" is the species name as it appears in the phylogenetic tree.
 "seq_len" is the total number of bases excluding missing bases ("?", "N", or "-") and only includes bases belonging to loci used in this study (not the entire accession).
 "sci_name" is the scientific name in the pteridocat taxonomic database.
-"ncbi_name" is the scientific name used in the NCBI taxonomic database version 2022-02-01.
+"ncbi_name" is the scientific name used in the NCBI taxonomic database version 2022-05-01.
 "ncbi_taxid" is the NCBI taxonomy database unique identifier.
-"outgroup_status" is "in" for ingroup taxa (ferns) and "out" for outgroup taxa.
+"outgroup_status" is "FALSE" for ingroup taxa (ferns) and "TRUE" for outgroup taxa.
 
 \newpage
 
