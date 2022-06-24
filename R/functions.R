@@ -1199,10 +1199,9 @@ make_bs_tbl <- function(phy) {
   tibble(
     # hard-code node ID: internal nodes start after tip nodes,
     # and phy$node.label is in the same order as internal nodes
-    node = 1:Nnode(phy) + Ntip(phy), 
+    node = seq_len(Nnode(phy)) + Ntip(phy), 
     bs = bs_values)
 }
-
 
 # Etc -----
 
