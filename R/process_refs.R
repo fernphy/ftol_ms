@@ -29,4 +29,4 @@ extract_citations("ms/manuscript.Rmd") %>%
   # where KEY is the citation key
   mutate(latex = glue::glue("\\citation{[key]}", .open = "[", .close = "]")) %>%
   pull(latex) %>%
-  write_lines("working/ms_keys.aux")
+  write_lines("working/ftol.aux")
