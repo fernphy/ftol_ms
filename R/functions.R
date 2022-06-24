@@ -1205,6 +1205,15 @@ make_bs_tbl <- function(phy) {
 
 # Etc -----
 
+# Helper function to go from package name to version
+pkg_ver <- function(pkg, renv_pkg_versions) {
+  ver <- renv_pkg_versions %>%
+    filter(package == pkg) %>%
+    pull(version)
+  assertthat::assert_that(assertthat::is.string(ver))
+  ver
+}
+
 # Work-around for tar_load()
 # for some reason, doesn't work with tar_load(store = ftol_cache)
 read_from_cache <- function(object, cache) {
