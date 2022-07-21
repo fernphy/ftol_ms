@@ -1,0 +1,1582 @@
+---
+references:
+- id: Axsmith_etal-2001
+  author:
+    - family: Axsmith
+      given: Brian J
+    - family: Kings
+      given: Michael
+    - family: Taylor
+      given: Thomas N.
+  citation-key: Axsmith_etal-2001
+  container-title: American Journal of Botany
+  DOI: 10.2307/3558399
+  issue: '9'
+  issued:
+    - year: 2001
+  page: 1558–1567
+  title: A filmy fern from the Upper Triassic of North Carolina (USA)
+  type: article-journal
+  volume: '88'
+
+- id: Barrington-1983
+  author:
+    - family: Barrington
+      given: David S
+  citation-key: Barrington-1983
+  container-title: American Journal of Botany
+  DOI: 10.1002/j.1537-2197.1983.tb12460.x
+  issue: '8'
+  issued:
+    - year: 1983
+  page: 1118–1124
+  title: >-
+    *Cibotium oregonense*: An Eocene tree-fern stem and petioles with internal
+    structure
+  type: article-journal
+  volume: '70'
+
+- id: Bateman-1991
+  author:
+    - family: Bateman
+      given: Richard M.
+  citation-key: Bateman-1991
+  container-title: Palaeontographica Abt. B
+  issued:
+    - year: 1991
+  page: 1–59
+  title: >-
+    Palaeobiological and phylogenetic implications of anatomically-preserved
+    *Archaeocalamites* from the Dinantian of Oxroad Bay and Loch Humphrey Burn,
+    Southern Scotland
+  type: article-journal
+  volume: '223'
+
+- id: Batten_etal-1998
+  author:
+    - family: Batten
+      given: David J.
+    - family: Collinson
+      given: Margaret E.
+    - family: Brain
+      given: Anthony P. R.
+  citation-key: Batten_etal-1998
+  container-title: American Journal of Botany
+  DOI: 10.2307/2446543
+  issue: '5'
+  issued:
+    - year: 1998
+  page: 724–735
+  title: >-
+    Ultrastructural interpretation of the Late Cretaceous megaspore <span
+    class="nocase">*Glomerisporites pupus*</span> and its associated microspores
+  type: article-journal
+  volume: '85'
+
+- id: BertoliCunha_etal-2008
+  author:
+    - family: Bertoli-Cunha
+      given: Michele
+    - family: Dutra
+      given: Tânia L.
+    - family: Cardoso
+      given: 'N'
+  citation-key: BertoliCunha_etal-2008
+  container-title: Journal of Geoscience
+  issue: '1'
+  issued:
+    - year: 2008
+  page: 1–13
+  title: Uma Dicksoniaceae fértil no Eoceno da Ilha King George, Península Antártica
+  type: article-journal
+  volume: '4'
+
+- id: Bolchotinova_1953
+  author:
+    - family: Bolchotinova
+      given: A.
+  citation-key: Bolchotinova_1953
+  issued:
+    - year: 1953
+  page: '184'
+  publisher: издательство академии наук ссср
+  title: Спорово-пыльцевая характеристика меловых отложений центральных областей СССР
+  type: book
+
+- id: Bonde_Kumaran-2002
+  author:
+    - family: Bonde
+      given: S D
+    - family: Kumaran
+      given: K P N
+  citation-key: Bonde_Kumaran-2002
+  container-title: Review of Palaeobotany and Palynology
+  DOI: 10.1016/S0034-6667(02)00081-7
+  issued:
+    - year: 2002
+  page: 285–299
+  title: >-
+    A permineralized species of mangrove fern *Acrostichum* L. from Deccan
+    Intertrappean beds of India
+  type: article-journal
+  volume: '120'
+
+- id: Brown-1975
+  author:
+    - family: Brown
+      given: John Thomas
+  citation-key: Brown-1975
+  container-title: American Journal of Botany
+  DOI: 10.1002/j.1537-2197.1975.tb14064.x
+  issue: '4'
+  issued:
+    - year: 1975
+  page: 410–415
+  title: >-
+    *Equisetum clarnoi*, a new species based on petrifactions from the Eocene of
+    Oregon
+  type: article-journal
+  volume: '62'
+
+- id: Cantrill-1998
+  author:
+    - family: Cantrill
+      given: David J.
+  citation-key: Cantrill-1998
+  container-title: Alcheringa
+  DOI: 10.1080/03115519808619203
+  issue: '3'
+  issued:
+    - year: 1998
+  page: 241–258
+  title: Early Cretaceous fern foliage from President Head, Snow Island, Antarctica
+  type: article-journal
+  volume: '22'
+
+- id: Cesari_PerezLoinaze-2006
+  author:
+    - family: Césari
+      given: Silvia N
+    - family: Pérez-Loinaze
+      given: Valeria S
+  citation-key: Cesari_PerezLoinaze-2006
+  container-title: Geobios
+  DOI: 10.1016/j.geobios.2006.01.001
+  issued:
+    - year: 2006
+  page: 785–790
+  title: A new Carboniferous equisetale from western Gondwana
+  type: article-journal
+  volume: '39'
+
+- id: Chen_etal-1997
+  author:
+    - family: Chen
+      given: Fen
+    - family: Deng
+      given: Sheghui
+    - family: Sun
+      given: Keqin
+  citation-key: Chen_etal-1997
+  container-title: Paleobotanist
+  issue: '3'
+  issued:
+    - year: 1997
+  page: 117–133
+  title: Early Cretaceous *Athyrium* Roth from Northeastern China
+  type: article-journal
+  volume: '46'
+
+- id: Chlonova-1960
+  author:
+    - family: Chlonova
+      given: A. F.
+  citation-key: Chlonova-1960
+  event-place: Novosibirsk
+  issued:
+    - year: 1960
+  publisher: СИБИРСКОГО ОТДЕЛЕНИЯ АН СССР
+  publisher-place: Novosibirsk
+  title: >-
+    ВИДОВОЙ СОСТАВ ПЫЛЬЦЫ И СПОР В ОТЛОЖЕНИЯХ ВЕРХНЕГО МЕЛА ЧУЛЫМО-ЕНИСЕЙСКОЙ
+    ВПАДИНЫ
+  type: book
+
+- id: Christenhusz_etal-2021
+  author:
+    - family: Christenhusz
+      given: Maarten J M
+    - family: Chase
+      given: Mark W
+    - family: Fay
+      given: Michael F
+    - family: Hidalgo
+      given: Oriane
+    - family: Leitch
+      given: Ilia J
+    - family: Pellicer
+      given: Jaume
+    - family: Viruel
+      given: Juan
+  citation-key: Christenhusz_etal-2021
+  container-title: Annals of Botany
+  DOI: 10.1093/aob/mcab005
+  issued:
+    - year: 2021
+  page: 681–695
+  title: >-
+    Biogeography and genome size evolution of the oldest extant vascular plant
+    genus, *Equisetum* (Equisetaceae)
+  type: article-journal
+  volume: '127'
+
+- id: Conran_etal-2010
+  author:
+    - family: Conran
+      given: John G
+    - family: Kaulfuss
+      given: Uwe
+    - family: Bannister
+      given: Jennifer M
+    - family: Mildenhall
+      given: Dallas C
+    - family: Lee
+      given: Daphne E
+  citation-key: Conran_etal-2010
+  container-title: Review of Palaeobotany and Palynology
+  DOI: 10.1016/j.revpalbo.2010.06.001
+  issued:
+    - year: 2010
+  page: 84–94
+  publisher: Elsevier B.V.
+  title: >-
+    Review of Palaeobotany and Palynology *Davallia* (Polypodiales:
+    Davalliaceae) macrofossils from Early Miocene Otago (New Zealand) with in
+    situ spores
+  type: article-journal
+  volume: '162'
+
+- id: Crabtree-1987
+  author:
+    - family: Crabtree
+      given: David
+  citation-key: Crabtree-1987
+  genre: Dissertation, Doctor of Philosophy (PhD)
+  issued:
+    - year: 1987
+  page: '336'
+  publisher: University of Montana
+  title: >-
+    The early Campanian flora of the Two Medicine Formation, northcentral
+    Montana
+  type: thesis
+
+- id: Dijkstra-1949
+  author:
+    - family: Dijkstra
+      given: S. J.
+  citation-key: Dijkstra-1949
+  container-title: Mededelingen van de Geologische Stichting, Nieuwe Serie
+  issued:
+    - year: 1949
+  page: 19–32
+  title: >-
+    Megaspores and some other fossils from the Aachenian (Senonian) in South
+    Limburg, Netherlands
+  type: article-journal
+  volume: '3'
+
+- id: Edwards_etal-1992
+  author:
+    - family: Edwards
+      given: D
+    - family: Davies
+      given: K L
+    - family: Axe
+      given: L
+  citation-key: Edwards_etal-1992
+  container-title: Nature
+  DOI: 10.1038/357683a0
+  issued:
+    - year: 1992
+  page: 683–685
+  title: A vascular conducting strand in the early land plant *Cooksonia*
+  type: article-journal
+  volume: '357'
+
+- id: Elgorriaga_etal-2018
+  author:
+    - family: Elgorriaga
+      given: Andrés
+    - family: Escapa
+      given: Ignacio H
+    - family: Rothwell
+      given: Gary W.
+    - family: Tomescu
+      given: Alexandru M. F.
+    - family: Cúneo
+      given: N. Rubén
+  citation-key: Elgorriaga_etal-2018
+  container-title: American Journal of Botany
+  DOI: 10.1002/ajb2.1125
+  issued:
+    - year: 2018
+  page: 1286–1303
+  title: >-
+    Origin of *Equisetum*: Evolution of horsetails (Equisetales) within the
+    major euphyllophyte clade Sphenopsida
+  type: article-journal
+  volume: '105'
+
+- id: Falaschi_etal-2009
+  author:
+    - family: Falaschi
+      given: Paula
+    - family: Zamunier
+      given: Alba B.
+    - family: Foix
+      given: Nicolás
+  citation-key: Falaschi_etal-2009
+  container-title: Ameghiniana
+  issue: '2'
+  issued:
+    - year: 2009
+  page: 263–272
+  title: >-
+    Una nueva Equisetaceae fértil de la Formación La Matilde, Jurásico Medio,
+    Argentina
+  type: article-journal
+  volume: '46'
+
+- id: Graham_Jarzen-1969
+  author:
+    - family: Graham
+      given: Alan
+    - family: Jarzen
+      given: David M
+  citation-key: Graham_Jarzen-1969
+  container-title: Annals of the Missouri Botanical Garden
+  DOI: 10.2307/2394849
+  issue: '3'
+  issued:
+    - year: 1969
+  page: 308–357
+  title: >-
+    Studies in neotropical paleobotany. I. The Oligocene communities of Puerto
+    Rico
+  type: article-journal
+  volume: '56'
+
+- id: Graham-1979
+  author:
+    - family: Graham
+      given: Alan
+  citation-key: Graham-1979
+  container-title: Annals of the Missouri Botanical Garden
+  DOI: 10.2307/2398850
+  issued:
+    - year: 1979
+  page: 572–576
+  publisher: JSTOR
+  title: >-
+    *Mortoniodendron* (Tiliaceae) and *Sphaeropteris*/*Trichipteris*
+    (Cyatheaceae) in cenozoic deposits of the Gulf-Caribbean region
+  type: article-journal
+
+- id: Hao_Xue-2013b
+  author:
+    - family: Hao
+      given: Shougang
+    - family: Xue
+      given: Jinzhuang
+  citation-key: Hao_Xue-2013b
+  event-place: Beijing
+  issued:
+    - year: 2013
+  page: '363'
+  publisher: Science Press
+  publisher-place: Beijing
+  title: >-
+    The Early Devonian Posongchong Flora of Yunnan - A contribution to an
+    understanding of the evolution and early diversification of vascular plants
+  type: book
+
+- id: Harris-1961
+  author:
+    - family: Harris
+      given: Thomas Maxwell
+  citation-key: Harris-1961
+  event-place: London
+  issued:
+    - year: 1961
+  page: '205'
+  publisher: British Museum (Natural History)
+  publisher-place: London
+  title: The Yorkshire Jurassic Flora. I. Thallophyta-Pteridophyta
+  type: book
+
+- id: Herendeen1998
+  author:
+    - family: Herendeen
+      given: Patrick S
+    - family: Skog
+      given: Judith E
+  citation-key: Herendeen1998
+  container-title: International Journal of Plant Sciences
+  DOI: 10.1086/297609
+  issued:
+    - year: 1998
+  page: 870–879
+  title: >-
+    *Gleichenia chaloneri* - A new fossil fern from the Lower Cretaceous
+    (Albian) of England
+  type: article-journal
+  volume: '159'
+
+- id: HernandezCastillo_etal-2006
+  author:
+    - family: Hernandez-Castillo
+      given: Genaro R
+    - family: Stockey
+      given: Ruth A
+    - family: Rothwell
+      given: Gar W
+  citation-key: HernandezCastillo_etal-2006
+  container-title: International Journal of Plant Sciences
+  DOI: 10.1086/502801
+  issue: '3'
+  issued:
+    - year: 2006
+  page: 665–674
+  title: >-
+    *Anemia quatsinoensis* sp. nov. (Schizaceae), a permineralized fern from the
+    Lower Cretaceous of Vancouver Island
+  type: article-journal
+  volume: '167'
+
+- id: Herrera_etal-2017
+  author:
+    - family: Herrera
+      given: Fabiany
+    - family: Moran
+      given: Robbin C
+    - family: Shi
+      given: Gongle
+    - family: Ichinnorov
+      given: Niiden
+    - family: Takahashi
+      given: Masamichi
+    - family: Crane
+      given: Peter R
+    - family: Herendeen
+      given: Patrick S
+  citation-key: Herrera_etal-2017
+  container-title: American Journal of Botany
+  DOI: 10.3732/ajb.1700246
+  issue: '9'
+  issued:
+    - year: 2017
+  page: 1370–1381
+  title: >-
+    An exquisitely preserved filmy fern (Hymenophyllaceae) from the Early
+    Cretaceous of Mongolia
+  type: article-journal
+  volume: '104'
+
+- id: Klavins_etal-2004
+  author:
+    - family: Klavins
+      given: Sharon D.
+    - family: Taylor
+      given: Thomas N.
+    - family: Taylor
+      given: Edith L.
+  citation-key: Klavins_etal-2004
+  container-title: Journal of Paleontology
+  DOI: 10.1666/0022-3360(2004)078<0211:MFGFTM>2.0.CO;2
+  issue: '1'
+  issued:
+    - year: 2004
+  page: 211–217
+  title: Matoniaceous ferns (Gleicheniales) from the Middle Triassic
+  type: article-journal
+  volume: '78'
+
+- id: Krafit_Stockey-2008
+  author:
+    - family: Karafit
+      given: Steven J
+    - family: Stockey
+      given: Ruth A
+  citation-key: Krafit_Stockey-2008
+  container-title: Review of Palaeobotany and Palynology
+  DOI: 10.1016/j.revpalbo.2007.11.005
+  issued:
+    - year: 2008
+  page: 163–173
+  title: >-
+    *Paralygodium meckertii* sp. nov. (Schizaeaceae) from the Upper Cretaceous
+    (Coniacian) of Vancouver Island, British Columbia, Canada
+  type: article-journal
+  volume: '149'
+
+- id: Kvacek_Teo-2020
+  author:
+    - family: Kvacek
+      given: Zlatko
+    - family: Teodoridis
+      given: Vasilis
+  citation-key: Kvacek_Teo-2020
+  container-title: Neues Jahrbuch für Geologie und Paläontologie, Abhandlungen
+  DOI: 10.1127/njgpa/2020/0864
+  issued:
+    - year: 2020
+  page: 9–16
+  title: >-
+    A new Oligocene fern of Dryopteridaceae from the Ceské stredohori Mts (Czech
+    Republic)
+  type: article-journal
+  volume: '295'
+
+- id: Kvacek-2001
+  author:
+    - family: Kvacek
+      given: Zlatko
+  citation-key: Kvacek-2001
+  container-title: Feddes Repertorium
+  DOI: 10.1002/fedr.20011120302
+  issued:
+    - year: 2001
+  page: 159–177
+  title: >-
+    A new fossil species of *Polypodium* (Polypodiaceae) from the Oligocene of
+    northern Bohemia (Czech Republic)
+  type: article-journal
+  volume: '112'
+
+- id: Lantz_etal-1999
+  author:
+    - family: Lantz
+      given: Trevor C
+    - family: Rothwell
+      given: Gar W
+    - family: Stockey
+      given: Ruth A
+  citation-key: Lantz_etal-1999
+  container-title: Journal of Plant Research
+  DOI: 10.1007/PL00013890
+  issued:
+    - year: 1999
+  page: 361–381
+  title: >-
+    *Conantiopteris schuchmanii*, gen. et sp. nov., and the role of fossils in
+    resolving the phylogeny of Cyatheaceae s.l.
+  type: article-journal
+  volume: '112'
+
+- id: Liping_etal-2017
+  author:
+    - family: Yuan
+      given: Liping
+    - family: Xie
+      given: Sanping
+    - family: Sun
+      given: Yu
+    - family: Liu
+      given: Zhiwei
+    - family: Chen
+      given: Jie
+    - family: Guo
+      given: Hu
+  citation-key: Liping_etal-2017
+  container-title: Geological Bulletin of China
+  issue: '8'
+  issued:
+    - year: 2017
+  page: 1334–1342
+  publisher: Geological Bulletin of China
+  title: >-
+    Revision on a fossil species of Late Miocene Polypodiaceae from Lin-cang,
+    Yunnan Province, and its biological significance
+  type: article-journal
+  volume: '36'
+
+- id: Loriga_etal-2014
+  author:
+    - family: Lóriga
+      given: Josmaily
+    - family: Schmidt
+      given: Alexander R
+    - family: Moran
+      given: Robbin
+    - family: Feldberg
+      given: Kathrin
+    - family: Schneider
+      given: Harald
+    - family: Heinrichs
+      given: Jochen
+  citation-key: Loriga_etal-2014
+  container-title: American Journal of Botany
+  DOI: 10.3732/ajb.1400262
+  issue: '9'
+  issued:
+    - year: 2014
+  page: 1466–1475
+  title: >-
+    The first fossil of a bolbitidoid fern belongs to the early-divergent
+    lineages of *Elaphoglossum* (Dryopteridaceae)
+  type: article-journal
+  volume: '101'
+
+- id: Lupia_etal-2000
+  author:
+    - family: Lupia
+      given: R
+    - family: Schneider
+      given: H
+    - family: Moeser
+      given: GM
+    - family: Pryer
+      given: KM
+    - family: Crane
+      given: PR
+  citation-key: Lupia_etal-2000
+  container-title: International Journal of Plant Sciences
+  DOI: 10.1086/317567
+  issue: '6'
+  issued:
+    - year: 2000
+  page: 975–988
+  publisher: The University of Chicago Press
+  title: Marsileaceae sporocarps and spores from the Late Cretaceous of Georgia, USA
+  type: article-journal
+  volume: '161'
+
+- id: MacGinitie-1953
+  author:
+    - family: MacGinitie
+      given: H. D.
+  citation-key: MacGinitie-1953
+  issued:
+    - year: 1953
+  page: 1–198
+  publisher: Carniegie Institution of Washington
+  title: Fossil plants of the Florissant Beds, Colorado.
+  type: book
+
+- id: Massini_etal-2006
+  author:
+    - family: García-Massinni
+      given: J.L.
+    - family: Jacobs
+      given: Bonnie Fine
+    - family: Pan
+      given: A.
+    - family: Tabor
+      given: N.
+    - family: Kappelman
+      given: J.
+  citation-key: Massini_etal-2006
+  container-title: International Journal of Plant Sciences
+  DOI: 10.1086/504390
+  issue: '4'
+  issued:
+    - year: 2006
+  page: 909–918
+  title: >-
+    The occurrence of the fern *Acrostichum* in Oligocene volcanic strata of the
+    Northwestern Ethiopian Plateau
+  type: article-journal
+  volume: '167'
+
+- id: Nagalingum_Cantrill-2006
+  author:
+    - family: Nagalingum
+      given: Nathalie S
+    - family: Cantrill
+      given: David J
+  citation-key: Nagalingum_Cantrill-2006
+  container-title: Review of Palaeobotany and Palynology
+  DOI: 10.1016/j.revpalbo.2005.11.001
+  issued:
+    - year: 2006
+  page: 73–93
+  title: >-
+    Early Cretaceous Gleicheniaceae and Matoniaceae (Gleicheniales) from
+    Alexander Island, Antarctica
+  type: article-journal
+  volume: '138'
+
+- id: Naugolnykh_etal-2016
+  author:
+    - family: Naugolnykh
+      given: Serge V
+    - family: Wang
+      given: Li
+    - family: Han
+      given: Meng
+    - family: Hua
+      given: Jian
+  citation-key: Naugolnykh_etal-2016
+  container-title: Journal of Plant Research
+  DOI: 10.1007/s10265-015-0765-0
+  ISSN: 1618-0860
+  issued:
+    - year: 2016
+  page: 3–12
+  title: >-
+    A new find of the fossil *Cyclosorus* from the Eocene of South China and its
+    paleoclimatic implication
+  type: article-journal
+  volume: '129'
+
+- id: Naugolnykh_etal-2020
+  author:
+    - family: Naugolnykh
+      given: Sergey V
+    - family: Tu
+      given: Ming
+    - family: Liu
+      given: Xiao-yan
+    - family: Jin
+      given: Jian-hua
+  citation-key: Naugolnykh_etal-2020
+  container-title: Palaeoworld
+  DOI: 10.1016/j.palwor.2019.07.003
+  ISSN: 1871-174X
+  issued:
+    - year: 2020
+  page: 606–616
+  title: >-
+    A new species of *Lygodium* (Schizaeaceae) from the Buxin Formation (middle
+    Paleocene), Sanshui Basin, South China
+  type: article-journal
+  volume: '29'
+
+- id: Nishida-1989
+  author:
+    - family: Nishida
+      given: Harufumi
+  citation-key: Nishida-1989
+  container-title: Botanical Magazine Tokyo
+  DOI: 10.1007/BF02488568
+  issued:
+    - year: 1989
+  page: 255–282
+  title: >-
+    Structure and affinities of the petrified plants from the Cretaceous of
+    Japan and Saghalien, V. Tree fern stems from Hokkaido, <span
+    class="nocase">*Paracyathocaulis ogurae*</span> gen. et comb. nov. and <span
+    class="nocase">*Cyathocaulis yezopteroides*</span> sp. nov.
+  type: article-journal
+  volume: '102'
+
+- id: Ogura-1927b
+  author:
+    - family: Ogura
+      given: 'Y'
+  citation-key: Ogura-1927b
+  container-title: Journal of the Faculty of Science, Imperial University of Tokyo
+  issued:
+    - year: 1927
+  page: 351–380
+  title: On the structure and affinities of some fossil tree-ferns from Japan
+  type: article-journal
+  volume: '1'
+
+- id: Ogura-1933
+  author:
+    - family: Ogura
+      given: Yudzuru
+  citation-key: Ogura-1933
+  container-title: The Botanical Magazine
+  DOI: 10.15281/jplantres1887.47.748
+  issue: '563'
+  issued:
+    - year: 1933
+  page: 748–754
+  title: >-
+    On the structure of a fossil fern stem of *Cibotium*-type from the Upper
+    Cretaceous of Iwate
+  type: article-journal
+  volume: '48'
+
+- id: Piel-1971
+  author:
+    - family: Piel
+      given: K. M.
+  citation-key: Piel-1971
+  container-title: Canadian Journal of Botany
+  DOI: 10.1139/b71-266
+  issued:
+    - year: 1971
+  page: 1885–1920
+  title: Palynology of Oligocene sediments from central British Columbia
+  type: article-journal
+  volume: '49'
+
+- id: Pigg_etal-2021
+  author:
+    - family: Pigg
+      given: Kathleen B
+    - family: DeVore
+      given: Melanie L
+    - family: Greenwood
+      given: David R
+    - family: Sundue
+      given: Michael A
+    - family: Schwartsburd
+      given: Pedro
+    - family: Basinger
+      given: James F
+  citation-key: Pigg_etal-2021
+  container-title: International Journal of Plant Sciences
+  DOI: 10.1086/715633
+  issue: '9'
+  issued:
+    - year: 2021
+  page: 793–807
+  title: >-
+    Fossil Dennstaedtiaceae and Hymenophyllaceae from the Early Eocene of the
+    Pacific Northwest
+  type: article-journal
+  volume: '182'
+
+- id: Pinson_etal-2018
+  author:
+    - family: Pinson
+      given: Jerald B.
+    - family: Manchester
+      given: Steven R.
+    - family: Sessa
+      given: Emily B.
+  citation-key: Pinson_etal-2018
+  container-title: International Journal of Plant Sciences
+  DOI: 10.1086/698938
+  issue: '8'
+  issued:
+    - year: 2018
+  page: 635–639
+  title: >-
+    *Culcita remberi* sp. nov., an understory fern of Cyatheales from the
+    Miocene of northern Idaho
+  type: article-journal
+  volume: '179'
+
+- id: Poinar_Buckley-2008
+  author:
+    - family: Poinar Jr.
+      given: George O.
+    - family: Buckley
+      given: Ron
+  citation-key: Poinar_Buckley-2008
+  container-title: Journal of the Botanical Research Institute of Texas
+  issued:
+    - year: 2008
+  page: 1175–1182
+  title: >-
+    *Cretacifilix fungiformis* gen. and sp. nov., an eupolypod fern
+    (Polypodiales) in early Cretaceous Burmese Amber
+  type: article-journal
+
+- id: PteridophytePhylogenyGroupI2016
+  author:
+    - literal: Pteridophyte Phylogeny Group I
+  citation-key: PteridophytePhylogenyGroupI2016
+  container-title: Journal of Systematics and Evolution
+  DOI: 10.1111/jse.12229
+  issue: '6'
+  issued:
+    - year: 2016
+  page: 563–603
+  title: A community-derived classification for extant lycophytes and ferns
+  type: article-journal
+  volume: '54'
+
+- id: Rees_Cleal-2004
+  author:
+    - family: Rees
+      given: P.M.
+    - family: Cleal
+      given: C.J.
+  citation-key: Rees_Cleal-2004
+  container-title: Special Papers in Palaentology
+  issued:
+    - year: 2004
+  page: 5–90
+  title: Lower Jurassic floras from Hope Bay and Botany Bay, Antarctica
+  type: article-journal
+  volume: '72'
+
+- id: Regalado_etal-2017
+  author:
+    - family: Regalado
+      given: Ledis
+    - family: Schmidt
+      given: Alexander R
+    - family: Müller
+      given: Patrick
+    - family: Kobbert
+      given: Max J
+    - family: Schneider
+      given: Harald
+    - family: Heinrichs
+      given: Jochen
+  citation-key: Regalado_etal-2017
+  container-title: Cretaceous Research
+  DOI: 10.1016/j.cretres.2016.12.003
+  issued:
+    - year: 2017
+  page: 8–12
+  title: >-
+    The first fossil of Lindsaeaceae (Polypodiales) from the Cretaceous amber
+    forest of Myanmar
+  type: article-journal
+  volume: '72'
+
+- id: Regalado_etal-2017b
+  author:
+    - family: Regalado
+      given: Ledis
+    - family: Schmidt
+      given: Alexander R
+    - family: Appelhans
+      given: Marc S
+    - family: Ilsemann
+      given: Bork
+  citation-key: Regalado_etal-2017b
+  container-title: Scientific Reports
+  issue: '14615'
+  issued:
+    - year: 2017
+  page: 1–9
+  title: >-
+    A fossil species of the enigmatic early polypod fern genus *Cystodium*
+    (Cystodiaceae) in Cretaceous amber from Myanmar
+  type: article-journal
+  volume: '7'
+
+- id: Regalado_etal-2018
+  author:
+    - family: Regalado
+      given: Ledis
+    - family: Schmidt
+      given: Alexander R
+    - family: Krings
+      given: Michael
+    - family: Bechteler
+      given: Julia
+    - family: Schneider
+      given: Harald
+    - family: Heinrichs
+      given: Jochen
+  citation-key: Regalado_etal-2018
+  container-title: Plant Systematics and Evolution
+  DOI: 10.1007/s00606-017-1439-2
+  issue: '1'
+  issued:
+    - year: 2018
+  page: 1–13
+  title: Fossil evidence of eupolypod ferns in the mid-Cretaceous of Myanmar
+  type: article-journal
+  volume: '304'
+
+- id: Regalado_etal-2019
+  author:
+    - family: Regalado
+      given: Ledis
+    - family: Schmidt
+      given: Alexander R
+    - family: Müller
+      given: Patrick
+    - family: Niedermeier
+      given: Lisa
+    - family: Krings
+      given: Michael
+    - family: Schneider
+      given: Harald
+  citation-key: Regalado_etal-2019
+  container-title: Journal of Systematics and Evolution
+  DOI: 10.1111/jse.12514
+  issue: '4'
+  issued:
+    - year: 2019
+  page: 329–338
+  title: >-
+    *Heinrichsia cheilanthoides* gen. et sp. nov., a fossil fern in the family
+    Pteridaceae (Polypodiales) from the Cretaceous amber forests of Myanmar
+  type: article-journal
+  volume: '57'
+
+- id: Ren_etal-2022
+  author:
+    - family: Ren
+      given: Wen-xiu
+    - family: Wu
+      given: Guang-tao
+    - family: Han
+      given: Lei
+    - family: Hua
+      given: Yi-fan
+    - family: Sun
+      given: Bai-nian
+  citation-key: Ren_etal-2022
+  container-title: Historical Biology
+  DOI: 10.1080/08912963.2021.2022135
+  issued:
+    - year: 2022
+  page: 1–8
+  title: >-
+    New species of fossil *Dryopterites* from the Lower Cretaceous in the
+    Zhongkouzi Basin, Beishan area, Northwest China, and its geological
+    significance
+  type: article-journal
+
+- id: Rothwell_etal-2018
+  author:
+    - family: Rothwell
+      given: Gar W
+    - family: Millay
+      given: Michael A
+    - family: Stockey
+      given: Ruth A
+  citation-key: Rothwell_etal-2018
+  container-title: American Journal of Botany
+  DOI: 10.1002/ajb2.1115
+  issue: '8'
+  issued:
+    - year: 2018
+  page: 1304–1314
+  title: Resolving the overall pattern of marattialean fern phylogeny
+  type: article-journal
+  volume: '105'
+
+- id: Rothwell_Stockey-1991
+  author:
+    - family: Rothwell
+      given: Gar W.
+    - family: Stockey
+      given: Ruth
+  citation-key: Rothwell_Stockey-1991
+  container-title: Review of Palaeobotany and Palynology
+  DOI: 10.1016/0034-6667(91)90081-D
+  issued:
+    - year: 1991
+  page: 113–124
+  title: >-
+    *Onoclea sensibilis* in the Paleocene of North America, a dramatic example
+    of structural and ecological stasis
+  type: article-journal
+  volume: '70'
+
+- id: Schneider_etal-2016
+  author:
+    - family: Schneider
+      given: Harald
+    - family: Schmidt
+      given: Alexander R
+    - family: Heinrichs
+      given: Jochen
+  citation-key: Schneider_etal-2016
+  container-title: Perspectives in Plant Ecology, Evolution and Systematics
+  DOI: 10.1016/j.ppees.2016.01.003
+  issued:
+    - year: 2016
+  page: 70–78
+  title: >-
+    Burmese amber fossils bridge the gap in the Cretaceous record of polypod
+    ferns
+  type: article-journal
+  volume: '18'
+
+- id: Schnneider_etal-2015
+  author:
+    - family: Schneider
+      given: Harald
+    - family: Schmidt
+      given: Alexander R
+    - family: Nascimbene
+      given: Paul C
+    - family: Heinrichs
+      given: Jochen
+  citation-key: Schnneider_etal-2015
+  container-title: Organisms Diversity & Evolution
+  DOI: 10.1007/s13127-015-0200-3
+  issued:
+    - year: 2015
+  page: 277–283
+  title: >-
+    A new Dominican amber fossil of the derived fern genus *Pleopeltis* confirms
+    generic stasis in the epiphytic fern diversity of the West Indies
+  type: article-journal
+  volume: '15'
+
+- id: Scott_Galtier-1996
+  author:
+    - family: Scott
+      given: Andrew C
+    - family: Galtier
+      given: Jean
+  citation-key: Scott_Galtier-1996
+  container-title: Review of Palaeobotany and Palynology
+  DOI: 10.1016/0034-6667(95)00028-3
+  issued:
+    - year: 1996
+  page: 141–153
+  title: >-
+    A review of the problems in the stratigraphical, palaeoecological and
+    palaeobiogeographical interpretation of Lower Carboniferous (Dinantian)
+    floras from Western Europe
+  type: article-journal
+  volume: '90'
+
+- id: Serbert_Rothwell-2006
+  author:
+    - family: Serbet
+      given: Rudolph
+    - family: Rothwell
+      given: Gar W
+  citation-key: Serbert_Rothwell-2006
+  container-title: International Journal of Plant Sciences
+  DOI: 10.1086/500996
+  issue: '3'
+  issued:
+    - year: 2006
+  page: 703–709
+  title: >-
+    Anatomically preserved ferns from the late Cretaceous of western North
+    America. II. Blechnaceae/Dryopteridaceae
+  type: article-journal
+  volume: '167'
+
+- id: Skog-1976
+  author:
+    - family: Skog
+      given: Judith E
+  citation-key: Skog-1976
+  container-title: American Fern Journal
+  DOI: 10.2307/1546365
+  issue: '1'
+  issued:
+    - year: 1976
+  page: 8–14
+  title: >-
+    *Loxsomopteris anasilla*, a new fossil fern rhizome from the Cretaceous of
+    Maryland
+  type: article-journal
+  volume: '66'
+
+- id: Smith_etal-2006
+  author:
+    - family: Smith
+      given: Selena Y
+    - family: Stockey
+      given: Ruth A
+    - family: Nishida
+      given: Harufumi
+    - family: Rothwell
+      given: Gar W
+  citation-key: Smith_etal-2006
+  container-title: International Journal of Plant Sciences
+  DOI: 10.1086/501034
+  issued:
+    - year: 2006
+  page: 711–719
+  title: >-
+    *Trawetssia princetonensis* gen. et sp. nov. (Blechnaceae): a permineralized
+    fern from the Middle Eocene Princeton Chert
+  type: article-journal
+  volume: '167'
+
+- id: Stockey_etal-1999
+  author:
+    - family: Stockey
+      given: Ruth A
+    - family: Nishida
+      given: Harufumi
+    - family: Rothwell
+      given: Gar W
+  citation-key: Stockey_etal-1999
+  container-title: International Journal of Plant Sciences
+  DOI: 10.1086/314191
+  issued:
+    - year: 1999
+  page: 1047–1055
+  title: >-
+    Permineralized ferns from the Middle Eocene Princeton Chert. I. <span
+    class="nocase">*Makotopteris princetonensis*</span> gen. et sp. nov.
+    (Athyriaceae)
+  type: article-journal
+  volume: '160'
+
+- id: Stockey_Rothwell-2004
+  author:
+    - family: Stockey
+      given: Ruth A
+    - family: Rothwell
+      given: Gar W
+  citation-key: Stockey_Rothwell-2004
+  container-title: Review of Palaeobotany and Palynology
+  DOI: 10.1016/j.revpalbo.2004.05.002
+  issued:
+    - year: 2004
+  page: 103–114
+  title: >-
+    Cretaceous tree ferns of western North America: <span
+    class="nocase">*Rickwoodopteris hirsuta*</span> gen. et sp. nov.
+    (Cyatheaceae s.l.)
+  type: article-journal
+  volume: '132'
+
+- id: Su_etal-2011
+  author:
+    - family: Su
+      given: Tao
+    - family: Jacques
+      given: Frédéric M B
+    - family: Liu
+      given: Yu-sheng Christopher
+    - family: Xiang
+      given: Jianying
+    - family: Xing
+      given: Yaowu
+    - family: Huang
+      given: Yongjiang
+    - family: Zhou
+      given: Zhekun
+  citation-key: Su_etal-2011
+  container-title: Review of Palaeobotany and Palynology
+  DOI: 10.1016/j.revpalbo.2010.11.011
+  issued:
+    - year: 2011
+  page: 132–142
+  title: A new *Drynaria* (Polypodiaceae) from the Upper Pliocene of Southwest China
+  type: article-journal
+  volume: '164'
+
+- id: Taylor-1967
+  author:
+    - family: Taylor
+      given: Thomas N
+  citation-key: Taylor-1967
+  container-title: Palaeontology
+  issued:
+    - year: 1967
+  page: 43–46
+  title: >-
+    On the structure and phylogenetic relationships of the fern *Radstockia*
+    Kidston
+  type: article-journal
+  volume: '10'
+
+- id: Tian_etal-2018
+  author:
+    - family: Tian
+      given: Ning
+    - family: Wang
+      given: Yong-dong
+    - family: Zhang
+      given: Wu
+    - family: Zheng
+      given: Shao-lin
+    - family: Zhu
+      given: Zhi-peng
+  citation-key: Tian_etal-2018
+  container-title: Palaeobiodiversity and Palaeoenvironments
+  DOI: 10.1007/s12549-017-0313-0
+  issued:
+    - year: 2018
+  page: 165–176
+  title: >-
+    Permineralized osmundaceous and gleicheniaceous ferns from the Jurassic of
+    Inner Mongolia, NE China
+  type: article-journal
+  volume: '98'
+
+- id: Tidwell_etal-1989
+  author:
+    - family: Tidwell
+      given: William D
+    - family: Nishida
+      given: Harufumi
+    - family: Webster
+      given: Neri
+  citation-key: Tidwell_etal-1989
+  container-title: Papers and Proceedings of the Royal Society of Tasmania
+  DOI: 10.26749/rstpp.123.15
+  issued:
+    - year: 1989
+  page: 15–25
+  title: >-
+    *Oguracaulis banksii* gen. et sp. nov., a mid-Mesozoic tree-fern stem from
+    Tasmania, Australia
+  type: article-journal
+  volume: '123'
+
+- id: Traverse_Ames-1979
+  author:
+    - family: Traverse
+      given: A.
+    - family: Ames
+      given: H. T.
+  citation-key: Traverse_Ames-1979
+  issued:
+    - year: 1979
+  page: 1–210
+  publisher: The Pennsylvania State University
+  title: >-
+    Catalog of fossil spores and pollen (Volume 41): Late Cretaceous and Early
+    Tertiary spores and pollen from the USA and the USSR
+  type: book
+  volume: '41'
+
+- id: Upchurch_Mack-1998
+  author:
+    - family: Upchurch Jr.
+      given: Garland R
+    - family: Mack
+      given: Greg H.
+  citation-key: Upchurch_Mack-1998
+  container-title: Las Cruces Country II
+  editor:
+    - family: Mack
+      given: Greg H.
+    - family: Austin
+      given: G.S.
+    - family: Barker
+      given: J. M.
+  issued:
+    - year: 1998
+  page: 209–222
+  publisher: New Mexico Geological Society Guidebook, 49th Field Conference
+  title: >-
+    Latest Cretaceous leaf megafloras from the Jose Creek Member, McRae
+    Formation of New Mexico
+  type: paper-conference
+
+- id: vanKonijnenburg-1989
+  author:
+    - family: Konijnenburg-van Cittert
+      given: J. H.A.
+      non-dropping-particle: van
+  citation-key: vanKonijnenburg-1989
+  container-title: Review of Palaeobotany and Palynology
+  DOI: 10.1016/0034-6667(89)90035-3
+  issued:
+    - year: 1989
+  page: 273–301
+  title: Dicksoniaceous spores in situ from the Jurassic of Yorshire, England
+  type: article-journal
+  volume: '61'
+
+- id: VanUffelen-1991
+  author:
+    - family: Uffelen
+      given: Gerda A
+  citation-key: VanUffelen-1991
+  container-title: 'Blumea: Biodiversity, Evolution and Biogeography of Plants'
+  issue: '1'
+  issued:
+    - year: 1991
+  page: 253–272
+  title: Fossil Polypodiaceae and their spores
+  type: article-journal
+  volume: '36'
+
+- id: Vikulin_etal-1987
+  author:
+    - family: Vikulin
+      given: Sergei V.
+  citation-key: Vikulin_etal-1987
+  container-title: Botanicheskii Zhurnal
+  issued:
+    - year: 1982
+  page: 1–7
+  title: >-
+    A new fossil genus *Prodrynaria* (Polypodiaceae) from the Paleogene flora of
+    Tim (tbe south of the middle Russian upland)
+  type: article-journal
+  volume: '72'
+
+- id: Wang_Pfefferkorn-2008
+  author:
+    - family: Yang
+      given: Shu
+    - family: Wang
+      given: Jun
+    - family: Pfefferkorn
+      given: Hermann W
+  citation-key: Wang_Pfefferkorn-2008
+  container-title: International Journal of Plant Sciences
+  DOI: 10.1086/526458
+  issue: '3'
+  issued:
+    - year: 2008
+  page: 473–482
+  title: >-
+    *Marattia aganzhensis* sp. nov. from the Lower Jurassic Daxigou Formation of
+    Lanzhou, Gansu, China
+  type: article-journal
+  volume: '169'
+
+- id: Xie_etal-2016
+  author:
+    - family: Xie
+      given: Sanping
+    - family: Li
+      given: Binke
+    - family: Zhang
+      given: Sihang
+    - family: Shao
+      given: Yang
+    - family: Wu
+      given: Jingyu
+    - family: Sun
+      given: Bainian
+  citation-key: Xie_etal-2016
+  container-title: PalZ
+  DOI: 10.1007/s12542-016-0304-x
+  issue: '2'
+  issued:
+    - year: 2016
+  page: 413–423
+  title: >-
+    First megafossil record of *Neolepisorus* (Polypodiaceae) from the late
+    Miocene of Yunnan, Southwest China
+  type: article-journal
+  volume: '90'
+
+- id: Xu_etal-2017
+  author:
+    - family: Xu
+      given: Cong-li
+    - family: Huang
+      given: Jian
+    - family: Su
+      given: Tao
+    - family: Zhang
+      given: Xian-chun
+    - family: Li
+      given: Shu-feng
+    - family: Zhou
+      given: Zhe-kun
+  citation-key: Xu_etal-2017
+  container-title: Palaeoworld
+  DOI: 10.1016/j.palwor.2017.01.006
+  issue: '3'
+  issued:
+    - year: 2017
+  page: 543–552
+  title: >-
+    The first megafossil record of *Goniophlebium* (Polypodiaceae) from the
+    Middle Miocene of Asia and its paleoecological implications
+  type: article-journal
+  volume: '26'
+
+- id: Xu_etal-2017b
+  author:
+    - family: Xu
+      given: Kewag
+    - family: Liao
+      given: Wenbo
+    - family: Jin
+      given: Jianhua
+    - family: Liu
+      given: Xiaoyan
+  citation-key: Xu_etal-2017b
+  container-title: Acta Geologica Sinica
+  DOI: 10.1111/1755-6724.13353
+  issue: '4'
+  issued:
+    - year: 2017
+  page: 1179–1189
+  title: >-
+    *Asplenium sanshuiense* sp. nov.: The lowest latitude fossil record of the
+    genus
+  type: article-journal
+  volume: '91'
+
+- id: Yamada_Kato-2002
+  author:
+    - family: Yamada
+      given: Toshihiro
+    - family: Kato
+      given: Masahiro
+  citation-key: Yamada_Kato-2002
+  container-title: International Journal of Plant Sciences
+  DOI: 10.1086/342036
+  issue: '5'
+  issued:
+    - year: 2002
+  page: 715–723
+  title: >-
+    *Regnellites nagashimae* gen. et sp. nov., the oldest macrofossil of
+    Marsileaecae, from the Upper Jurassic to Lower Cretaceous of Western Japan
+  type: article-journal
+  volume: '163'
+
+- id: Yang_etal-2016
+  author:
+    - family: Yu
+      given: Yang
+    - family: Xie
+      given: San-ping
+    - family: Devaney
+      given: John
+    - family: Zhang
+      given: Si-hang
+    - family: Chen
+      given: Tian-yu
+  citation-key: Yang_etal-2016
+  container-title: Palaeobiodiversity and Palaeoenvironments
+  DOI: 10.1007/s12549-020-00429-0
+  issued:
+    - year: 2020
+  page: 939–949
+  title: >-
+    A new species of *Drynaria* (Polypodiaceae) from the late Miocene of Yunnan,
+    Southwest China and implications on the genus evolution
+  type: article-journal
+  volume: '100'
+
+- id: Zhao2019
+  author:
+    - family: Zhao
+      given: Cun-Feng
+    - family: Wei
+      given: Ran
+    - family: Zhang
+      given: Xian-Chun
+    - family: Xiang
+      given: Qiao-Ping
+  citation-key: Zhao2019
+  container-title: Cladistics
+  container-title-short: Cladistics
+  DOI: 10.1111/cla.12403
+  issue: '3'
+  issued:
+    - year: 2020
+  page: 235–258
+  title: >-
+    Backbone phylogeny of *Lepisorus* (Polypodiaceae) and a novel infrageneric
+    classification based on the total evidence from plastid and morphological
+    data
+  type: article-journal
+  volume: '36'
+
+- id: Zhaogi_Taylor-1988
+  author:
+    - family: Zhaoqi
+      given: Yao
+    - family: Taylor
+      given: Thomas N
+  citation-key: Zhaogi_Taylor-1988
+  container-title: Review of Palaeobotany and Palynology
+  DOI: 10.1016/0034-6667(88)90008-5
+  issued:
+    - year: 1988
+  page: 121–134
+  title: On a new Gleicheniaceous fern from the Permian of South China
+  type: article-journal
+  volume: '54'
+...
