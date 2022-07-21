@@ -1,5 +1,5 @@
 ---
-title: "*Supplementary Material 1*"
+title: "*Appendix A1*"
 subtitle: "Tables and Figures"
 mainfont: Roboto-Regular.ttf
 fontsize: 11pt
@@ -30,7 +30,7 @@ header-includes:
   - \pagestyle{fancy}  # enable header
   - \fancypagestyle{plain}{\pagestyle{fancy}} # show header on first page
   - \renewcommand{\headrulewidth}{0pt} # delete line beneath header
-  - \fancyhead[RE,RO]{Supplementary Material 1} # add header on right side
+  - \fancyhead[RE,RO]{Appendix A1} # add header on right side
   - \fancyhead[LO,LE]{} # suppress automatic section header on left side
   - \setlength{\headheight}{13.6pt}
   - \cfoot{\thepage} # footer
@@ -259,7 +259,7 @@ write_csv(genera_diff_table, result_file(s_table("genera_diff"), "csv"))
 Differences in genera included as accepted in "pteridocat" taxonomic database v1.0.0 (https://github.com/fernphy/pteridocat) vs. PPGI [@PteridophytePhylogenyGroupI2016] (`r result_file(s_table("genera_diff"), "csv") %>% fs::path_file()`).
 "diff" is type of difference (pteridocat genus not in PPGI or PPGI genus not in pteridocat).
 "n_species" is the number of accepted species in each genus (pteridocat) or estimated number of species (PPGI).
-References in "notes" column provided at end of Supplementary Materials.
+References in "note" column provided at end of this appendix.
 "World Ferns" refers to @Hassler2022, which was modified to create pteridocat.
 
 ```{r fossils-make}
@@ -323,7 +323,7 @@ write_csv(fossils_table, result_file(s_table("fossils"), "csv"))
 Fossils used as calibration points for molecular dating (`r result_file(s_table("fossils"), "csv") %>% fs::path_file()`).
 "n_fos" is the fossil ID number used in the "ferncal" database v1.0.1 (https://github.com/fernphy/ferncal).
 "minimum_age" is the age used for calibration (Ma); "lower" is the lower limit of the oldest stratigraphic age for the fossil (Ma); "upper" is the upper limit of the oldest stratigraphic age for the fossil (Ma).
-For detailed notes and full references for each fossil, see Appendix S2.
+For detailed notes and full references for each fossil, see Appendix A2.
 
 ```{r rogues-make}
 rogues_table <-
@@ -342,7 +342,7 @@ write_csv(rogues_table, result_file(s_table("rogues"), "csv"))
 ```
 
 **`r s_table("rogues")`**.
-GenBank accessions identified as rogues by all-by-all BLAST.
+GenBank accessions identified as rogues by all-by-all BLAST (`r result_file(s_table("rogues"), "csv") %>% fs::path_file()`).
 "q_family" is the family of the GenBank query (accession).
 "s_family" is the family of the top three best matches (only cases where the top three matches all belong to the same family included).
 All accessions in this table were excluded from further analysis.
@@ -393,6 +393,7 @@ sanger_accessions_selection %>%
 
 **`r s_table("join_by")`**.
 Methods used to join accessions across loci for Sanger dataset.
+"manual" only used for Thelypteridaceae (see Methods).
 Count is number of species.
 
 \newpage
@@ -775,7 +776,7 @@ ggplot(all_ages_with_du) +
 ```
 
 **`r s_figure("du-ages")`**.
-Stem age of fern families (Ma) estimated by selected studies, only including families that were sampled across all studies.
+Stem age of fern families (Ma) estimated by selected studies, only including families with stem ages that were provided across all studies.
 For studies that used methods with confidence intervals, error bars indicate lower and upper 95% highest posterior density levels and point indicates median [@Rothfels2015a; @Testo2016a; @Du2021].
 For other studies, point indicates best (most likely) estimate [@Schuettpelz2009\; this study].
 @Du2021 used six different dating schemes; for details, see that paper.
@@ -869,7 +870,7 @@ ggsave(
 ```
 
 **`r s_figure("ts_fossil_map")`**.
-Consensus phylogeny (Sanger dataset) with node labels indicating placement of fossil constraints of @Testo2016a.
+Consensus phylogeny (Sanger dataset) with node labels indicating placement of fossil constraints of @Testo2016a (`r result_file(s_figure("ts_fossil_map"), "pdf") %>% fs::path_file()`).
 Number for each constraint is age in Ma.
 Outgroup taxon *Zygnema circumcarinatum* (algae) pruned prior to dating analysis and not shown.
 
@@ -1124,8 +1125,8 @@ ggplot(tt_data, aes(x = time, y = log_n_percent, color = dataset)) +
 ```
 
 **`r s_figure("ltt")`**.
-Lineage through time (LTT) plots for the fern order Polypodiales (black; this study) and angiosperms [colored lines\; @Li2019; @Ramirez-Barahona2020].
-Angiosperm datasets labeled with "CC", "RC", or "UC" correspond to the six analysis schemes of @Ramirez-Barahona2020; for details, see that paper.
+Lineage through time (LTT) plots for the fern order Polypodiales (black; this study) and angiosperms [colored lines\; @Li2019; @Ramírez-Barahona2020].
+Angiosperm datasets labeled with "CC", "RC", or "UC" correspond to the six analysis schemes of @Ramírez-Barahona2020; for details, see that paper.
 Log number of lineages shown as percent of total to enable comparison across trees.
 
 \newpage
