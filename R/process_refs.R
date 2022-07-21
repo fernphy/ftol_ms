@@ -30,3 +30,15 @@ extract_citations("ms/manuscript.Rmd") %>%
   mutate(latex = glue::glue("\\citation{[key]}", .open = "[", .close = "]")) %>%
   pull(latex) %>%
   write_lines("working/ftol.aux")
+
+extract_citations(
+   c(
+     "ms/si.rmd", # SI
+     "_targets/user/data_raw/pteridocat_ppgi_diff_notes.csv" # refs in SI tables
+   )
+  ) %>%
+  filter(str_detect(key, "figureHmakeatother", negate = TRUE)) %>%
+  filter(key != "") %>%
+  mutate(latex = glue::glue("\\citation{[key]}", .open = "[", .close = "]")) %>%
+  pull(latex) %>%
+  write_lines("temp/ftol_si1.aux")
