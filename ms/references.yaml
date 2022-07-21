@@ -7,7 +7,7 @@ references:
     given: Alexandre
   - family: Dubuisson
     given: Jean-Yves
-  - family: Hennerquin
+  - family: Hennequin
     given: Sabine
   citation-key: Almeida2017
   container-title: PhytoKeys
@@ -580,6 +580,7 @@ references:
   citation-key: Fawcett2021
   issued:
   - year: 2021
+  number-of-pages: '102'
   publisher: Botanical Research Institute of Texas Press
   title: A Generic Classification of the Thelypteridaceae
   type: book
@@ -700,7 +701,7 @@ references:
   container-title: BMC Evolutionary Biology
   DOI: 10.1186/1471-2148-13-8
   ISSN: 1471-2148
-  issue: '1'
+  issue: '8'
   issued:
   - year: 2013
     month: 1
@@ -1595,39 +1596,6 @@ references:
     transcription factor families
   type: article-journal
   volume: '127'
-- id: Qiu2006
-  author:
-  - family: Qiu
-    given: 'Y'
-  - family: Li
-    given: L
-  - family: Wang
-    given: B
-  - family: Chen
-    given: Z D
-  - family: Knoop
-    given: V
-  - family: Groth-Malonek
-    given: M
-  - family: Dombrovska
-    given: O
-  - family: Lee
-    given: J
-  - family: Kent
-    given: L
-  - family: Rest
-    given: J
-  citation-key: Qiu2006
-  container-title: Proceedings of the National Academy of Sciences
-  DOI: 10.1073/pnas.0603335103
-  ISSN: 1091-6490
-  issue: '42'
-  issued:
-  - year: 2006
-  page: '15511'
-  title: The deepest divergences in land plants inferred from phylogenomic evidence
-  type: article-journal
-  volume: '103'
 - id: Qiu2007
   accessed:
   - year: 2022
@@ -1679,9 +1647,9 @@ references:
 - id: Rai2010
   author:
   - family: Rai
-    given: H
+    given: Hardeep S.
   - family: Graham
-    given: S
+    given: Sean W.
   citation-key: Rai2010
   container-title: American Journal of Botany
   DOI: 10.3732/ajb.0900305
@@ -2108,21 +2076,21 @@ references:
   - family: Shang
     given: Hui
   - family: Sundue
-    given: Michael A
+    given: Michael
   - family: Wei
     given: Ran
   - family: Wei
-    given: Xue Ping
+    given: Xue-Ping
   - family: Luo
-    given: Jun Jie
+    given: Jun-Jie
   - family: Liu
     given: Li
   - family: Schwartsburd
     given: Pedro B.
   - family: Yan
-    given: Yue Hong
+    given: Yue-Hong
   - family: Zhang
-    given: Xian Chun
+    given: Xian-Chun
   citation-key: Shang2018
   container-title: Molecular Phylogenetics and Evolution
   DOI: 10.1016/j.ympev.2018.04.038
@@ -2165,8 +2133,8 @@ references:
   DOI: 10.1093/gigascience/gix116/
   issued:
   - year: 2018
-  page: 1-11
-  title: Large scale phylogenomic analysis resolves a backbone phylogeny in ferns
+  page: gix116
+  title: Large-scale phylogenomic analysis resolves a backbone phylogeny in ferns
   type: article-journal
   volume: '7'
 - id: Shu2022

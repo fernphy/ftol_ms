@@ -92,7 +92,7 @@ references:
   citation-key: Li2019
   container-title: Nature Plants
   container-title-short: Nat. Plants
-  DOI: 10/ghdjtm
+  DOI: 10.1038/s41477-019-0421-0
   ISSN: 2055-0278
   issue: '5'
   issued:
@@ -118,7 +118,7 @@ references:
   title: A community-derived classification for extant lycophytes and ferns
   type: article-journal
   volume: '54'
-- id: Ramirez-Barahona2020
+- id: Ramírez-Barahona2020
   accessed:
   - year: 2020
     month: 7
@@ -130,7 +130,7 @@ references:
     given: Hervé
   - family: Magallón
     given: Susana
-  citation-key: Ramirez-Barahona2020
+  citation-key: Ramírez-Barahona2020
   container-title: Nature Ecology & Evolution
   DOI: 10/gg45rb
   ISSN: 2397-334X
@@ -276,7 +276,7 @@ references:
     given: Alexandre
   - family: Dubuisson
     given: Jean-Yves
-  - family: Hennerquin
+  - family: Hennequin
     given: Sabine
   citation-key: Almeida2017
   container-title: PhytoKeys
@@ -298,8 +298,8 @@ references:
   - family: Applequist
     given: Wendy L.
   citation-key: Applequist2019
-  container-title: TAXON
-  container-title-short: TAXON
+  container-title: Taxon
+  container-title-short: Taxon
   DOI: 10.1002/tax.12113
   ISSN: 0040-0262, 1996-8175
   issue: '4'
@@ -333,7 +333,7 @@ references:
   issued:
   - year: 2017
   page: 83-107
-  title: Phylogenetic analyses place the monotypic Dryopolystichum within Lomariopsidaceae
+  title: Phylogenetic analyses place the monotypic *Dryopolystichum* within Lomariopsidaceae
   type: article-journal
   volume: '78'
 - id: Dong2018b
@@ -349,7 +349,7 @@ references:
   citation-key: Dong2018b
   container-title: Annals of the Missouri Botanical Garden
   container-title-short: Annals of the Missouri Botanical Garden
-  DOI: 10/gmgfp8
+  DOI: 10.3417/2017049
   ISSN: 0026-6493, 2162-4372
   issue: '1'
   issued:
@@ -358,7 +358,7 @@ references:
   language: en
   page: 1-23
   source: DOI.org (Crossref)
-  title: On the Recognition of *Gymnosphaera* As a Distinct Genus in Cyatheaceae <sup/>
+  title: On the recognition of *Gymnosphaera* as a distinct genus in Cyatheaceae <sup/>
   type: article-journal
   URL: http://www.bioone.org/doi/10.3417/2017049
   volume: '103'
@@ -385,7 +385,7 @@ references:
   citation-key: Dong2018c
   container-title: Journal of Systematics and Evolution
   container-title-short: Jnl of Sytematics Evolution
-  DOI: 10/gdbgs5
+  DOI: 10.1111/jse.12292
   ISSN: '16744918'
   issue: '2'
   issued:
@@ -425,7 +425,7 @@ references:
   citation-key: Dong2020
   container-title: Journal of Systematics and Evolution
   container-title-short: J. Syst. Evol.
-  DOI: 10/gn9h7f
+  DOI: 10.1111/jse.12679
   ISSN: 1674-4918, 1759-6831
   issued:
   - year: 2020
@@ -448,6 +448,7 @@ references:
   citation-key: Fawcett2021
   issued:
   - year: 2021
+  number-of-pages: '102'
   publisher: Botanical Research Institute of Texas Press
   title: A Generic Classification of the Thelypteridaceae
   type: book
@@ -489,7 +490,7 @@ references:
   citation-key: George2019
   container-title: Systematic Botany
   container-title-short: Systematic Botany
-  DOI: 10/gphjp4
+  DOI: 10.1600/036364419x15620113920536
   ISSN: 0363-6445
   issue: '3'
   issued:
@@ -499,7 +500,7 @@ references:
   language: en
   page: 471-482
   source: DOI.org (Crossref)
-  title: '*Baja* : A New Monospecific Genus Segregated from *Cheilanthes* s. l. (Pteridaceae)'
+  title: '*Baja*: A new monospecific genus segregated from *Cheilanthes* s.l. (Pteridaceae)'
   title-short: '*Baja*'
   type: article-journal
   URL: https://www.ingentaconnect.com/content/10.1600/036364419X15620113920536
@@ -548,7 +549,7 @@ references:
   citation-key: Liu2020c
   container-title: Plant Systematics and Evolution
   container-title-short: Plant Syst Evol
-  DOI: 10/gg5mz9
+  DOI: 10.1007/s00606-020-01657-9
   ISSN: 0378-2697, 2199-6881
   issue: '2'
   issued:
@@ -557,7 +558,7 @@ references:
   language: en
   page: '30'
   source: DOI.org (Crossref)
-  title: 'The significance of Rouxopteris (Gleicheniaceae, Polypodiopsida): a new
+  title: 'The significance of *Rouxopteris* (Gleicheniaceae, Polypodiopsida): A new
     genus endemic to the Madagascan region'
   title-short: The significance of Rouxopteris (Gleicheniaceae, Polypodiopsida)
   type: article-journal
@@ -596,9 +597,9 @@ references:
   - family: Zhang
     given: Li‐Bing
   citation-key: Lu2019
-  container-title: TAXON
+  container-title: Taxon
   container-title-short: TAXON
-  DOI: 10/gmxqm6
+  DOI: 10.1002/tax.12180
   ISSN: 0040-0262, 1996-8175
   issue: '6'
   issued:
@@ -627,8 +628,8 @@ references:
     given: Michael
   citation-key: Moran2019
   container-title: TAXON
-  container-title-short: TAXON
-  DOI: 10/gphjp8
+  container-title-short: Taxon
+  DOI: 10.1002/tax.12063
   ISSN: 0040-0262, 1996-8175
   issue: '3'
   issued:
@@ -638,7 +639,7 @@ references:
   page: 425-441
   source: DOI.org (Crossref)
   title: Phylogenetic relationships of Neotropical lady ferns (Athyriaceae), with
-    a description of *Ephemeropteris* , gen. nov.
+    a description of *Ephemeropteris*, gen. nov.
   type: article-journal
   URL: https://onlinelibrary.wiley.com/doi/10.1002/tax.12063
   volume: '68'
@@ -655,7 +656,7 @@ references:
   citation-key: Parris2020
   container-title: Phytotaxa
   container-title-short: Phytotaxa
-  DOI: 10/ggw7cf
+  DOI: 10.11646/phytotaxa.436.1.4
   ISSN: 1179-3163, 1179-3155
   issue: '1'
   issued:
@@ -664,7 +665,7 @@ references:
     day: 16
   page: 45-54
   source: DOI.org (Crossref)
-  title: 'The fern genus Oreogrammitis (Grammitidoideae: Polypodiaceae) re-defined'
+  title: 'The fern genus *Oreogrammitis* (Grammitidoideae: Polypodiaceae) re-defined'
   title-short: The fern genus Oreogrammitis (Grammitidoideae
   type: article-journal
   URL: https://www.biotaxa.org/Phytotaxa/article/view/phytotaxa.436.1.4
@@ -780,21 +781,21 @@ references:
   - family: Shang
     given: Hui
   - family: Sundue
-    given: Michael A
+    given: Michael
   - family: Wei
     given: Ran
   - family: Wei
-    given: Xue Ping
+    given: Xue-Ping
   - family: Luo
-    given: Jun Jie
+    given: Jun-Jie
   - family: Liu
     given: Li
   - family: Schwartsburd
     given: Pedro B.
   - family: Yan
-    given: Yue Hong
+    given: Yue-Hong
   - family: Zhang
-    given: Xian Chun
+    given: Xian-Chun
   citation-key: Shang2018
   container-title: Molecular Phylogenetics and Evolution
   DOI: 10.1016/j.ympev.2018.04.038
@@ -848,7 +849,7 @@ references:
   - year: 2018
   page: 25-36
   PMID: '29111475'
-  title: A total-evidence phylogeny of the lady fern genus Athyrium Roth (Athyriaceae)
+  title: A total-evidence phylogeny of the lady fern genus *Athyrium* Roth (Athyriaceae)
     with a new infrageneric classification
   type: article-journal
   URL: https://doi.org/10.1016/j.ympev.2017.10.019
@@ -897,7 +898,7 @@ references:
   - year: 2017
   page: 59-72
   title: 'Phylogeny of the fern subfamily Pteridoideae (Pteridaceae; Pteridophyta),
-    with the description of a new genus: Gastoniella'
+    with the description of a new genus: *Gastoniella*'
   type: article-journal
   URL: http://dx.doi.org/10.1016/j.ympev.2016.12.037
   volume: '109'
@@ -938,7 +939,7 @@ references:
   citation-key: Zhang2020b
   container-title: Cladistics
   container-title-short: Cladistics
-  DOI: 10/gmxqnt
+  DOI: 10.1111/cla.12408
   ISSN: 0748-3007, 1096-0031
   issue: '4'
   issued:
@@ -963,14 +964,14 @@ references:
   - family: Xiang
     given: Qiao Ping
   citation-key: Zhao2019
-  container-title: Cladistics-the International Journal of The Willi Hennig Society
+  container-title: Cladistics
   container-title-short: Cladistics
   DOI: 10.1111/cla.12403
   ISSN: '10960031'
   issued:
   - year: 2019
   page: 1-24
-  title: Backbone phylogeny of Lepisorus (Polypodiaceae) and a novel infrageneric
+  title: Backbone phylogeny of *Lepisorus* (Polypodiaceae) and a novel infrageneric
     classification based on the total evidence from plastid and morphological data
   type: article-journal
 - id: Zhou2017
