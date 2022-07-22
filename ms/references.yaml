@@ -1596,6 +1596,71 @@ references:
     transcription factor families
   type: article-journal
   volume: '127'
+- id: Qiu2006
+  accessed:
+  - year: 2022
+    month: 7
+    day: 21
+  author:
+  - family: Qiu
+    given: Yin-Long
+  - family: Li
+    given: Libo
+  - family: Wang
+    given: Bin
+  - family: Chen
+    given: Zhiduan
+  - family: Knoop
+    given: Volker
+  - family: Groth-Malonek
+    given: Milena
+  - family: Dombrovska
+    given: Olena
+  - family: Lee
+    given: Jungho
+  - family: Kent
+    given: Livija
+  - family: Rest
+    given: Joshua
+  - family: Estabrook
+    given: George F.
+  - family: Hendry
+    given: Tory A.
+  - family: Taylor
+    given: David W.
+  - family: Testa
+    given: Christopher M.
+  - family: Ambros
+    given: Mathew
+  - family: Crandall-Stotler
+    given: Barbara
+  - family: Duff
+    given: R. Joel
+  - family: Stech
+    given: Michael
+  - family: Frey
+    given: Wolfgang
+  - family: Quandt
+    given: Dietmar
+  - family: Davis
+    given: Charles C.
+  citation-key: Qiu2006
+  container-title: Proceedings of the National Academy of Sciences
+  container-title-short: Proc. Natl. Acad. Sci. U.S.A.
+  DOI: 10.1073/pnas.0603335103
+  ISSN: 0027-8424, 1091-6490
+  issue: '42'
+  issued:
+  - year: 2006
+    month: 10
+    day: 17
+  language: en
+  page: 15511-15516
+  source: DOI.org (Crossref)
+  title: The deepest divergences in land plants inferred from phylogenomic evidence
+  type: article-journal
+  URL: https://pnas.org/doi/full/10.1073/pnas.0603335103
+  volume: '103'
 - id: Qiu2007
   accessed:
   - year: 2022
