@@ -206,7 +206,7 @@ We anticipate FTOL will be particularly relevant for macroecological studies at 
 Ferns (`r ca` `r number(12000)` species) are the second most diverse lineage of vascular plants after angiosperms (`r ca` `r number(300000)` species) and are a useful study system for understanding processes of biogeography [`r eg`, @Tryon1986; @Kato1993], community ecology [`r eg`, @Hennequin2014; @Lehtonen2015], and speciation [`r eg`, @Kao2020].
 Key to any investigation of evolutionary history in this group is a well-sampled phylogeny.
 Fortunately, ferns have received relatively intense focus from molecular systematists, which has resulted in the publication of trees for all major clades and DNA sequence data from nearly half of all currently recognized fern species.
-Thus, there is both a pressing need and sufficient sampling for a globally sampled fern phylogeny.
+Thus, there is both a pressing need and sufficient sampling for a global, species-level fern phylogeny.
 
 Past efforts to construct such a global phylogeny have steadily expanded their sampling, at first by mostly generating new sequences, then later by mining GenBank [@Pryer2004a; @Lehtonen2011; @Schuettpelz2007; @Testo2016a].
 Indeed, the growth of plastid fern accessions in GenBank shows no sign of slowing since the most recent global fern phylogeny [@Testo2016a\; `r figure("genbank")`].
@@ -907,7 +907,7 @@ The `r extract_iqtree_mod(plastome_iqtree_log)` model was selected according to 
 `r str_to_sentence(n_converge)` of the ten runs converged (correlation coefficient of split occurrence frequencies >0.99), but the run with the highest log-likelihood, from which the final tree was selected, did not converge (correlation coefficient 0.976 after `r number(1000)` iterations).
 The consensus tree had higher log-likelihood (`r number(best_con_score)`) than the ML tree (`r number(best_ml_score)`), so we only present the topology and divergence times estimated from the consensus tree.
 
-Ferns are strongly supported as monophyletic (BS `r ferns_bs`; all subsequent relationships mentioned received BS ≥ `r percent(.98)` in the backbone phylogeny unless otherwise indicated).
+Ferns are strongly supported as monophyletic (BS `r ferns_bs`; all subsequent relationships mentioned received BS > `r percent(.98)` in the backbone phylogeny unless otherwise indicated).
 The first split within ferns separates a clade including Equisetidae and Ophioglossidae from all other species (Figures `r figure_num("backbone")`, `r s_figure_num("backbone_full")`).
 The next split separates Marattiales from the remaining ferns, the leptosporangiates (Polypodiidae).
 Within leptosporangiate ferns, Osmundales is sister to all other species.
@@ -920,7 +920,7 @@ All sampled orders, suborders, families, and subfamilies were recovered as monop
 `r fern_monophy_summ$genus$No$n %>% english::english() %>% str_to_sentence()` genera (`r fern_monophy_summ$genus$No$p`) were non-monophyletic (`r s_table("monophy")`).
 The subfamilies with the most non-monophyletic genera were `r top_nonmono_subfam$subfamily[[1]]` (`r top_nonmono_subfam$n[[1]]`), `r top_nonmono_subfam$subfamily[[2]]` (`r top_nonmono_subfam$n[[2]]`), and `r top_nonmono_subfam$subfamily[[3]]` (`r top_nonmono_subfam$n[[3]]`); other (sub)families each had four or fewer non-monophyletic genera (`r s_table("nonmono_gen")`).
 
-Bootstrap support was generally moderate to high across the tree (mean `r bs$sanger$mean` ± `r bs$sanger$sd`; Sanger phylogeny) and particularly high at deeper nodes (mean `r bs$plastome$mean` ± `r bs$plastome$sd`; `r plastome_bs100$true$percent` of nodes with 100% BS; backbone phylogeny).
+Bootstrap support was generally moderate to high across the tree (mean `r bs$sanger$mean` ± `r bs$sanger$sd`; Sanger phylogeny) and particularly high at deeper nodes (mean `r bs$plastome$mean` ± `r bs$plastome$sd`, `r plastome_bs100$true$percent` of nodes with 100% BS; backbone phylogeny).
 Relationships within some genera were less well-supported, including *Cyathea*, *Amauropelta*, and parts of *Dryopteris* and *Elaphoglossum* (`r s_figure("bs")`).
 
 ## Divergence times
@@ -1044,7 +1044,7 @@ We chose our approach because it allowed us to implement various steps specific 
 For example, we integrate our phylogeny with a custom taxonomy for ferns (pteridocat), tailor alignment strategies to locus and taxon (fern-wide alignment for coding loci, nested alignment within families for non-coding loci), inspect intermediate results and modify input based on expert taxonomic knowledge (curation of sample inclusion and exclusion lists), and employ a custom set of criteria for selecting and concatenating sequences within species.
 While we have not sought to make our workflow available as a general tool due to its high degree of specialization, some of the methods employed here could be adapted and implemented in other phylogeny pipelines.
 
-## Accesibility and usage of FTOL
+## Accesibility and usage
 
 We have sought to make FTOL easily available to support research on the evolution and ecology of ferns.
 FTOL is available via the ftolr R package [@ftol2022c], and a web portal (https://fernphy.github.io).
@@ -1057,7 +1057,7 @@ The pteridocat package includes the pteridocat taxonomic database as a data fram
 The taxastand package includes functions to resolve taxonomic names while taking into account variation in taxonomic author format and orthographic variation.
 By using these two packages in combination, it should be straightforward for other researchers to map their own data onto FTOL, thus greatly enabling and enhancing studies including, but not limited to, comparative phylogenetics, biogeography, and community ecology in ferns.
 
-## FTOL as a living, community-driven resource
+## A living, community-driven resource
 
 We want to be clear that FTOL is in no way meant to be the "official" fern phylogeny; it is simply one reasonable hypothesis that has been designed to be maximally inclusive at the species level.
 FTOL cannot substitute for careful systematic studies at finer taxonomic scales that include sampling of multiple individuals per species and/or other sources (`r eg`, morphological, nuclear) of data, and such studies continue to be vital to our understanding of fern evolution.
